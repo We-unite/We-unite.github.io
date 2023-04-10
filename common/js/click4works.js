@@ -10,10 +10,10 @@ window.onclick = function (e) {
         yanhua.appendChild(div);
         div.style.setProperty("--t", y + (Math.random() - 0.5) * 300 + "px")
         div.style.setProperty("--l", x + (Math.random() - 0.5) * 300 + "px")
-        div.style.animation = "yanhua 1s"
+        div.style.animation = "yanhua 2s"
         setTimeout(() => {
             div.remove()
-        }, 1000);
+        }, 2000);
     }
 
 }
