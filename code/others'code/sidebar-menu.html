@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>导航栏示例</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        
+        .navigation {
+            background-color: black;
+            /*导航栏的背景色*/
+        }
+        
+        .navigation>li {
+            display: inline-block;
+            position: relative;
+            padding: 10px;
+            vertical-align: middle;
+            /*使得导航栏中的列表居中显示*/
+        }
+        
+        .navigation>li>a {
+            text-decoration: none;
+            color: white;
+            padding: 15px;
+        }
+        
+        .navigation>li:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            /*鼠标悬停变色*/
+        }
+        
+        .navigation>li:hover>a {
+            color: black;
+            /*鼠标悬停变色*/
+        }
+        
+        .logo {
+            display: block;
+        }
+        
+        .list_down {
+            display: none;
+            /*通过hover选择器来显示菜单，此处默认为隐藏*/
+            position: absolute;
+            /*使得下拉列表向下覆盖*/
+            list-style-type: none;
+            /*取消ul的样式*/
+            margin-top: 10px;
+            margin-left: -10px;
+            width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            /*添加阴影*/
+        }
+        
+        .list_down li {
+            display: block;
+            background-color: rgba(255, 255, 255, 0.9)
+        }
+        
+        .list_down li:hover {
+            background-color: black;
+            /*鼠标悬停变色*/
+        }
+        
+        .list_down li:hover>a {
+            color: white;
+            /*鼠标悬停变色*/
+        }
+        
+        .list_right {
+            display: none;
+            /*通过hover选择器来显示菜单，此处默认为隐藏*/
+            position: absolute;
+            margin-left: 150px;
+            margin-top: -51px;
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            /*添加阴影*/
+        }
+        
+        .list_right a,
+        .list_down li a {
+            display: block;
+            text-decoration: none;
+            color: black;
+            padding: 15px;
+        }
+        
+        .list_right a:hover {
+            background-color: black;
+            color: white;
+            /*鼠标悬停变色*/
+        }
+        
+        .list_down .button2:hover .list_right {
+            display: block;
+        }
+        
+        .navigation .button1:hover .list_down {
+            display: block;
+            /*显示下拉菜单*/
+        }
+        
+        .text {
+            margin: 20px;
+            /*文本*/
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="navigation">
+        <li><img class="logo" src="AMD-LOGO.png" alt="amdlogo" height="50" width="160"></li>
+        <li class="button1"><a href="#">处理器</a>
+            <ul class="list_down">
+                <li class="button2"><a href="#">台式机</a>
+                    <div class="list_right">
+                        <a href="#">消费类处理器:</a>
+                        <a href="#">锐龙 THREADRIPPER</a>
+                        <a href="#">锐龙</a>
+                        <a href="#">锐龙搭载显卡</a>
+                        <a href="#">速龙搭载显卡</a>
+                        <a href="#">商业用户:</a>
+                        <a href="#">锐龙 PRO</a>
+                        <a href="#">速龙 PRO</a>
+                        <a href="#">AMD PRO 技术</a>
+                        <a href="#">商用电脑</a>
+                    </div>
+                </li>
+                <li><a href="#">笔记本电脑</a></li>
+                <li><a href="#">工作站</a></li>
+                <li><a href="#">服务器</a></li>
+                <li><a href="#">嵌入式解决方案</a></li>
+                <li><a href="#">半定制</a></li>
+                <li><a href="#">产品规格</a></li>
+                <li><a href="#">技术</a></li>
+            </ul>
+        </li>
+        <li><a href="#">显卡</a></li>
+        <li><a href="#">游戏</a></li>
+        <li><a href="#">企业解决方案</a></li>
+        <li><a href="#">购买</a></li>
+        <li><a href="#">驱动与支持</a></li>
+        <li><a href="#">行业解决方案</a></li>
+    </ul>
+    <div class="text">
+        <h1>AMD at Chinajoy 2021</h1>
+        <h2>极速制胜 制霸游戏</h2>
+        <p>具体内容</p>
+    </div>
+
+</body>
+
+</html>
+
+作者：我爱小锦鲤
+链接：https://juejin.cn/post/6989085136373415973
+来源：稀土掘金
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。

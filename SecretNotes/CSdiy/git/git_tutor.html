@@ -1,0 +1,951 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width initial-scale=1'>
+    <title>Git tutor</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/github.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4secret.js"></script>
+
+</head>
+
+<body class='typora-export os-windows'>
+    <div class='typora-export-content'>
+        <div id='write' class=''>
+            <p class="title">Git tutor<br>in MIT Missing Semester</p>
+            <p class="time"><a href='https://missing.csail.mit.edu/2020/version-control/'><span>原文网址</span></a></p>
+            <div class='md-toc' mdtype='toc'>
+                <p class="md-toc-content" role="list"><span role="listitem" class="md-toc-item md-toc-h1"
+                        data-ref="n69"><a class="md-toc-inner" href="#数据结构">数据结构</a></span><span role="listitem"
+                        class="md-toc-item md-toc-h2" data-ref="n71"><a class="md-toc-inner"
+                            href="#基本说明">基本说明</a></span><span role="listitem" class="md-toc-item md-toc-h2"
+                        data-ref="n96"><a class="md-toc-inner" href="#继续">继续</a></span><span role="listitem"
+                        class="md-toc-item md-toc-h2" data-ref="n100"><a class="md-toc-inner"
+                            href="#文中伪代码解释">文中伪代码解释</a></span><span role="listitem" class="md-toc-item md-toc-h2"
+                        data-ref="n103"><a class="md-toc-inner" href="#仓库">仓库</a></span><span role="listitem"
+                        class="md-toc-item md-toc-h1" data-ref="n105"><a class="md-toc-inner"
+                            href="#部分说明课后习题">部分说明课后习题</a></span></p>
+            </div>
+            <h1 id='数据结构'><span>数据结构</span></h1>
+            <div class="md-diagram-panel md-fences-adv-panel"><svg id="mermaidChart1" width="100%"
+                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img"
+                    aria-labelledby="chart-title-mermaidChart1 chart-desc-mermaidChart1" height="310.5999946594238"
+                    style="max-width: 911.8125076293945px;" viewBox="0 0 911.8125076293945 310.5999946594238">
+                    <title id="chart-title-mermaidChart1"></title>
+                    <desc id="chart-desc-mermaidChart1"></desc>
+                    <style>
+                        #mermaidChart1 {
+                            font-family: sans-serif;
+                            font-size: 16px;
+                            fill: #333;
+                        }
+
+                        #mermaidChart1 .error-icon {
+                            fill: #552222;
+                        }
+
+                        #mermaidChart1 .error-text {
+                            fill: #552222;
+                            stroke: #552222;
+                        }
+
+                        #mermaidChart1 .edge-thickness-normal {
+                            stroke-width: 2px;
+                        }
+
+                        #mermaidChart1 .edge-thickness-thick {
+                            stroke-width: 3.5px;
+                        }
+
+                        #mermaidChart1 .edge-pattern-solid {
+                            stroke-dasharray: 0;
+                        }
+
+                        #mermaidChart1 .edge-pattern-dashed {
+                            stroke-dasharray: 3;
+                        }
+
+                        #mermaidChart1 .edge-pattern-dotted {
+                            stroke-dasharray: 2;
+                        }
+
+                        #mermaidChart1 .marker {
+                            fill: #333333;
+                            stroke: #333333;
+                        }
+
+                        #mermaidChart1 .marker.cross {
+                            stroke: #333333;
+                        }
+
+                        #mermaidChart1 svg {
+                            font-family: sans-serif;
+                            font-size: 16px;
+                        }
+
+                        #mermaidChart1 .label {
+                            font-family: sans-serif;
+                            color: #333;
+                        }
+
+                        #mermaidChart1 .cluster-label text {
+                            fill: #333;
+                        }
+
+                        #mermaidChart1 .cluster-label span {
+                            color: #333;
+                        }
+
+                        #mermaidChart1 .label text,
+                        #mermaidChart1 span {
+                            fill: #333;
+                            color: #333;
+                        }
+
+                        #mermaidChart1 .node rect,
+                        #mermaidChart1 .node circle,
+                        #mermaidChart1 .node ellipse,
+                        #mermaidChart1 .node polygon,
+                        #mermaidChart1 .node path {
+                            fill: #ECECFF;
+                            stroke: #9370DB;
+                            stroke-width: 1px;
+                        }
+
+                        #mermaidChart1 .node .label {
+                            text-align: center;
+                        }
+
+                        #mermaidChart1 .node.clickable {
+                            cursor: pointer;
+                        }
+
+                        #mermaidChart1 .arrowheadPath {
+                            fill: #333333;
+                        }
+
+                        #mermaidChart1 .edgePath .path {
+                            stroke: #333333;
+                            stroke-width: 2.0px;
+                        }
+
+                        #mermaidChart1 .flowchart-link {
+                            stroke: #333333;
+                            fill: none;
+                        }
+
+                        #mermaidChart1 .edgeLabel {
+                            background-color: #e8e8e8;
+                            text-align: center;
+                        }
+
+                        #mermaidChart1 .edgeLabel rect {
+                            opacity: 0.5;
+                            background-color: #e8e8e8;
+                            fill: #e8e8e8;
+                        }
+
+                        #mermaidChart1 .cluster rect {
+                            fill: #ffffde;
+                            stroke: #aaaa33;
+                            stroke-width: 1px;
+                        }
+
+                        #mermaidChart1 .cluster text {
+                            fill: #333;
+                        }
+
+                        #mermaidChart1 .cluster span {
+                            color: #333;
+                        }
+
+                        #mermaidChart1 div.mermaidTooltip {
+                            position: absolute;
+                            text-align: center;
+                            max-width: 200px;
+                            padding: 2px;
+                            font-family: sans-serif;
+                            font-size: 12px;
+                            background: hsl(80, 100%, 96.2745098039%);
+                            border: 1px solid #aaaa33;
+                            border-radius: 2px;
+                            pointer-events: none;
+                            z-index: 100;
+                        }
+
+                        #mermaidChart1 :root {
+                            --mermaid-font-family: sans-serif;
+                        }
+
+                        #mermaidChart1 :root {
+                            --mermaid-alt-font-family: sans-serif;
+                        }
+                    </style>
+                    <g transform="translate(0, 0)">
+                        <g class="output">
+                            <g class="clusters"></g>
+                            <g class="edgePaths">
+                                <g class="edgePath LS-A LE-B" id="L-A-B" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M117.4375,133.81068686569964L197,155.2999973297119L222,155.2999973297119"
+                                        marker-end="url(#arrowhead89)"
+                                        style="fill:none;stroke-width:2px;stroke-dasharray:3;"></path>
+                                    <defs>
+                                        <marker id="arrowhead89" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-B LE-C" id="L-B-C" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M272,169.74999713897705L297,184.1999969482422L359.90625381469727,184.1999969482422"
+                                        marker-end="url(#arrowhead90)"
+                                        style="fill:none;stroke-width:2px;stroke-dasharray:3;"></path>
+                                    <defs>
+                                        <marker id="arrowhead90" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-A LE-D" id="L-A-D" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M117.4375,116.42505622021505L197,87.49999809265137L247,87.49999809265137L297,87.49999809265137L399.1062545776367,87.49999809265137L501.21250915527344,87.49999809265137L541.4562568664551,108.62304463309731"
+                                        marker-end="url(#arrowhead91)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead91" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-B LE-D" id="L-B-D" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M272,140.84999752044678L297,126.39999771118164L399.1062545776367,126.39999771118164L501.21250915527344,126.39999771118164L541.4562568664551,126.39999771118164"
+                                        marker-end="url(#arrowhead92)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead92" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-C LE-D" id="L-C-D" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M438.3062553405762,184.1999969482422L501.21250915527344,184.1999969482422L546.0903207043422,149.1999969482422"
+                                        marker-end="url(#arrowhead93)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead93" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-F LE-E" id="L-F-E" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M476.21250915527344,279.7999954223633L501.21250915527344,279.7999954223633L526.2125091552734,279.7999954223633"
+                                        marker-end="url(#arrowhead94)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead94" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-D LE-G" id="L-D-G" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M609.1937599182129,126.39999771118164L649.4375076293945,126.39999771118164L697.0840025444849,199.1999969482422"
+                                        marker-end="url(#arrowhead95)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead95" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-E LE-G" id="L-E-G" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M624.4375076293945,279.7999954223633L649.4375076293945,279.7999954223633L687.325158589606,244.79999542236328"
+                                        marker-end="url(#arrowhead96)" style="fill:none"></path>
+                                    <defs>
+                                        <marker id="arrowhead96" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-E LE-H" id="L-E-H" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M584.112137615037,256.99999618530273L649.4375076293945,87.49999809265137L712.0062561035156,87.49999809265137L774.5750045776367,87.49999809265137L838.6208378813021,199.1999969482422"
+                                        marker-end="url(#arrowhead97)"
+                                        style="fill:none;stroke-width:2px;stroke-dasharray:3;"></path>
+                                    <defs>
+                                        <marker id="arrowhead97" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                                <g class="edgePath LS-G LE-H" id="L-G-H" style="opacity: 1;">
+                                    <path class="path"
+                                        d="M749.5750045776367,221.99999618530273L774.5750045776367,221.99999618530273L799.5750045776367,221.99999618530273"
+                                        marker-end="url(#arrowhead98)"
+                                        style="fill:none;stroke-width:2px;stroke-dasharray:3;"></path>
+                                    <defs>
+                                        <marker id="arrowhead98" viewBox="0 0 10 10" refX="9" refY="5"
+                                            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+                                            <path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath"
+                                                style="stroke-width: 1; stroke-dasharray: 1, 0;"></path>
+                                        </marker>
+                                    </defs>
+                                </g>
+                            </g>
+                            <g class="edgeLabels">
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-A-B"
+                                                    class="edgeLabel L-LS-A' L-LE-B" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-B-C"
+                                                    class="edgeLabel L-LS-B' L-LE-C" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-A-D"
+                                                    class="edgeLabel L-LS-A' L-LE-D" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-B-D"
+                                                    class="edgeLabel L-LS-B' L-LE-D" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-C-D"
+                                                    class="edgeLabel L-LS-C' L-LE-D" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-F-E"
+                                                    class="edgeLabel L-LS-F' L-LE-E" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-D-G"
+                                                    class="edgeLabel L-LS-D' L-LE-G" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-E-G"
+                                                    class="edgeLabel L-LS-E' L-LE-G" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-E-H"
+                                                    class="edgeLabel L-LS-E' L-LE-H" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                                <g class="edgeLabel" transform="" style="opacity: 1;">
+                                    <g transform="translate(0,0)" class="label">
+                                        <rect rx="0" ry="0" width="0" height="0"></rect>
+                                        <foreignObject width="0" height="0">
+                                            <div xmlns="http://www.w3.org/1999/xhtml"
+                                                style="display: inline-block; white-space: nowrap;"><span id="L-L-G-H"
+                                                    class="edgeLabel L-LS-G' L-LE-H" style=""></span></div>
+                                        </foreignObject>
+                                    </g>
+                                </g>
+                            </g>
+                            <g class="nodes">
+                                <g class="node default" id="flowchart-z-63" transform="translate(90,30.799999237060547)"
+                                    style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-82" y="-22.800000190734863" width="164"
+                                        height="45.60000038146973" class="label-container"></rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-72,-12.800000190734863)">
+                                            <foreignObject width="144" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">你猜我为什么在这里</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-A-64" transform="translate(90,126.39999771118164)"
+                                    style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-27.4375" y="-22.800000190734863" width="54.875"
+                                        height="45.60000038146973" class="label-container"></rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-17.4375,-12.800000190734863)">
+                                            <foreignObject width="34.875" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">bolb</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-B-65" transform="translate(247,155.2999973297119)"
+                                    style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-25" y="-22.800000190734863" width="50"
+                                        height="45.60000038146973" class="label-container"></rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-15,-12.800000190734863)">
+                                            <foreignObject width="30" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">tree</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-C-67"
+                                    transform="translate(399.1062545776367,184.1999969482422)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-39.20000076293945" y="-22.800000190734863"
+                                        width="78.4000015258789" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-29.200000762939453,-12.800000190734863)">
+                                            <foreignObject width="58.400001525878906" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">commit</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-D-69"
+                                    transform="translate(575.325008392334,126.39999771118164)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-33.86874961853027" y="-22.800000190734863"
+                                        width="67.73749923706055" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-23.868749618530273,-12.800000190734863)">
+                                            <foreignObject width="47.73749923706055" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">object</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-F-74"
+                                    transform="translate(399.1062545776367,279.7999954223633)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-77.10625457763672" y="-22.800000190734863"
+                                        width="154.21250915527344" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-67.10625457763672,-12.800000190734863)">
+                                            <foreignObject width="134.21250915527344" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">object的Hash寻址
+                                                </div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-E-75"
+                                    transform="translate(575.325008392334,279.7999954223633)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-49.11249923706055" y="-22.800000190734863"
+                                        width="98.2249984741211" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-39.11249923706055,-12.800000190734863)">
+                                            <foreignObject width="78.2249984741211" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">object的id</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-G-77"
+                                    transform="translate(712.0062561035156,221.99999618530273)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-37.56875038146973" y="-22.800000190734863"
+                                        width="75.13750076293945" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-27.568750381469727,-12.800000190734863)">
+                                            <foreignObject width="55.13750076293945" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">objects</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                                <g class="node default" id="flowchart-H-81"
+                                    transform="translate(851.6937561035156,221.99999618530273)" style="opacity: 1;">
+                                    <rect rx="0" ry="0" x="-52.118751525878906" y="-22.800000190734863"
+                                        width="104.23750305175781" height="45.60000038146973" class="label-container">
+                                    </rect>
+                                    <g class="label" transform="translate(0,0)">
+                                        <g transform="translate(-42.118751525878906,-12.800000190734863)">
+                                            <foreignObject width="84.23750305175781" height="25.600000381469727">
+                                                <div xmlns="http://www.w3.org/1999/xhtml"
+                                                    style="display: inline-block; white-space: nowrap;">object的ref</div>
+                                            </foreignObject>
+                                        </g>
+                                    </g>
+                                </g>
+                            </g>
+                        </g>
+                    </g>
+                </svg></div>
+            <h2 id='基本说明'><span>基本说明</span></h2>
+            <p><span>说明：</span></p>
+            <figure>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style='text-align:center;'><span>英文</span></th>
+                            <th style='text-align:center;'><span>中文</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style='text-align:center;'><span>bolb</span></td>
+                            <td style='text-align:center;'><span>文件</span></td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'><span>tree</span></td>
+                            <td style='text-align:center;'><span>树</span></td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'><span>commit</span></td>
+                            <td style='text-align:center;'><span>提交/历史版本</span></td>
+                        </tr>
+                        <tr>
+                            <td style='text-align:center;'><span>object</span></td>
+                            <td style='text-align:center;'><span>文件</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </figure>
+            <p><span>文件本身是一个字符串，另外具有其名字；通过文件，递归地定义树：</span></p>
+            <ul>
+                <li><span>文件是树，是叶子</span></li>
+                <li><span>树的子树是叶子（文件）或树</span></li>
+            </ul>
+            <p><span>我们可以将树理解为“文件或文件夹”。</span><strong><span>其中，最高层级的被跟踪版本信息的树，称为commit。</span></strong></p>
+            <h2 id='继续'><span>继续</span></h2>
+            <p><span>blob/tree/commit实际上都是磁盘上的一个区域，我们将之全部抽象为对象object。</span><strong><span>三者在此完成统一。</span></strong></p>
+            <p><span>对象查找利用的是哈希寻址，利用Git的哈希函数SHA1-hash构造出长长的一个id字符串，是十六进制内存地址，也即指针；id太长人记不住，于是截取为引用ref。objects是从id到object的键值对。</span>
+            </p>
+            <p><strong><span>实际上，从树开始，整个数据结构是层层抽象，是指针。</span></strong></p>
+            <h2 id='文中伪代码解释'><span>文中伪代码解释</span></h2>
+            <p><span>文中的伪代码对Git作出了十分简洁明确的说明。鉴于本人语言表达不好，对之进行注释更便于理解。</span></p>
+            <pre class="md-fences md-end-block md-fences-with-lineno ty-contain-cm modeLoaded" spellcheck="false"
+                lang=""
+                style="break-inside: unset;"><div class="CodeMirror cm-s-inner cm-s-null-scroll CodeMirror-wrap" lang=""><div style="overflow: hidden; position: relative; width: 3px; height: 0px; top: 9.51875px; left: 44px;"><textarea autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" style="position: absolute; bottom: -1em; padding: 0px; width: 1000px; height: 1em; outline: none;"></textarea></div><div class="CodeMirror-scrollbar-filler" cm-not-content="true"></div><div class="CodeMirror-gutter-filler" cm-not-content="true"></div><div class="CodeMirror-scroll" tabindex="-1"><div class="CodeMirror-sizer" style="margin-left: 36px; margin-bottom: 0px; border-right-width: 0px; padding-right: 0px; padding-bottom: 0px;"><div style="position: relative; top: 0px;"><div class="CodeMirror-lines" role="presentation"><div role="presentation" style="position: relative; outline: none;"><div class="CodeMirror-measure"><pre><span>xxxxxxxxxx</span></pre>
+            <div class="CodeMirror-linenumber CodeMirror-gutter-elt">
+                <div>45</div>
+            </div>
+        </div>
+        <div class="CodeMirror-measure"></div>
+        <div style="position: relative; z-index: 1;"></div>
+        <div class="CodeMirror-code" role="presentation" style="">
+            <div class="CodeMirror-activeline" style="position: relative;">
+                <div class="CodeMirror-activeline-background CodeMirror-linebackground"></div>
+                <div class="CodeMirror-gutter-background CodeMirror-activeline-gutter"
+                    style="left: -36px; width: 36px;"></div>
+                <div class="CodeMirror-gutter-wrapper CodeMirror-activeline-gutter" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">1</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">// 文件是字符串</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">2</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">type blob = array&lt;byte&gt;</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">3</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">4</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">// 树是从文件名/文件夹名到子树或文件的映射</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">5</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">// 即，一个文件夹有多少子文件夹/文件，从各自名称到实体的映射</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">6</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">type tree = map&lt;string, tree | blob&gt;</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">7</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">8</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">// 历史版本</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">9</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">type commit = struct {</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">10</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  parents: array&lt;commit&gt;//父版本</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">11</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  author: string//作者名</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">12</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  message: string//提交日志信息</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">13</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  snapshot: tree//快照是树，最高层那个被跟踪的树</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">14</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">}</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">15</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">16</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//对象是文件、树或历史版本，其实历史版本就相当于最高的树</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">17</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">type object = blob | tree | commit</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">18</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">19</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//object是从id到object的键值对</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">20</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">objects = map&lt;string, object&gt;</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">21</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">22</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">def store(object)://函数，存储一个对象的信息</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">23</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  id = sha1(object)//哈希函数构造id</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">24</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  objects[id] = object</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">25</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">26</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">def load(id)://按照id加载对象</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">27</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  return objects[id]</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">28</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">29</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//引用是从name到id的映射</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">30</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">references = map&lt;string, string&gt;</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">31</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">32</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//更新引用，即新对象新名字写入记录</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">33</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">def update_reference(name, id):</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">34</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  references[name] = id</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">35</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">36</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//读取名字对应的id</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">37</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">def read_reference(name):</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">38</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  return references[name]</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">39</div>
+                </div>
+                <pre class=" CodeMirror-line " role="presentation"><span role="presentation" style="padding-right: 0.1px;"><span cm-text="" cm-zwsp="">
+</span></span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">40</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">//按照已知信息加载</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">41</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;">def load_reference(name_or_id):</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">42</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  if name_or_id in references://参量是name</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">43</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  return load(references[name_or_id])</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 27px;">44</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp;  else:</span></pre>
+            </div>
+            <div style="position: relative;">
+                <div class="CodeMirror-gutter-wrapper" style="left: -36px;">
+                    <div class="CodeMirror-linenumber CodeMirror-gutter-elt CodeMirror-linenumber-show"
+                        style="left: 0px; width: 27px;">45</div>
+                </div>
+                <pre class=" CodeMirror-line "
+                    role="presentation"><span role="presentation" style="padding-right: 0.1px;"> &nbsp; &nbsp; &nbsp;  return load(name_or_id)</span></pre>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    <div style="position: absolute; height: 0px; width: 1px; border-bottom: 0px solid transparent; top: 1037px;"></div>
+    <div class="CodeMirror-gutters" style="height: 1037px;">
+        <div class="CodeMirror-gutter CodeMirror-linenumbers" style="width: 35px;"></div>
+    </div>
+    </div>
+    </div>
+    </pre>
+    <h2 id='仓库'><span>仓库</span></h2>
+    <p><span>根据以上说明，现在可以对Git仓库加以解释：仓库是数据对象和引用。</span></p>
+    <h1 id='部分说明课后习题'><span>部分说明课后习题</span></h1>
+    <ul>
+        <li><p><span>阅读</span><a href="https://git-scm.com/book/en/v2"><span>Pro Git</span></a><span>和/或</span><a
+                    href="https://learngitbranching.js.org/?locale=zh_CN"><span>Learning Git Branching</span></a></p></li>
+        <li><p><span>略。</span></p></li>
+        <li><p><span>略。</span></p></li>
+        <li><p><span>如下：</span></p><ul><li><code>git stash</code><span>将暂存区（尚未提交）全部内容放入堆栈，可用以解决代码版本冲突（如，本地</span><code>git stash</code><span>后，重新拉取远程库代码，然后</span><code>git stash pop</code><span>将存入的内容出栈放回）。</span></li><li><code>git log --all --oneline</code><span>展示所有历史版本的引用ref和对应日志信息。</span></li></ul></li>
+        <li><p><span>略</span></p></li>
+        <li><p><span>略</span></p></li>
+        <li><p><span>略</span></p></li>
+    </ul>
+    </div>
+    </div>
+</body>
+
+</html>

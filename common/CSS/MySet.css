@@ -1,0 +1,104 @@
+/* 以下部分为自行开发 */
+
+a {
+    text-decoration: none !important;
+}
+
+/* 文章标题 */
+.title {
+    text-align: center;
+    font-style: normal;
+    font-weight: 900;
+    font-size: 50px;
+    line-height: 70px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* 题记 */
+.metto {
+    text-align: center;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+/* 引言 */
+
+.intro {
+    /* text-align: right; */
+    color: darkslategray;
+    font-size: 20px;
+}
+
+/* 以下目录列表 */
+.menu-time {
+    /* text-align: center; */
+    font-size: 40px;
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: bolder;
+}
+
+.menu-list {
+    font-size: 25px;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+/* 以下用于文章尾部署日 */
+.time {
+    text-align: right;
+    color: darkslategray;
+    font-size: 20px;
+}
+
+/* 以下为鼠标特效 */
+.yanhua>div {
+    width: 5px;
+    height: 5px;
+    z-index: 99;
+    position: absolute;
+    border-radius: 50%;
+}
+
+@keyframes yanhua {
+    to {
+        top: var(--t);
+        left: var(--l);
+        opacity: .2;
+        transform: scale(.2);
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* 以下MarkMap */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.map-box
+{
+    display: flex;
+    justify-content: center;
+}
+
+#mindmap {
+    display: block;
+    width: 35vw;
+    height: 70vh;
+}
+
+.p {
+    text-indent: 8em;
+}
+
+.h1 {
+    text-indent: 20em;
+}
+
+/* 以下评论区 */
+.comment{
+    padding-bottom: 20px;
+}
+.comment hr{
+    margin-top: 50px;
+    margin-bottom: 40px;
+}

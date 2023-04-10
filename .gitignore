@@ -1,0 +1,5 @@
+# To ignore all files used to push or run
+*.bat
+*.sh
+*.exe
+/.vscode

@@ -1,0 +1,377 @@
+body {
+    font-family: 'Comic Sans MS', Verdana, sans-serif;
+    margin: 0;
+    font-size: 500%;
+    font-weight: 800;
+    color: #000;
+    background-color: #4a96cd;
+    min-width: 250px;
+    display: flex;
+}
+
+.sidenav {
+    height: 91.5%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: .5s;
+    padding-top: 60px
+}
+
+.sidenav a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    /* color: #818181; */
+    display: block;
+    transition: .3s
+}
+
+.sidenav a:hover,
+.offcanvas a:focus {
+    color: #f1f1f1
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px
+}
+
+@media screen and (max-height:450px) {
+    .sidenav {
+        padding-top: 15px
+    }
+
+    .sidenav a {
+        font-size: 18px
+    }
+}
+
+body,
+html {
+    height: 100%;
+    font-size: 12px;
+    /* font-family: Avenir Next, PingFang SC, Hiragino Sans GB, Droid Sans Fallback, Microsoft YaHei, sans-serif; */
+    /* font-family: Microsoft YaHei; */
+    font-family: "PT Serif", 'Times New Roman', Times, serif;
+    margin: 0;
+    padding: 0
+}
+
+ul,
+li {
+    list-style: none
+}
+
+table {
+    border-spacing: 0;
+    border-collapse: collapse
+}
+
+h2,
+h3 {
+    margin: 0
+}
+
+.icon {
+    padding: 1rem 0 0 0
+}
+
+.icon svg {
+    height: 21px;
+    width: 21px;
+    fill: #eee
+}
+
+.icon svg:hover {
+    fill: #fff
+}
+
+.icon a {
+    display: inline-block;
+    /* margin: 0 5px; */
+    position: relative
+}
+
+.icon a:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -10px;
+    left: -3px;
+    width: 50px;
+    padding: 2px;
+    color: #fff;
+    z-index: 1;
+    font-size: 12px
+}
+
+.icon svg.sina {
+    width: 26px
+}
+
+.background {
+    background: linear-gradient(#4a96cd, #7cb6dd, #4a96cd);
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.box {
+    padding: 30px;
+    width: 50%;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .01);
+    box-shadow: inset 2px 2px 30px rgba(255, 255, 255, .5), inset -2px -2px 30px rgba(255, 255, 255, .5);
+    margin: 30px;
+}
+
+.title {
+    color: #eee;
+    font-weight: 400;
+    text-align: center;
+    line-height: 36px;
+    margin-bottom: 40px
+}
+
+.project {
+    color: #eee;
+    font-weight: 400;
+    text-align: center;
+    line-height: 36px;
+    font-size: 16px;
+    margin-bottom: 30px
+}
+
+.project:hover {
+    color: #fff
+}
+
+.content {
+    margin-left: 30px
+}
+
+.github-corner {
+    position: fixed;
+    top: 0;
+    right: 0
+}
+
+.footer {
+    position: fixed;
+    height: 30px;
+    width: 100vw;
+    bottom: 0;
+    display: flex;
+    justify-content: center
+}
+
+.copyright {
+    text-decoration: none;
+    color: rgba(255, 255, 255, .8)
+}
+
+blockquote {
+    border-left: 4px solid #dfe2e5;
+    padding: 0 15px;
+    color: #f1f1f1;
+}
+
+p,
+blockquote,
+ul,
+ol,
+dl,
+table {
+    margin: 0.8em 0;
+}
+
+blockquote {
+    margin: 1rem 0px;
+}
+
+blockquote {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 40px;
+    margin-inline-end: 40px;
+}
+
+
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6,
+#write p {
+    position: relative;
+}
+
+h1 {
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    position: relative;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+    line-height: 1.4;
+    cursor: text;
+}
+
+.md-math-block,
+.md-rawblock,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    break-after: avoid-page;
+    break-inside: avoid;
+    orphans: 4;
+}
+
+h1 {
+    display: block;
+    font-size: 2em;
+    margin-block-start: 0.67em;
+    margin-block-end: 0.67em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+
+.icon a {
+    padding-left: 10px;
+}
+
+.menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.md-toc-h2 .md-toc-inner {
+    margin-left: 2em;
+}
+
+.md-toc-h3 .md-toc-inner {
+    margin-left: 4em;
+}
+
+.md-toc-h4 .md-toc-inner {
+    margin-left: 6em;
+}
+
+.md-toc-h5 .md-toc-inner {
+    margin-left: 8em;
+}
+
+.md-toc-h6 .md-toc-inner {
+    margin-left: 10em;
+}
+
+/* p {
+    text-indent: 2em !important;
+}
+
+span .menu{
+    text-indent: 0 !important;
+} */
+
+h1 {
+    font-size: 2.25em;
+    line-height: 1.2;
+    border-bottom: 1px solid #eee;
+}
+
+h2 {
+    font-size: 1.75em;
+    line-height: 1.225;
+    border-bottom: 1px solid #eee;
+}
+
+/*@media print {
+.typora-export h1,
+.typora-export h2 {
+border-bottom: none;
+padding-bottom: initial;
+}
+
+.typora-export h1::after,
+.typora-export h2::after {
+content: "";
+display: block;
+height: 100px;
+margin-top: -96px;
+border-top: 1px solid #eee;
+}
+}*/
+
+h3 {
+    font-size: 1.5em;
+    line-height: 1.43;
+}
+
+h4 {
+    font-size: 1.25em;
+}
+
+h5 {
+    font-size: 1em;
+}
+
+h6 {
+    font-size: 1em;
+    color: #777;
+}
+
+ul li {
+    list-style-type: disc;
+    list-style-position: outside;
+}
+
+ul,
+ol {
+    margin: 0 0 0 3em;
+}
+
+strong {
+    font-weight: 1000 !important;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
