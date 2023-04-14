@@ -8294,27 +8294,25 @@
         })(),
         m = () => {
           s["e"].alert({
-            title: "\u9690\u79c1\u4fdd\u62a4\u6307\u5f15",
+            title: "隐私保护指引",
             content: Object(d["jsxs"])("div", {
               children: [
                 Object(d["jsx"])("br", {}),
-                "\u6211\u4eec",
+                "我们",
                 Object(d["jsx"])("b", {
-                  children: "\u4e0d\u4f1a\u6536\u96c6/\u5b58\u50a8",
+                  children: "不会收集/存储",
                 }),
-                "\u60a8\u7684\u884c\u7a0b\u6570\u636e\uff0c\u884c\u7a0b\u6570\u636e\u53ea\u4f1a\u5728",
-                Object(d["jsx"])("b", { children: "\u672c\u5730" }),
-                "\u5904\u7406\u3002",
+                "您的行程数据，行程数据只会在",
+                Object(d["jsx"])("b", { children: "本地" }),
+                "处理。",
                 Object(d["jsx"])("br", {}),
-                Object(d["jsx"])("br", {}),
-                "\u6211\u4eec\u4e5f",
+                "我们也",
                 Object(d["jsx"])("b", {
-                  children: "\u4e0d\u4f1a\u4e0a\u4f20/\u5206\u6790",
+                  children: "不会上传/分析",
                 }),
-                "\u60a8\u7684\u884c\u7a0b\u6570\u636e\uff0c\u8bf7\u653e\u5fc3\u4f7f\u7528\u3002",
+                "您的行程数据，请放心使用。",
                 Object(d["jsx"])("br", {}),
-                Object(d["jsx"])("br", {}),
-                "\u6211\u4eec\u7684\u7075\u611f\u6765\u6e90\u4e8e",
+                "我们的灵感来源于",
                 " ",
                 Object(d["jsx"])("span", {
                   className: c.a.privacy,
@@ -8322,13 +8320,41 @@
                     location.href =
                       "https://mp.weixin.qq.com/s/U_Ao8BctwznDe-sKo-Vw9w";
                   },
-                  children: "@\u7b2c\u4e00\u8d22\u7ecf",
+                  children: "@第一财经",
+                }),
+                Object(d["jsx"])("br", {}),
+                "页面入口：",
+                Object(d["jsx"])("span", {
+                  className: c.a.privacy,
+                  onClick: () => {
+                    location.href =
+                      "https://www.qin-juan-ge-zhu.top/play/travel-card-ce";
+                  },
+                  children: "www.qin-juan-ge-zhu.top/play/travel-card-ce",
                 }),
                 Object(d["jsx"])("br", {}),
                 Object(d["jsx"])("br", {}),
-                "\u7eaa\u5ff5\u7248\u9875\u9762\u5165\u53e3: xingchengka.com",
+                "原版：",
+                Object(d["jsx"])("span", {
+                  className: c.a.privacy,
+                  onClick: () => {
+                    location.href =
+                      "https://xingchengka.com";
+                  },
+                  children: "xingchengka.com",
+                }),
                 Object(d["jsx"])("br", {}),
+                "仓库地址：",
+                Object(d["jsx"])("span", {
+                    className: c.a.privacy,
+                    onClick: () => {
+                        location.href =
+                            "https://github.com/aladdin-chu/travel-card-ce"
+                    },
+                    children: "github.com/aladdin-chu/travel-card-ce",
+                }),
                 Object(d["jsx"])("br", {}),
+                "向原作学习！向原作致敬！",
               ],
             }),
             onConfirm: () => {
@@ -8401,8 +8427,6 @@
                 onClick: m,
                 children: "\u9690\u79c1\u6307\u5f15",
               }),
-              " ",
-              "- xingchengka.com",
             ],
           }),
           Object(d["jsx"])(s["b"].Group, {
@@ -8452,7 +8476,7 @@
           Object(d["jsx"])("div", {
             className: c.a.footer_tip,
             children:
-              "\u300c\u884c\u7a0b\u5361\u7eaa\u5ff5\u7248\u300d - xingchengka.com",
+              "\u300c\u884c\u7a0b\u5361\u7eaa\u5ff5\u7248\u300d",
           }),
         ],
       });
@@ -11841,7 +11865,7 @@
                 }),
                 Object(h["jsx"])("div", {
                   className: c.a.h1,
-                  children: "2020***2022\u7684\u52a8\u6001\u884c\u7a0b\u5361",
+                  children: "2020--2022\u7684\u52a8\u6001\u884c\u7a0b\u5361",
                 }),
                 Object(h["jsx"])("div", {
                   className: c.a.h2,
@@ -11893,7 +11917,7 @@
                     Object(h["jsx"])("br", {}),
                     Object(h["jsx"])("span", {
                       className: c.a.domain,
-                      children: "xingchengka.com",
+                      children: "www.qin-juan-ge-zhu.top/play/travel-card-ce",
                     }),
                   ],
                 }),
