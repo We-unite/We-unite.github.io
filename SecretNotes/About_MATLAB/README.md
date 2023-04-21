@@ -14,4 +14,4 @@
 + 数字可视化
   + [2D数据可视化](Data_Visualization/2D_Data_Visualization)
   + [3D数据可视化](Data_Visualization/3D_Data_Visualization)
-+ 关系运算与逻辑运算
++ [关系运算与逻辑运算](Relation_and_Logic_Operation)
