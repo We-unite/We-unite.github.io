@@ -51,10 +51,10 @@ a {
 
 /* 以下为鼠标特效 */
 .yanhua>div {
-    width: 5px;
-    height: 5px;
-    z-index: 99;
-    position: absolute;
+    width: 10px;
+    height: 10px;
+    z-index: 9;
+    position: fixed;
     border-radius: 50%;
 }
 
@@ -62,9 +62,9 @@ a {
     to {
         top: var(--t);
         left: var(--l);
-        opacity: .2;
-        transform: scale(.2);
-        filter: hue-rotate(360deg);
+        opacity: 0;
+        transform: scale(0);
+        /* filter: hue-rotate(360deg); */
     }
 }
 

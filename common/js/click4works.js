@@ -1,19 +1,18 @@
-const yanhua = document.querySelector(".yanhua")
-window.onclick = function (e) {
-    for (let i = 0; i < 20; i++) {
-        let x = e.pageX;
-        let y = e.pageY;
-        let div = document.createElement("div");
-        div.style.left = x + "px";
-        div.style.top = y + "px";
-        div.style.backgroundColor = `rgb(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255})`
-        yanhua.appendChild(div);
-        div.style.setProperty("--t", y + (Math.random() - 0.5) * 300 + "px")
-        div.style.setProperty("--l", x + (Math.random() - 0.5) * 300 + "px")
-        div.style.animation = "yanhua 2s"
-        setTimeout(() => {
-            div.remove()
-        }, 2000);
+const yanhua = document.querySelector(".yanhua");
+window.onclick = (e) => {
+    for (let t = 0; t < 20; t++) {
+        let t = e.pageX,
+            a = e.pageY,
+            n = document.createElement("div");
+        (n.style.left = t + "px"),
+            (n.style.top = a + "px"),
+            (n.style.background = `radial-gradient(rgb(${255 * Math.random()},${255 * Math.random()},${255 * Math.random()}), transparent)`),
+            yanhua.appendChild(n),
+            n.style.setProperty("--t", a + 1e3 * (Math.random() - 0.5) + "px"),
+            n.style.setProperty("--l", t + 1e3 * (Math.random() - 0.5) + "px"),
+            (n.style.animation = "yanhua 2s"),
+            setTimeout(() => {
+                n.remove();
+            }, 2e3);
     }
-
-}
+};
