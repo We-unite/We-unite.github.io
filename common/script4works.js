@@ -49,7 +49,7 @@ document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\"typora-export os-windows\">");
 document.writeln("    <div class=\"yanhua\"></div>");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4works.js\"></script>");
+document.writeln("    <!-- <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4works.js\"></script> -->");
 document.writeln("    <div id=\"mySidenav\" class=\"sidenav\" style=\"width: 0px;\">");
 document.writeln("        <div class=\"sidebar\" name=\"sizebar\">");
 document.writeln("            <div class=\"sidebar\" name=\"sizebar\">");
