@@ -18,4 +18,22 @@ script.innerHTML = `new Valine({
 //将div写在引用本条script标签之后
 document.write(div.outerHTML);
 //将script添加到上述div之后
-document.write(script.outerHTML);
+document.write(script.outerHTML)
+
+// 发现并绑定Valine评论框
+var count = 0;
+var domTimer = setInterval(function () {
+    if (++count > 50) clearInterval(domTimer);
+    if (document.querySelector('#veditor')) {
+        clearInterval(domTimer);
+        var cdraw = new CaveDraw({
+            element: "#veditor",
+            readOnlyMode: false, // valine 不提交form，而是过滤评论框数据后发送，所以评论框不能readonly。
+            afterUpdateEditor: ()=>{ // 手动触发valine对评论框数据的过滤
+                document.querySelector('#veditor').focus();
+                document.querySelector('#veditor').blur();
+            },
+            controls: ['brush', 'eraser', 'bucket', 'clear', 'undo', 'redo', 'save']
+        });
+    }
+}, 200);
