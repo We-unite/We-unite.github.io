@@ -1,16 +1,16 @@
-//生成随机颜色
-function randomColor() {
-  var r = Math.floor(Math.random() * 64);
-  var g = Math.floor(Math.random() * 64);
-  var b = Math.floor(Math.random() * 64);
-  var a = Math.random() / 10 + 0.8;
-  return "rgba(" + r + "," + g + "," + b + "," + a + ")";
-}
+// //生成随机颜色
+// function randomColor() {
+//   var r = Math.floor(Math.random() * 64);
+//   var g = Math.floor(Math.random() * 64);
+//   var b = Math.floor(Math.random() * 64);
+//   var a = Math.random() / 10 + 0.8;
+//   return "rgba(" + r + "," + g + "," + b + "," + a + ")";
+// }
 
-$.shuicheMouse({
-  type: ~~(Math.random() * 12) + 1,
-  color: false,
-});
+// $.shuicheMouse({
+//   type: ~~(Math.random() * 12) + 1,
+//   color: false,
+// });
 
 //以下不知所云
 ("use strict");

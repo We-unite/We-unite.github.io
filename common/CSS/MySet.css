@@ -74,16 +74,16 @@ a {
     padding: 0;
 }
 
-.map-box
-{
+.map-box {
     display: flex;
     justify-content: center;
 }
 
 #mindmap {
     display: block;
-    width: 800px;
+    width: 90%;
     height: 1000px;
+    margin-left: 10%;
 }
 
 .p {
@@ -95,10 +95,11 @@ a {
 }
 
 /* 以下评论区 */
-.comment{
+.comment {
     padding-bottom: 20px;
 }
-.comment hr{
+
+.comment hr {
     margin-top: 50px;
     margin-bottom: 40px;
 }
