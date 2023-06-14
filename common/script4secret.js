@@ -10,7 +10,7 @@ document.writeln("    <script src=\"https://cdn.static.runoob.com/libs/jquery/2.
 document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\'typora-export os-windows\'>");
-document.writeln("    <script src=\"https://blog-static.cnblogs.com/files/xuange306/mouse.min.js\"></script>");
+document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4secret.js\"></script>");
 document.writeln("    <script type=\"text/javascript\">");
 document.writeln("        //生成随机颜色");
 document.writeln("        function randomColor() {");
