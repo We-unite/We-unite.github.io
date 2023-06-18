@@ -108,7 +108,7 @@ body.typora-export {
 }
 
 .typora-export .footnote-line,
-.typora-export li,
+/* .typora-export li, */
 .typora-export p {
     white-space: pre-wrap;
 }
