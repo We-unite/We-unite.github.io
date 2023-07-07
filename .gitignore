@@ -3,3 +3,4 @@
 *.sh
 *.exe
 /.vscode
+*/html2js

@@ -107,11 +107,11 @@ body.typora-export {
     padding-right: 30px;
 }
 
-.typora-export .footnote-line,
-/* .typora-export li, */
+/* .typora-export .footnote-line,
+.typora-export li,
 .typora-export p {
     white-space: pre-wrap;
-}
+} */
 
 .typora-export .task-list-item input {
     pointer-events: none;

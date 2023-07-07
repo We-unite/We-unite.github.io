@@ -1,0 +1,76 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://highlightjs.org/static/demo/styles/github.css">
+    <script src="https://highlightjs.org/static/highlight.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/highlightjs-line-numbers.js/2.8.0/highlightjs-line-numbers.min.js"></script>
+    <script>
+        hljs.highlightAll();
+        hljs.initLineNumbersOnLoad();
+    </script>
+    <style>
+        /* for block of numbers */
+        pre code td.hljs-ln-numbers {
+            text-align: center;
+            color: #9c9c9c;
+            border-right: 0.5px solid #9c9c9c;
+            vertical-align: top;
+            padding-left: 0.5rem;
+            padding-right: 0.8rem;
+            border: none;
+        }
+
+        /* for block of code */
+        pre code td.hljs-ln-code {
+            padding-left: 1rem;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <pre>
+                <code class="language-c++">
++#include &lt;iostream&gt;
+
+-int main()
++{
+&nbsp;&nbsp;std::cout&lt;&lt;"Hello, Programmer!"&lt;&lt;std::endl;
++&nbsp;&nbsp;return 0;
++}
+                </code>
+            </pre>
+    </div>
+</body>
+<script>
+    onload = () => {
+        setTimeout(() => {
+            for (let i of document.querySelectorAll('td')) {
+                if (i.innerText.startsWith('+')) {
+                    i.style.backgroundColor = '#cfc';
+                }
+                else if (i.innerText.startsWith('-')) {
+                    i.style.backgroundColor = '#fcc';
+                }
+                else {
+                    i.style.color = '#777';
+                }
+            };
+            //查找每一行，如果开头没有+或-，则在开头添加两个空格
+            for (let i of document.querySelectorAll('td.hljs-ln-code')) {
+                if (!i.innerText.startsWith('+') && !i.innerText.startsWith('-')) {
+                    i.innerText = ' ' + i.innerText;
+                }
+            };
+        });
+        // for (let i of document.querySelectorAll('td')) {
+        //     if (i.innerText.startsWith('+')) {
+        //         i.style.backgroundColor = '#cfc';
+        //     };
+        // };
+    };
+</script>
+
+</html>
