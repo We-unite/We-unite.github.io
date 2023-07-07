@@ -13,7 +13,7 @@ a:active, a:hover { outline: 0px; }
 .for-image #write { padding-left: 8px; padding-right: 8px; }
 body.typora-export { padding-left: 30px; padding-right: 30px; }
 /* .typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; } */
-.typora-export .footnote-line, .typora-export p { white-space: pre-wrap; }
+/* .typora-export .footnote-line, .typora-export p { white-space: pre-wrap; } */
 .typora-export .task-list-item input { pointer-events: none; }
 @media screen and (max-width: 500px) {
   body.typora-export { padding-left: 0px; padding-right: 0px; }

@@ -1,38 +1,58 @@
 <!-- 我的vim设置 -->
 
-# vim 学习
+# vim? 那是个什么 JB 东西？
 
-vim 是一个文本编辑器，素有"编辑器之神"的美名，同时它也是 Linux 尤其是服务器连接编辑的主要方法。vim 的主要特点是分模式编辑，有以下几个模式：
+Enjoy coding 的你，是否时常痛恨鼠标点来点去、方向键远离字母，耽误码字？可曾詈骂手动批量重复处理的痛苦？Debug 时代码上下反复跳转，令你烦闷否？别人写的编辑器设置种种不便，是否想过有一个自己私人订制的编辑器？如果你有以上苦恼，那么 vim 将是你的绝佳选择。
 
-｜模式｜说明｜功能｜
-｜--｜--｜--｜
-｜ Normal ｜正常｜光标移动、阅读文件｜
-｜ Insert ｜插入｜在当前光标位置插入内容，编辑文件｜
-｜ Visual ｜视觉/选择｜选中、复制粘贴｜
-｜ Replace ｜替换｜替换当前光标下字符｜
+vim 是一个文本编辑器，素有"编辑器之神"的美名，同时它也是 Linux 尤其是服务器连接编辑的主要方法。
+
+vim 的主要特点是分模式编辑：
+
+| 模式    | 说明      | 功能                             |
+| ------- | --------- | -------------------------------- |
+| Normal  | 正常      | 光标移动、阅读文件               |
+| Insert  | 插入      | 在当前光标位置插入内容，编辑文件 |
+| Visual  | 视觉/选择 | 选中、复制粘贴                   |
+| Replace | 替换      | 替换当前光标下字符               |
 
 其关系如下：
+
 ```mermaid
 graph LR
-N(Normal)--i/a->I(Insert)
-N(Normal)--v->V(Visual)
-N(Normal)--Ins->I(Replace)
+N(Normal)--->I(Insert)
+N--->V(Visual)
+N--->R(Replace)
+I-->N
+V-->N
+R-->N
 ```
 
-对于vim的学习，我的主要路线如下：
-- 环境：虚拟机Ubuntu22.04环境，vim。也可以使用windows下的gvim/neovim/gitbash自带vim等。
-- 首先，阅读和观看MIT的`Missing Semister`中关于vim的[课程](网址在此)。消失的学期其他课程也非常不错。要是我刚上大学就知道有这个学期该多好！
-- 而后，在网上玩[Vim Adventures](网址在此)，多玩几遍，直到熟悉其所有键位。`家贫，无从致游戏以玩`，谁要是有这个游戏全版，记得v我一份！
-- 同时，在命令行中学`vimtutor`，这是vim自带的基础官方教程，对于基础使用方法介绍非常完整。系统如果是中文则该教程是中文，否则为英文，不过这点英文初中英语就足以应付了。使用方法为在命令行中输入<kbd>vimtutor</kbd>并会车。学习过程中尽量不要退出，因为教程不会保存本次做过的操作，下次再进来什么都没有。第一次学会慢一些，一小时左右，一共7章若干节，一节一个技能，每一章节
-- 用了vim，你难道不觉得键盘上的Esc放那么远简直倒灶吗？没错，我也这么觉得。于是我们想到自己做[键盘映射](网址在此)
+# 我的 vim 学习路线
 
-# 基础说明
+不幸的是 Vim 的学习曲线确实相当陡峭，我花了很久才适应了用 Vim 进行开发的过程。最开始你会觉得非常不适应，但一旦熬过了初始阶段，相信我，你会爱上 Vim。以我而言，现在离开了 vim 的模式几乎已经快不会写材料了，前几天交作业要求 word，我保存文件居然不是<kbd>Ctrl+s</kbd>，而是顺手来了个<kbd>:wqa</kbd>。
 
-网上一般的教程都说 vim 的默认配置文件为`~/.vimrc`。这当然是不错的，但是有一个巨大的问题：家目录是随着用户而不同的，会导致我们以当前普通用户打开 vim 编辑文件与以 root 用户使用 vim 的观感完全不一致，就很烦。解决方法是**直接编辑 vim 默认的最根本的 vimrc**，不管什么用户都会先加载该文件的配置而后加载用户配置。
+我的 vim 学习路线如下：
+
+- 环境：虚拟机 Ubuntu22.04 LTS 环境，vim。也可以使用 windows 下的 gvim/neovim 或 gitbash 自带 vim 等。
+- 首先，阅读和观看 MIT 的`Missing Semister`中关于 vim 的[课程](https://missing.csail.mit.edu/2020/editors/)。**消失的学期其他课程也非常不错。要是我刚上大学就知道有这个学期该多好！**
+- 而后，在网上玩[Vim Adventures](https://vim-adventures.com/)，多玩几遍，直到熟悉其所有键位。~~**“家贫，无从致游戏以玩”**，谁要是有这个游戏全版，记得 v 我一份！~~
+- 同时，在命令行中学`vimtutor`，这是 vim 自带的基础官方教程，对于基础使用方法介绍非常完整。
+  - 系统如果是中文则该教程是中文，否则为英文，不过这点英文初中英语就足以应付了。
+  - 使用方法为在命令行中输入<kbd>vimtutor</kbd>并回车。学习过程中尽量不要退出，因为教程不会保存本次做过的操作，下次再进来是个新的。
+  - 第一次学会慢一些，一小时左右，一共 7 章若干节，一节一个技能，每一章有一个总结。
+- 用了 vim，你难道不觉得键盘上的 Esc 放那么远简直倒灶吗？没错，我也这么觉得。于是我们想到自己做[键盘映射](./keymap.html)
+
+想了解其他信息，可以参考 CSDiy 的[vim 指南](https://csdiy.wiki/%E5%BF%85%E5%AD%A6%E5%B7%A5%E5%85%B7/Vim/)。当然，众所周知，学习工具的核心在于使用，用起来逢山开路遇水搭桥，才最具效率和效果，_isn't it?_ 现代的我们，大多数情况的代码都有 IDE，但 vim 的分模式编辑和高度定制化一定会帮我们在 Coding 之路上快马加鞭。在你的各种 IDE 里安装 vim 插件，练起来，享受 All in One 的乐趣吧！
+
+# 我的 vim 配置
+
+网上一般的教程都说 vim 的默认配置文件为`~/.vimrc`。这当然是不错的，但是有一个巨大的问题：家目录是随着用户而不同的，这会导致我们以当前普通用户打开 vim 编辑文件与以 root 用户使用 vim 的观感完全不一致，就很烦。解决方法是**直接编辑 vim 默认的最根本的 vimrc**，不管什么用户都会先加载该文件的配置而后加载用户配置。
 
 vim 默认的最根本的 vimrc 在`/etc/vim`下的 vimrc。为了便于后续编辑，我们可以在家目录下创建一个软链接，每次只需要编辑链接里的文件即可自动改变原来的文件。但需要注意，编辑该文件夹内的内容仍然需要 sudo 权限。
 
-```bash
+除此之外，出于同样的目的（保证当前用户与 root 用户观感一致），建议将插件也指定一个专门的绝对路径。我放在了`/home/player/useful/bundle`。
+
+```
 # 创建软链接
 # 我习惯把有用的文件放在～/useful下
 mkdir useful
@@ -40,15 +60,14 @@ cd useful
 
 # 创建软链接
 sudo ln -s /etc/vim /home/player/useful/vim
+
+# 插件存放位置
+mkdir bundle
 ```
-
-# 插件配置
-
-# vimrc 设置
 
 ## 设置
 
-当前目录`/home/player/useful/vim`也即`/etc/vim`。由于内容过多，在目录下创建了`vimrcs`文件夹，将不同内容分别以专门文件管理，vimrc 文件调用这些文件
+下文所有设置的目录均为`/home/player/useful/vim`，也即`/etc/vim`。由于内容过多，我在目录下创建了`vimrcs`文件夹，将不同内容分别以专门文件管理，vimrc 文件调用这些文件。因此，下边只有`vimrc`在`/etc/vim`下；其他文件均在`/etc/vim/vimrcs`下，以`./vimrcs/<文件名>`表示。插件放置在`/home/player/useful/bundle`。
 
 ### vimrc
 
@@ -125,7 +144,7 @@ map <leader>g :YcmCompleter GoToDefinitionElseDeclaration<CR> "找到当前内�
 "NERDTree
 autocmd vimenter * NERDTree "进入vim自动打开nerdtree
 autocmd bufenter * if(winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif "当nerdtree为剩余唯一窗口时自动关闭
-map <F2> :NERDTree<CR> "F2键开关文件目录树，注意shift+i切换是否显示隐藏文件
+map <F2> :NERDTreeToggle<CR> "F2键开关文件目录树，注意shift+i切换是否显示隐藏文件
 let g:NERDTreeDirArrowExpandable = '+'
 let g:NERDTreeDirArrowCollapsible = '-' "修改树的显示图标
 "let g:NERDTreeWinPos='left' "窗口位置
@@ -158,7 +177,7 @@ let g:NERDTreeGitStatusUntrackedFilesMode = 'all' " a heavy feature too. default
 set termwinsize=10*120
 
 "syntastic
-"" syntastic
+"以下内容是syntastic插件的一般配置，由于YouCompleteMe插件对该插件支持过于优秀，一般不再需要配置，故废弃
 "set statusline+=%#warningmsg#
 "set statusline+=%{syntasticstatuslineflag()}
 "set statusline+=%*
@@ -299,10 +318,7 @@ endfunction
 ### ./vimrcs/fuck.vim
 
 ```vim
-" ############################键盘映射设置区域###############################
-map <F2> :NERDTreeToggle<CR>
-map <F4> t :NERDTreeMirror<CR>
-
+" 键盘映射设置区域
 
 " 对应使用函数的配置
 set guitablabel=%{ShortTabLabel()}
@@ -434,4 +450,5 @@ autocmd Filetype c,cpp map <buffer><C-d> 0xx<esc>ta
 autocmd Filetype python map <buffer><C-d> 0xx<esc>ta
 "autocmd Filetype python vmap <buffer><C-p> <C-v>I# <esc>
 "autocmd Filetype c,cpp vmap <buffer><C-d> <C-v>0xx
+"说明：本文件上文所有<Ctrl-p>的设置，原是用来为c,cpp,python文件设置注释的，但是注释可以通过<Ctrl-v>进入块选模式而后<Ctrl-i>进入插入模式，在前边输入注释符号，保存，则选中的行均被注释，甚为方便，因此这许多键一起弃用。
 ```
