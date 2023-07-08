@@ -11,7 +11,8 @@ pre code td.hljs-ln-numbers {
 
 /* for block of code */
 pre code td.hljs-ln-code {
-    padding-left: 1rem;
+    /* 为保持代码整齐，删去下一行 */
+    /* padding-left: 1rem; */
     border: none;
 }
 

@@ -8,13 +8,6 @@ document.writeln("    <link rel=\"stylesheet\" href=\"https://www.qin-juan-ge-zh
 document.writeln("    <link rel=\"icon\" type=\"image/x-icon\" href=\"https://www.qin-juan-ge-zhu.top/common/icon.png\" />");
 document.writeln("    <script src=\"https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/click4code.js\"></script>");
-document.writeln("");
-document.writeln("    <!-- pandoc代码高亮与行号，只有需要的网页才会用到 -->");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/jQuery.js\"></script>");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/highlight/highlight.min.js\"></script>");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/highlight/plugs/highlightjs-line-numbers.js\"></script>");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/highlight/plugs/clipboard.min.js\"></script>");
-document.writeln("    <link rel=\"stylesheet\" href=\"https://www.qin-juan-ge-zhu.top/common/CSS/highlight.css\">");
 document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\'typora-export os-windows\'>");

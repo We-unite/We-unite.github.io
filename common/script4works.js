@@ -137,12 +137,13 @@ document.writeln("                <a href=\"https://code.qin-juan-ge-zhu.top\">-
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/vim/vim.html\">-vim学习与配置</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/vim/keymap.html\">-键盘映射</a>");
 document.writeln("            </div>");
+document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/code/cpppp.html\">-C++ Primer");
+document.writeln("                Plus<br>&nbsp;&nbsp;&nbsp;基础知识整理</a>");
+document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/code/highlight.html\">-代码块高亮与<br>&nbsp;&nbsp;&nbsp;一键复制</a>");
 document.writeln("            <a onclick=\"clickit(\'grandson22\')\">-一些小玩意儿</a>");
 document.writeln("            <div class=\"grandson\" id=\"grandson22\" style=\"display:none\">");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/index.html\">C的小零件</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/index.html\">-C的小零件</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/stdc++.html\">-C++九千能头文件</a>");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/cpppp.html\">-C++ Primer");
-document.writeln("                    Plus<br>&nbsp;&nbsp;&nbsp;基础知识整理</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/fileop(cpp).html\">C++文件操作</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/experiment\">大物实验MATLAB</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/zeal.html\">Zeal文档下载</a>");

@@ -7,6 +7,7 @@
     <title>键盘映射</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
+    <script src="https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
 </head>
 
 <body>
@@ -466,25 +467,24 @@ B::A</code></pre>
             vim 中可行。</p>
         <h2 id="更换按键位置">更换按键位置</h2>
         <p>如下：</p>
-        <div class="sourceCode" id="cb2">
-            <pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="co"># 进入对应文件夹</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="bu">cd</span> /usr/shared/X11/xkb/symbols</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co"># 查看一下</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="fu">ls</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co"># 由于pc文件只有读权限，需要修改必须进入root权限，因此此处进入root用户修改</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co"># 如无root权限进入编辑时，会警告正在编辑只读文件，并且编辑的内容无法保存</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="fu">sudo</span> -s</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co"># 首次编辑之前一定要备份原始文件！切记！</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="fu">cp</span> pc pc_bkup</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="co"># 编辑pc文件</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="ex">vim</span> pc</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="co"># 退出root用户</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true"></a><span class="bu">exit</span></span></code></pre>
-        </div>
+        <pre><code># 进入对应文件夹
+cd /usr/shared/X11/xkb/symbols
+
+# 查看一下
+ls
+
+# 由于pc文件只有读权限，需要修改必须进入root权限，因此此处进入root用户修改
+# 如无root权限进入编辑时，会警告正在编辑只读文件，并且编辑的内容无法保存
+sudo -s
+
+# 首次编辑之前一定要备份原始文件！切记！
+cp pc pc_bkup
+# 编辑pc文件
+vim pc
+
+# 退出root用户
+exit
+</code></pre>
         <p>在编辑 pc 文件时，可以看到，每一行的构成如下：</p>
         <pre class="vim"><code>key&lt;Esc&gt; { [ Escape ] }</code></pre>
         <p>可以理解为键盘上的 Esc 键位是 Esc 键的功能。需要修改时，将中括号中内容修改。如：</p>

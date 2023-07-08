@@ -128,7 +128,7 @@ B::A
 
 如下：
 
-```bash
+```
 # 进入对应文件夹
 cd /usr/shared/X11/xkb/symbols
 

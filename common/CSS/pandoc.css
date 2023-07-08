@@ -5,6 +5,7 @@ html {
 
 body {
     margin: 0 auto;
+    margin-bottom: 3em;
     hyphens: auto;
     overflow-wrap: break-word;
     text-rendering: optimizeLegibility;
@@ -497,20 +498,15 @@ pre code.hljs {
     text-align: center;
 }
 
-/* 代码高亮专用 */
-/* for block of numbers */
-pre code td.hljs-ln-numbers {
-    text-align: center;
-    color: #9c9c9c;
-    border-right: 0.5px solid #9c9c9c;
-    vertical-align: top;
-    padding-left: 0.5rem;
-    padding-right: 0.8rem;
-    border: none;
+/* 手搓目录专用
+你说气人不气人 */
+.menu ul {
+    list-style: none;
+    font-family: monospace;
+    font-weight: bolder;
+    font-size: 0.8rem;
 }
 
-/* for block of code */
-pre code td.hljs-ln-code {
-    padding-left: 1rem;
-    border: none;
+.menu a {
+    color: #4183c4 !important;
 }
