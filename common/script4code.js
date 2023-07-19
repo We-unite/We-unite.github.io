@@ -8,6 +8,7 @@ document.writeln("    <link rel=\"stylesheet\" href=\"https://www.qin-juan-ge-zh
 document.writeln("    <link rel=\"icon\" type=\"image/x-icon\" href=\"https://www.qin-juan-ge-zhu.top/common/icon.png\" />");
 document.writeln("    <script src=\"https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/click4code.js\"></script>");
+document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/vim.js\"></script>");
 document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\'typora-export os-windows\'>");

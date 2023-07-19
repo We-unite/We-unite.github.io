@@ -23,7 +23,8 @@ body {
 }
 
 .sidenav a {
-    padding: 8px 8px 8px 32px;
+    /* 四个参数分别对应上右下左，莫搞错了 */
+    padding: 4px 4px 4px 32px;
     text-decoration: none;
     /* color: #818181; */
     display: block;
@@ -56,7 +57,7 @@ body {
 body,
 html {
     height: 100%;
-    font-size: 12px;
+    font-size: 20px;
     /* font-family: Avenir Next, PingFang SC, Hiragino Sans GB, Droid Sans Fallback, Microsoft YaHei, sans-serif; */
     /* font-family: Microsoft YaHei; */
     font-family: "PT Serif", 'Times New Roman', Times, serif;
@@ -117,7 +118,7 @@ h3 {
 
 .background {
     background: linear-gradient(#4a96cd, #7cb6dd, #4a96cd);
-    width: 100vw;
+    width: 100%;
     padding: 0;
     margin: 0;
     display: flex;
