@@ -11,13 +11,13 @@
 </head>
 
 <body>
-    <p class="title">vim学习与我的配置</p>
     <div class="pandoc">
-        <p class="intro">Enjoy coding
-            的你，是否时常痛恨鼠标点来点去，耽误码字？<br>可曾詈骂手动批量重复处理的痛苦？<br>Debug时代码上下反复跳转，令你烦闷否？<br>别人的编辑器设置十分不便，私人订制的编辑器呢？<br>如果你有以上苦恼，那么
-            vim 将是你的绝佳选择。</p>
+        <!-- 我的vim设置 -->
+        <p class="title">vim学习与我的配置</p>
         <h1 id="vim-那是个什么-jb-东西">vim? 那是个什么 JB 东西？</h1>
-        <p>vim 是一个文本编辑器，素有“编辑器之神”的美名，同时它也是 Linux 尤其是服务器连接编辑的主要方法。</p>
+        <p>Enjoy coding 的你，是否时常痛恨鼠标点来点去、方向键远离字母，耽误码字？可曾詈骂手动批量重复处理的痛苦？Debug
+            时代码上下反复跳转，令你烦闷否？别人写的编辑器设置种种不便，是否想过有一个自己私人订制的编辑器？如果你有以上苦恼，那么 vim 将是你的绝佳选择。</p>
+        <p>vim 是一个文本编辑器，素有“编辑器之神”的美名，同时它也是 Linux 尤其是服务器环境下编辑文件的主要方法。</p>
         <p>vim 的主要特点是分模式编辑：</p>
         <div class="table-div">
             <table>
@@ -396,8 +396,8 @@
             </svg></div>
         <!-- 楚河汉界 -->
         <h1 id="我的-vim-学习路线">我的 vim 学习路线</h1>
-        <p>不幸的是 Vim 的学习曲线确实相当陡峭，我花了很久才适应了用 Vim 进行开发的过程。最开始你会觉得非常不适应，但一旦熬过了初始阶段，相信我，你会爱上 Vim。以我而言，现在离开了 vim
-            的模式几乎已经快不会写材料了，前几天交作业要求 word，我保存文件居然不是<kbd>Ctrl+s</kbd>，而是顺手来了个<kbd>:wqa</kbd>。</p>
+        <p>不幸的是 Vim 的学习曲线确实相当陡峭，最开始你会觉得非常不适应，但一旦熬过了初始阶段，你会爱上 Vim。以我而言，现在离开了 vim 的模式几乎已经快不会写材料了，前几天交作业要求
+            word，我保存文件居然不是<kbd>Ctrl+s</kbd>，而是顺手来了个<kbd>:wq</kbd>。</p>
         <p>我的 vim 学习路线如下：</p>
         <ul>
             <li>环境：虚拟机 Ubuntu22.04 LTS 环境，vim。也可以使用 windows 下的 gvim/neovim 或 gitbash 自带 vim 等。</li>
@@ -408,23 +408,127 @@
                     Adventures</a>，多玩几遍，直到熟悉其所有键位。<del><strong>“家贫，无从致游戏以玩”</strong>，谁要是有这个游戏全版，记得 v 我一份！</del></li>
             <li>同时，在命令行中学<code>vimtutor</code>，这是 vim 自带的基础官方教程，对于基础使用方法介绍非常完整。
                 <ul>
-                    <li>系统如果是中文则该教程是中文，否则为英文，不过这点英文初中英语就足以应付了。</li>
+                    <li>系统如果是中文则该教程是中文，否则为英文。</li>
                     <li>使用方法为在命令行中输入<kbd>vimtutor</kbd>并回车。学习过程中尽量不要退出，因为教程不会保存本次做过的操作，下次再进来是个新的。</li>
                     <li>第一次学会慢一些，一小时左右，一共 7 章若干节，一节一个技能，每一章有一个总结。</li>
                 </ul>
             </li>
-            <li>用了 vim，你难道不觉得键盘上的 Esc 放那么远简直倒灶吗？没错，我也这么觉得。于是我们想到自己做<a href="./keymap.html">键盘映射</a></li>
+            <li>用了 vim，你难道不觉得键盘上的 Esc 放那么远简直是反人类吗？没错，我也这么觉得。于是想到自己做<a
+                    href="https://www.qin-juan-ge-zhu.top/code/linux/vim/keymap.html">键盘映射</a>。</li>
         </ul>
         <p>想了解其他信息，可以参考 CSDiy 的<a href="https://csdiy.wiki/%E5%BF%85%E5%AD%A6%E5%B7%A5%E5%85%B7/Vim/">vim
                 指南</a>。当然，众所周知，学习工具的核心在于使用，用起来逢山开路遇水搭桥，才最具效率和效果，<em>isn’t it?</em> 现代的我们，大多数情况的代码都有 IDE，但 vim
             的分模式编辑和高度定制化一定会帮我们在 Coding 之路上快马加鞭。在你的各种 IDE 里安装 vim 插件，练起来，享受 All in One 的乐趣吧！</p>
+        <h1 id="vim-手动编译安装">vim 手动编译安装</h1>
+        <p>vim 在许多 Linux 发行版都有预装，即使没有预装的也都可以下载到安装包进行安装。但是这里边有几个问题：</p>
+        <ul>
+            <li>很多 vim 版本不支持 python/python2/rust/perl/lua 等语言编写的插件。
+                <ul>
+                    <li>是否支持某功能，在命令行运行<code>vim --version</code>或在 vim
+                        内运行<code>:version</code>命令即可查看，带有<code>+</code>号的表示支持，<code>-</code>号表示不支持。</li>
+                    <li>语言后边带有<code>dyn</code>的（如<code>+python3/dyn</code>）表示支持动态链接，否则表示仅静态链接。</li>
+                </ul>
+            </li>
+            <li>不论何种 Linux 发行版，使用的 vim 版本都略微比发行时间旧一些以保证稳定性；但有时追求新功能的话需要最新版，甚至网上找不到你需要的版本的安装包。</li>
+        </ul>
+        <p>因而，我们有时会需要自己手动编译安装 vim。即以我而言，为了在 vim 上使用 GitHub Copilot 插件，根据插件文档要求，我不得不手动编译 vim。下面是我的编译过程。当前系统为 Ubuntu22.04
+            LTS。编译过程中主要参考以下几篇文章，在此一并致谢：</p>
+        <ul>
+            <li><a href="https://richrose.dev/posts/linux/vim/vim-compile/">Compiling Vim</a></li>
+            <li><a href="https://blog.csdn.net/MHSMIE/article/details/112005119">vim 使用原码升级到最新版本</a></li>
+            <li><a href="https://zhuanlan.zhihu.com/p/111592292">VIM 学习笔记 编译 Vim 支持 Python3</a></li>
+        </ul>
+        <h2 id="清理干净">清理干净</h2>
+        <p>下载的第一步当然是卸载当前系统具有的 vim 了。除此之外，由于 Python2 过于老旧，我选择不支持 Python2 仅支持 Python3 的 vim，因此也将 Python2 卸载。</p>
+        <pre><code class="language-bash">sudo apt autoremove vim rvim gvim vim-runtime
+sudo apt autoremove python2*</code></pre>
+        <h2 id="做好准备">做好准备</h2>
+        <p>为了编译能够支持 python3/rust/perl/lua 等语言的 vim，我们需要安装一些包。</p>
+        <pre><code class="language-bash">sudo apt install -y git \
+                 libatk1.0-dev \
+                 libcairo2-dev \
+                 #libgtk2.0-dev \
+                 liblua5.1-0-dev \
+                 libncurses5-dev \
+                 libperl-dev \
+                 libx11-dev \
+                 libxpm-dev \
+                 libxt-dev \
+                 lua5.1 \
+                 python3-dev \
+                 ruby-dev</code></pre>
+        <p>由于我的编译在服务器上运行，主要运行环境为命令行，不需要 gtk2 等图形界面的支持，因而将安装 gtk 的那一行注释掉了。在编译带有 gtk2.0 的 vim 时似乎会遇到问题：vim
+            源码截至目前版本（v9.0.1854）采用的 gtk 代码中的<code>struct _GTimeVal</code>已经被弃用，gcc
+            要求改用<code>struct _GDateTime</code>，因此编译时会报错，而且陷入死循环，编译不会终止，只能<kbd>Ctrl+c</kbd>杀死进程。我尚不知道如何解决。这也是我放弃支持 gtk
+            的原因之一。</p>
+        <h2 id="下载源码">下载源码</h2>
+        <p>vim 源码可以通过其<a href="https://github.com/vim/vim">GitHub 仓库</a>下载，也可以在其<a
+                href="https://www.vim.org/download.php">官网</a>下载。我选择了前者。</p>
+        <pre><code class="language-bash">git clone https://github.com/vim/vim
+
+# 后续处理过程都在源码目录下的src目录内进行，因而切换过去
+cd vim/src
+# 如果此前自己编译安装过vim，需要先卸载自己的安装并清理上次的编译文件，否则会持续报错
+sudo make uninstall
+sudo make distclean</code></pre>
+        <h2 id="开干">开干！</h2>
+        <h3 id="configure">configure</h3>
+        <p>vim
+            的编译过程中，需要先运行<code>configure</code>脚本，该脚本会检查当前系统的环境，并以参数形式接收你需要哪些功能。可以通过<code>./configure --help</code>查看所有可选参数及其功能说明。我选择的参数如下：
+        </p>
+        <pre><code class="language-bash">sudo ./configure\
+ --with-features=huge \
+ --enable-multibyte \
+ --enable-rubyinterp=dynamic \
+ --with-ruby-command=/usr/bin/ruby \
+ --enable-luainterp\
+ --enable-python3interp=dynamic \
+ --with-python3-command=/usr/bin/python3.10 \
+ --with-python3-config-dir=/usr/lib/python3.10/config-3.10-x86_64-linux-gnu \
+ --enable-perlinterp=dynamic \
+ --enable-largefile \
+ --enable-cscope \
+ --with-compiledby=&quot;An Ordinary Communist weunite1848@gmail.com&quot; \
+ --enable-fail-if-missing \
+ --prefix=/usr</code></pre>
+        <p>对以上选择的参数做一简要说明：</p>
+        <ul>
+            <li><code>--with-features=huge</code>：支持最多的功能</li>
+            <li><code>--enable-multibyte</code>：支持多字节字符（比如中文！！！）</li>
+            <li><code>--enable-rubyinterp=dynamic</code>：支持 ruby 插件，动态链接</li>
+            <li><code>--with-ruby-command=/usr/bin/ruby</code>或<code>--with-python3-command=/usr/bin/python3</code>等，指定
+                vim 使用的这些语言解释器的位置</li>
+            <li><code>--with-python3-config-dir=/usr/lib/python3.10/config-3.10-x86_64-linux-gnu</code>，指定 python3 的
+                config 文件位置。
+                <ul>
+                    <li>该文件在不同系统上的位置不同，可以通过命令行运行<code>python3-config --configdir</code>查看。</li>
+                </ul>
+            </li>
+            <li><code>--enable-largefile</code>：支持大文件</li>
+            <li><code>--enable-cscope</code>：支持 cscope</li>
+            <li><code>--with-compiledby</code>：说明编译者。该信息在编译结束之后会在 vim 首页、帮助页面及版本信息中显示，也就是你的名字与此次编译的 vim 版本永远绑定了。</li>
+            <li><code>--enable-fail-if-missing</code>：如果缺少某些功能，编译过程会终止，而不是继续编译。强烈推荐加上！否则遇到编译错误还继续编译，只会得到不符合需求的 vim。</li>
+            <li><code>--prefix=/usr</code>：指定安装位置。默认为<code>/usr/local</code>，但我选择了<code>/usr</code>。</li>
+        </ul>
+        <p>除此之外还有一些参数，如<code>--enable-gui=gtk2</code>/<code>--enable-gtk2-check</code>/<code>--enable-fontset</code>等，可以根据自己的需求选择。
+        </p>
+        <h3 id="编译安装">编译安装</h3>
+        <p>编译安装过程简单到无以复加，就几句话的事。</p>
+        <pre><code class="language-bash"># 编译
+sudo make
+# 安装
+sudo make install</code></pre>
+        <p>安装过程中可能会出现报错，如部分文件（<code>ex</code>/<code>view</code>等）已经存在，删掉该文件再重新运行命令安装便是。</p>
+        <p>安装完成后，可以在命令行中运行<code>vim --version</code>查看 vim 的版本信息，确认是否支持你需要的功能。</p>
         <h1 id="我的-vim-配置">我的 vim 配置</h1>
         <p>网上一般的教程都说 vim 的默认配置文件为<code>~/.vimrc</code>。这当然是不错的，但是有一个巨大的问题：家目录是随着用户而不同的，这会导致我们以当前普通用户打开 vim 编辑文件与以 root
-            用户使用 vim 的观感完全不一致，就很烦。解决方法是<strong>直接编辑 vim 默认的最根本的 vimrc</strong>，不管什么用户都会先加载该文件的配置而后加载用户配置。</p>
-        <p>vim 默认的最根本的 vimrc 在<code>/etc/vim</code>下的
-            vimrc。为了便于后续编辑，我们可以在家目录下创建一个软链接，每次只需要编辑链接里的文件即可自动改变原来的文件。但需要注意，编辑该文件夹内的内容仍然需要 sudo 权限。</p>
+            用户使用 vim 的观感完全不一致，就很烦。</p>
+        <p>通过查看<kbd>vim –version</kbd>的输出，可以发现，vim 的配置文件有几层，其中“系统 vimrc
+            文件”被放置在<code>$VIM/vimrc</code>，而<code>$VIM</code>为<code>/etc/vim</code>。因此，我们可以将 vim
+            的配置文件放置在<code>/etc/vim</code>下，这样不论是普通用户还是 root
+            用户，都会使用这份文件，保证观感一致。另外，由于该文件位置较远，我选择在<code>~/useful</code>下创建软链接，方便使用。</p>
         <p>除此之外，出于同样的目的（保证当前用户与 root 用户观感一致），建议将插件也指定一个专门的绝对路径。我放在了<code>/home/player/useful/bundle</code>。</p>
-        <pre><code># 创建软链接
+        <pre><code class="language-bash"># 创建软链接
 # 我习惯把有用的文件放在～/useful下
 mkdir useful
 cd useful
@@ -433,14 +537,13 @@ cd useful
 sudo ln -s /etc/vim /home/player/useful/vim
 
 # 插件存放位置
-mkdir bundle
-        </code></pre>
+mkdir bundle</code></pre>
         <h2 id="设置">设置</h2>
-        <p>下文所有设置的目录均为<code>/home/player/useful/vim</code>，也即<code>/etc/vim</code>。由于内容过多，我在目录下创建了<code>vimrcs</code>文件夹，将不同内容分别以专门文件管理，vimrc
-            文件调用这些文件。因此，下边只有<code>vimrc</code>在<code>/etc/vim</code>下；其他文件均在<code>/etc/vim/vimrcs</code>下，以<code>./vimrcs/&lt;文件名&gt;</code>表示。插件放置在<code>/home/player/useful/bundle</code>。
+        <p>下文所有设置的目录均为<code>~/useful/vim</code>，也即<code>/etc/vim</code>。由于内容过多，我在目录下创建了<code>vimrcs</code>文件夹，将不同内容分别以专门文件管理，vimrc
+            文件调用这些文件。因此，下边只有<code>vimrc</code>在<code>/etc/vim</code>下；其他文件均在<code>/etc/vim/vimrcs</code>下，以<code>./vimrcs/&lt;文件名&gt;</code>表示。插件放置在<code>~/useful/bundle</code>。
         </p>
-        <h3 id="vimrc">vimrc</h3>
-        <pre class="vim"><code>&quot; Vundle插件管理及插件内容
+        <h3 id="vimrc">./vimrc</h3>
+        <pre><code class="hljs language-vim">&quot; Vundle插件管理及插件内容
 if filereadable(expand(&quot;/etc/vim/vimrcs/plugs.vim&quot;))
   source /etc/vim/vimrcs/plugs.vim
 endif
@@ -470,28 +573,30 @@ if filereadable(expand(&quot;/etc/vim/vimrcs/autocmd.vim&quot;))
   source /etc/vim/vimrcs/autocmd.vim
 endif</code></pre>
         <h3 id="vimrcsplugs.vim">./vimrcs/plugs.vim</h3>
-        <pre class="vim"><code>&quot; Vundle插件管理器配置
-set nocompatible               &quot;去除VIM一致性，必须&quot;
-filetype off                   &quot;必须&quot;
+        <pre><code class="hljs language-vim">&quot; Vundle插件管理器配置
+set nocompatible               &quot;去除VIM一致性，必须
+filetype off                   &quot;必须
 
-&quot;设置包括vundle和初始化相关的运行时路径&quot;
+&quot;设置包括vundle和初始化相关的运行时路径
 set rtp+=/home/player/useful/bundle/Vundle.vim
 call vundle#begin(&#39;/home/player/useful/bundle&#39;)
 
-Plugin &#39;VundleVim/Vundle.vim&#39;   &quot;启用vundle管理插件，必须&quot;
-Plugin &#39;Valloric/YouCompleteMe&#39;
-Plugin &#39;preservim/nerdtree&#39;
+Plugin &#39;VundleVim/Vundle.vim&#39;   &quot;启用vundle管理插件，必须
+Plugin &#39;Valloric/YouCompleteMe&#39; &quot;代码补全插件
+Plugin &#39;preservim/nerdtree&#39; &quot;文件目录树插件
 Plugin &#39;Xuyuanp/nerdtree-git-plugin&#39; &quot;nerdtree git支持
-Plugin &#39;skywind3000/vim-terminal-help&#39;
-Plugin &#39;scrooloose/syntastic&#39;
-Plugin &#39;Lokaltog/powerline&#39;,{&#39;rtp&#39;:&#39;powerline/bindings/vim/&#39;}
+Plugin &#39;skywind3000/vim-terminal-help&#39; &quot;vim-terminal-help插件
+Plugin &#39;scrooloose/syntastic&#39; &quot;语法检查插件
+Plugin &#39;Lokaltog/powerline&#39;,{&#39;rtp&#39;:&#39;powerline/bindings/vim/&#39;} &quot;状态栏信息插件
+Plugin &#39;ianva/vim-youdao-translater&#39; &quot;有道翻译插件
+Plugin &#39;github/copilot.vim&#39; &quot;GitHub Copilot插件
 
-&quot;在此增加其他插件，安装的插件需要放在vundle#begin和vundle#end之间&quot;
-&quot;安装github上的插件格式为 Plugin &#39;用户名/插件仓库名&#39;&quot;
+&quot;在此增加其他插件，安装的插件需要放在vundle#begin和vundle#end之间
+&quot;安装github上的插件格式为 Plugin &#39;用户名/插件仓库名&#39;
 
  call vundle#end()
 
-filetype plugin indent on     &quot;加载vim自带和插件相应的语法和文件类型相关脚本，必须&quot;
+filetype plugin indent on     &quot;加载vim自带和插件相应的语法和文件类型相关脚本，必须
 
 &quot; YouCompleteMe
 let g:ycm_global_ycm_extra_conf=&#39;/home/player/useful/bundle/YouCompleteMe/.ycm_extra_conf.py&#39;
@@ -503,7 +608,7 @@ let g:ycm_semantic_triggers =  {
 highlight PMenu ctermfg=34 ctermbg=21 guifg=darkred guibg=darkblue
 highlight PMenuSel ctermfg=21 ctermbg=34 guifg=darkblue guibg=darkred
 let g:ycm_autoclose_preview_window_after_completion=1 &quot;窗口在完成操作后消失
-map &lt;leader&gt;g :YcmCompleter GoToDefinitionElseDeclaration&lt;CR&gt; &quot;找到当前内容定义位置的快捷方式
+map &lt;leader&gt;g :YcmCompleter GoToDefinitionElseDeclaration&lt;CR&gt;  &quot;找到当前内容定义位置的快捷方式
 
 &quot;NERDTree
 autocmd vimenter * NERDTree &quot;进入vim自动打开nerdtree
@@ -518,6 +623,7 @@ let g:NERDTreeShowLineNumbers=1 &quot;窗口是否显示行号
 let NERDTreeShowHidden=1 &quot; 显示隐藏文件
 let NERDTreeIgnore = [&#39;\.pyc$&#39;, &#39;\.swp&#39;, &#39;\.swo&#39;, &#39;\.vscode&#39;, &#39;__pycache__&#39;] &quot; 过滤: 所有指定文件和文件夹不显示
 autocmd BufWinEnter * if getcmdwintype() == &#39;&#39; | silent NERDTreeMirror | endif &quot; 在每个标签页打开相同的文件树
+let g:NERDtreeNodeDelimiter = &quot;\u00a0&quot;
 
 
 &quot;nerdtree-git-plugin
@@ -538,7 +644,7 @@ let g:NERDTreeGitStatusUntrackedFilesMode = &#39;all&#39; &quot; a heavy feature
 &quot;let g:NERDTreeGitStatusGitBinPath = &#39;/your/file/path&#39; &quot; default: git (auto find in path)
 
 &quot;vim-terminal-help
-set termwinsize=10*120
+set termwinsize=10*106
 
 &quot;syntastic
 &quot;以下内容是syntastic插件的一般配置，由于YouCompleteMe插件对该插件支持过于优秀，一般不再需要配置，故废弃
@@ -582,10 +688,15 @@ let g:syntastic_python_pylint_args=[&#39;--disable=C0111,R0903,C0301&#39;]
 
 &quot; powerline
 let laststatus=2
-let g:airlinr_powerline_fonts=1 &quot; 使用官方打过补丁的字体
-let g:Powerline_symbols=&#39;fancy&#39;</code></pre>
+let g:airlinr_powerline_fonts=1 &quot;使用官方打过补丁的字体
+let g:Powerline_symbols=&#39;fancy&#39;
+
+&quot;vim-youdao-translater
+vnoremap &lt;silent&gt; &lt;C-t&gt; :&lt;C-u&gt;Ydv&lt;CR&gt;
+nnoremap &lt;silent&gt; &lt;C-t&gt; :&lt;C-u&gt;Ydc&lt;CR&gt;
+noremap &lt;leader&gt;yd: &lt;C-u&gt;Yde&lt;CR&gt;</code></pre>
         <h3 id="vimrcsmyset.vim">./vimrcs/myset.vim</h3>
-        <pre class="vim"><code>set nocp    &quot;设置兼容
+        <pre><code class="hljs language-vim">set nocp    &quot;设置兼容
 set expandtab   &quot;设置tab
 set shiftwidth=4    &quot;设置tab的间隔
 set tabstop=4   &quot;四个空格代表一个tab
@@ -649,12 +760,12 @@ endif
 syntax on
 set cul
 set cuc
-hi CursorLine   cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
+hi CursorLine cterm=NONE ctermbg=darkred ctermfg=white guibg=darkred guifg=white
 &quot;&quot;set lines=35 columns=118
-colorscheme darkblue &quot;设置颜色主题
+colorscheme zaibatsu &quot;设置颜色主题
 set wrap &quot;设置自动折行</code></pre>
         <h3 id="vimrcsmatch.vim">./vimrcs/match.vim</h3>
-        <pre class="vim"><code>&quot;各类符号自动匹配
+        <pre><code class="hljs language-vim">&quot;各类符号自动匹配
 :inoremap ( ()&lt;ESC&gt;i
 :inoremap ) &lt;c-r&gt;=ClosePair(&#39;)&#39;)&lt;CR&gt;
 :inoremap { {}&lt;ESC&gt;i
@@ -670,7 +781,7 @@ function ClosePair(char)
     endif
 endfunction</code></pre>
         <h3 id="vimrcsfuck.vim">./vimrcs/fuck.vim</h3>
-        <pre class="vim"><code>&quot; 键盘映射设置区域
+        <pre><code class="hljs language-vim">&quot; 键盘映射设置区域
 
 &quot; 对应使用函数的配置
 set guitablabel=%{ShortTabLabel()}
@@ -742,7 +853,7 @@ function! CurDir()
     return curdir
 endfunction</code></pre>
         <h3 id="vimrcskeybind.vim">./vimrcs/keybind.vim</h3>
-        <pre class="vim"><code>map - dd
+        <pre><code class="hljs language-vim">map - dd
 map up 20k
 map ne 20j
 map end G
@@ -785,8 +896,7 @@ au BufNewFile,BufRead *.py
     \ set autoindent |
     \ set fileformat=unix |</code></pre>
         <h3 id="vimrcsautocmd.vim">./vimrcs/autocmd.vim</h3>
-        <pre
-            class="vim"><code>autocmd BufReadPost,BufWritePre *.html,*.c,*.cpp normal gg=G
+        <pre><code class="hljs language-vim">autocmd BufReadPost,BufWritePre *.html,*.c,*.cpp normal gg=G
 autocmd Filetype html,markdown setlocal nowrap
 &quot;autocmd Filetype c,cpp map &lt;buffer&gt;&lt;C-p&gt; I//&lt;esc&gt;
 autocmd Filetype c,cpp map &lt;buffer&gt;&lt;C-d&gt; 0xx&lt;esc&gt;ta
@@ -795,11 +905,13 @@ autocmd Filetype c,cpp map &lt;buffer&gt;&lt;C-d&gt; 0xx&lt;esc&gt;ta
 autocmd Filetype python map &lt;buffer&gt;&lt;C-d&gt; 0xx&lt;esc&gt;ta
 &quot;autocmd Filetype python vmap &lt;buffer&gt;&lt;C-p&gt; &lt;C-v&gt;I# &lt;esc&gt;
 &quot;autocmd Filetype c,cpp vmap &lt;buffer&gt;&lt;C-d&gt; &lt;C-v&gt;0xx
-&quot;说明：本文件上文所有&lt;Ctrl-p&gt;的设置，原是用来为c,cpp,python文件设置注释的，但是注释可以通过&lt;Ctrl-v&gt;进入块选模式而后&lt;Ctrl-i&gt;进入插入模式，在前边输入注释符号，保存，则选中的行均被注释，甚为方便，因此这许多键一起弃用。</code></pre>
-        <p class="time">2023.7.5</p>
+&quot;说明：本文件上文所有&lt;Ctrl-p&gt;的设置，原是用来为c,cpp,python文件设置注释的
+&quot;但是注释可以通过&lt;Ctrl-v&gt;进入块选模式而后&lt;Ctrl-i&gt;进入插入模式
+&quot;在前边输入注释符号，保存，则选中的行均被注释
+&quot;甚为方便，因此这许多键一起弃用。</code></pre>
+        <p class="time">2023.7.5<br>2023.9.6改</p>
         <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
     </div>
 </body>
-
 
 </html>
