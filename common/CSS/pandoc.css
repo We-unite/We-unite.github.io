@@ -54,12 +54,12 @@ p {
 
 a {
     text-decoration: none;
-    color: cyan;
+    color: #daa520;
 }
 
 a:visited {
     text-decoration: none;
-    color: cyan;
+    color: chocolate;
 }
 
 img {

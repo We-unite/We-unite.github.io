@@ -159,6 +159,7 @@ document.writeln("        </div>");
 document.writeln("        <div class=\"main-menu\" is=\"main4\" onclick=\"clickit(\'child4\')\">-贪玩蓝月</div>");
 document.writeln("        <div class=\"child\" id=\"child4\" style=\"display:none\">");
 document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/play/travel-card-ce\">-行程卡纪念版</a>");
+document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/play/calendar/index.htm\">通用寿星历</a>");
 document.writeln("        </div>");
 document.writeln("    </div>");
 document.writeln("    <!-- 目录结束 -->");
