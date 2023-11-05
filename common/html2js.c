@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 void html2js(char file_name[])
@@ -45,8 +46,6 @@ int main()
     strcpy(file_name, "script4code");
     html2js(file_name);
     strcpy(file_name, "script4works");
-    html2js(file_name);
-    strcpy(file_name, "script4secret");
     html2js(file_name);
     return 0;
 }

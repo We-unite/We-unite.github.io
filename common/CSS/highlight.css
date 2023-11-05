@@ -1,17 +1,17 @@
 /* for block of numbers */
 pre code td.hljs-ln-numbers {
-    text-align: center;
     color: #9c9c9c;
     border-right: 0.5px solid #9c9c9c;
     vertical-align: top;
     padding-left: 0.5rem;
     padding-right: 0.8rem;
     border: none;
+    text-align: right;
 }
 
 /* for block of code */
 pre code td.hljs-ln-code {
-    padding-left: 1rem;
+    /* padding-left: 1rem; */
     border: none;
 }
 

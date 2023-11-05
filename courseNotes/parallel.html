@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>并行计算大法好</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
+    <script src="https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+	    tex2jax: {
+	        inlineMath: [['$','$'], ['\\(','\\)']],
+	        processEscapes: true
+	    }
+	});
+    </script>
+</head>
+
+<body>
+    <div class="pandoc">
+        <div class="main">
+            <p class="title">并行计算大法好</p>
+            <h1 id="基于共享内存的并行编程">基于共享内存的并行编程</h1>
+            <h2 id="pthreads的多线程并行"><code>Pthreads</code>的多线程并行</h2>
+            <h3 id="简介">简介</h3>
+            <p><code>Pthreads</code>是 POSIX（类 Unix 系统的通用标准）为了支持多线程而提供的 API，在类 Unix 操作系统（GNU/Linux，Mac）可用，Windows 也已经由
+                MinGW/mingw-w64/msvc 等编译器实现。</p>
+            <p>在 C 语言使用该 API 时需引用头文件<code>#include &lt;pthread.h&gt;</code></p>
+            <p>API 主要提供了如下几类功能：</p>
+            <ul>
+                <li>线程管理</li>
+                <li>互斥量</li>
+                <li>路障（同步）</li>
+                <li>条件变量</li>
+            </ul>
+            <h3 id="线程管理">线程管理</h3>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+#define THREADS_NUM 10
+
+void *hello(void* args)
+{
+    int i=(int)args;
+    printf(&quot;Thread %d is here!\n&quot;,i);
+    return NULL;
+}
+
+int main()
+{
+    /*
+     * 创建线程变量
+     * pthread_t 是一个32b整数，是线程id
+     */
+    pthread_t p[THREADS_NUM];
+    int i;
+
+    // 创建线程
+    for(i=0;i&lt;THREADS_NUM;i)
+    {
+        /*
+         * 函数说明：
+         * 第一个参数是线程id的地址
+         * 第二个参数是线程调用函数返回的参数
+         * 第三个是调用的函数名
+         * 第四个是函数的参数列表，类型必须为void *类型（64b）
+         * 如果是一个参数可以考虑强转，多个参数必须写进结构体或数组等，总之必须只能传一个void *参数
+         */
+        pthread_create(&amp;p[i],NULL,hello,(void *)i);
+    }
+    for(i=0;i&lt;THREADS_NUM;i++)
+    {
+        /*
+         * 函数说明：
+         * 这个函数是用来等待线程结束的，线程结束之后才会进行下一句
+         * 第一个参数是线程id（不是地址！！！）
+         * 第二个参数是线程返回值不为NULL时返回值存储的地址
+         * 这里写成NULL只是因为这里不会异常返回，否则可以用别的参数接一下，用来做异常处理
+         */
+        pthread_join(p[i],NULL);
+        /*
+         * 如果不需要等待线程结束，换言之即将主线程与子线程分离，可以使用
+         * pthread_detach(pthread_t thread)
+         */
+    }
+    return 0;
+}</code></pre>
+            <h3 id="互斥量">互斥量</h3>
+            <p>在多线程编程过程中，多个线程可能同时访问同一段数据，此时<strong>如果至少有一个线程在写数据</strong>，就会出现数据不一致的情况，称为<strong>竞争条件</strong>。为此，我们需要<strong>临界区</strong>。
+            </p>
+            <p>临界区是指一个更新共享资源的代码段，<strong>一次只允许一个线程访问该段代码</strong>，目的是在多线程访问共享数据时保证数据的完整性，解决上述问题。之所以叫临界区，是<strong>临各线程之界</strong>。访问临界区的原则是：
+            </p>
+            <ul>
+                <li>一次只有一个线程访问</li>
+                <li>一个线程不能停留在里边一直访问</li>
+            </ul>
+            <h4 id="忙等待">忙等待</h4>
+            <p>可以通过空循环的方法实现当一个线程在用的时候另一个线程禁止访问。</p>
+            <p>空口白话不好使，看代码吧，利用泰勒公式求$\pi$的值。</p>
+            <p>已知：</p>
+            <ul>
+                <li>$arctan(1)=\frac \pi 4$</li>
+                <li>$arctan(x)=\Sigma_{i=0}^{+\infty}(-1)^i \frac 1 {2x+1}$，收敛域为$[-1, 1]$</li>
+            </ul>
+            <blockquote>
+                <p>哪个大佬知道收敛更快的算法啊，这个办法<strong>收敛实在是太慢辣</strong>！</p>
+            </blockquote>
+            <p>编程如下：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+#define SUM_NUM 1000000000 // 求和累加次数
+int flag=0; // 临界区标志位，这里用1/0等待，也可以让各个线程顺序访问之类别的方式
+int CyclePerThread; // 每个线程计算次数
+double pi=0; // pi的值
+
+void *thread(void * args)
+{
+    int i=(int)args,j,k;
+    double temp=0;
+    for(j=0;j&lt;CyclePerThread;j++)
+    {
+        k=j+i*CyclePerThread;
+        temp+=(k%2==0?1.0:-1.0)/(2.0*k+1);
+    }
+    while(flag!=0)
+    {
+        ;
+    }
+    flag++;
+    pi+=temp*4;
+    flag--;
+
+    return NULL;
+}
+
+int main()
+{
+    int n;// 线程数
+    printf(&quot;Please input the number of threads: &quot;);
+    scanf(&quot;%d&quot;,&amp;n);
+    // 检查，防止除不尽导致最后一个线程计算次数不够
+    if(SUM_NUM%n!=0)
+    {
+        printf(&quot;The number of threads is not suitable!\n&quot;);
+        exit(1);
+    }
+    CyclePerThread=SUM_NUM/n;
+
+    pthread_t *p=(pthread_t *)malloc(sizeof(pthread_t)*n);
+    int i;
+    for(i=0;i&lt;n;i++)
+    {
+        pthread_create(&amp;p[i],NULL,thread,(void *)i);
+    }
+    for(i=0;i&lt;n;i++)
+    {
+        pthread_join(p[i],NULL);
+    }
+    printf(&quot;The value of pi is %.15lf\n&quot;,pi);
+    return 0;
+}</code></pre>
+            <h4 id="互斥锁">互斥锁</h4>
+            <p>上述<strong>通过循环的办法实现的忙等待，优点在于实现比较简单好理解，缺点在于空循环浪费 CPU
+                    资源，且当线程数较多时，线程切换的开销也会增大</strong>。因此我们可以调用<code>Pthreads</code>提供的互斥锁来实现临界区的功能。互斥锁是一个变量，通过调用函数来实现锁定临界区实现忙等待。
+            </p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+
+#define SUM_NUM 1000000000 // 求和累加次数
+pthread_mutex_t mutex; // 互斥锁
+int CyclePerThread; // 每个线程计算次数
+double pi=0; // pi的值
+
+void *thread(void * args)
+{
+    int i=(int)args,j,k;
+    double temp=0;
+    for(j=0;j&lt;CyclePerThread;j++)
+    {
+        k=j+i*CyclePerThread;
+        temp+=(k%2==0?1.0:-1.0)/(2.0*k+1);
+    }
+    // 互斥锁可以保证该段代码同一时刻只有一个线程在操作
+    pthread_mutex_lock(&amp;mutex); // 加锁
+    pi+=temp*4;
+    pthread_mutex_unlock(&amp;mutex); // 解锁
+
+    return NULL;
+}
+
+int main()
+{
+    int n;// 线程数
+    printf(&quot;Please input the number of threads: &quot;);
+    scanf(&quot;%d&quot;,&amp;n);
+    // 检查，防止除不尽导致最后一个线程计算次数不够
+    if(SUM_NUM%n!=0)
+    {
+        printf(&quot;The number of threads is not suitable!\n&quot;);
+        exit(1);
+    }
+    CyclePerThread=SUM_NUM/n;
+
+    pthread_t *p=(pthread_t *)malloc(sizeof(pthread_t)*n);
+    int i;
+    /*
+     * 初始化互斥锁，函数原型：
+     * int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+     * mutex：互斥锁变量
+     * attr：互斥锁属性，一般为NULL
+     */
+    pthread_mutex_init(&amp;mutex,NULL);
+
+    for(i=0;i&lt;n;i++)
+    {
+        pthread_create(&amp;p[i],NULL,thread,(void *)i);
+    }
+    for(i=0;i&lt;n;i++)
+    {
+        pthread_join(p[i],NULL);
+    }
+    // 销毁互斥锁
+    pthread_mutex_destroy(&amp;mutex);
+
+    printf(&quot;The value of pi is %.15lf\n&quot;,pi);
+    return 0;
+}</code></pre>
+            <p>可以看到，互斥锁的使用分以下几个步骤：</p>
+            <ul>
+                <li>定义互斥锁变量</li>
+                <li>初始化互斥锁</li>
+                <li>临界区上锁</li>
+                <li>解锁</li>
+                <li>销毁互斥锁</li>
+            </ul>
+            <h4 id="比较">比较</h4>
+            <p>通过实际数据比较，得出以下结论：</p>
+            <ul>
+                <li>忙等待强调访问临界区的顺序（指按顺序访问的写法而言）</li>
+                <li>互斥量访问临界区顺序随机</li>
+                <li>当线程数多于 CPU 核数时，忙等待效率降低</li>
+                <li>有一些应用需要控制线程进入临界区的顺序</li>
+                <li>某些并行计算（如矩阵乘法）没有交换律，无法使用互斥量</li>
+            </ul>
+            <h3 id="信号量">信号量</h3>
+            <p>信号量可以用于临界区，保护共享资源，其特性如下：</p>
+            <ul>
+                <li>是一种特殊类型的<code>unsigned int</code></li>
+                <li>要访问共享资源必须获取一个信号量，且信号量减 1</li>
+                <li>离开共享资源的线程释放信号量，信号量加 1</li>
+                <li>信号量为 0 时，试图访问共享资源的线程将处于等待状态</li>
+            </ul>
+            <p>需要注意的是，上述的信号量只是一种管理方法，与<code>Pthreads</code>中的信号量似乎区别不小，这一点从<code>sem_t</code>的大小上就能看出来。凑合看吧，知道原理就行。</p>
+            <pre><code>#include &lt;semaphore.h&gt; // 信号量头文件
+
+// 定义信号量
+sem_t sem;
+
+/*
+ * 信号量初始化
+ * sem: 信号量变量
+ * pshared: 信号量的类型，0为线程间共享，非0为进程间共享，一般设置为0
+ * value: 信号量的初始值
+ */
+int sem_init(sem_t *sem, int pshared, unsigned int value);
+
+/*
+ * 申请信号量，为0则等待，否则占用一个并减1
+ */
+int sem_wait(sem_t *sem);
+
+/*
+ * 释放信号量，信号量值加1
+ */
+int sem_post(sem_t *sem);
+
+/*
+ * 销毁信号量
+ * sem: 信号量变量
+ */
+int sem_destroy(sem_t *sem);</code></pre>
+            <p>一个示例：</p>
+            <ul>
+                <li>t 个线程，每个线程依次向后一个发送消息，最后一个向第 0 个发送消息</li>
+                <li>线程接收到消息后打印出来并终止</li>
+                <li>为实现消息传递，分配一个<code>char *</code>数组，每个线程初始化消息之后，共享数组的指针指向要发送的消息</li>
+                <li>主线程将共享数组初始化为<code>NULL</code></li>
+                <li>信号量初始化为 0</li>
+            </ul>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;semaphore.h&gt;
+#define MSG_MAX_LEN 50
+
+int t;
+char **msg=NULL:
+sem_t *sem;
+
+void *thread(void *args)
+{
+    int myRank=(int)args;
+    int dest=(myRank+1)%t;
+    sprintf(msg[dest],&quot;Hello to from thread %d&quot;,dest,myRank);
+    sem_post(&amp;sem[dest]);
+    sem_wait(&amp;sem[myRank]);
+    printf(&quot;Thread %d &gt; %s\n&quot;,myRank,msg[myRank]);
+    return NULL;
+}
+
+int main()
+{
+    int i;
+    printf(&quot;Input the num of threads you want: &quot;);
+    scanf(&quot;%d&quot;,&amp;t);
+
+    // 内存申请与信号量初始化
+    pthread_t *p=(pthread_t *)malloc(sizeof(pthread_t)*t);
+    sem=(sem_t *)malloc(sizeof(sem_t)*t);
+    msg=(char **)malloc(sizeof(char *)*t);
+    for(i=0;i&lt;t;i++)
+    {
+        sem_init(&amp;sem[i],0,0);
+        msg[i]=(char *)malloc(sizeof(char)*MSG_MAX_LEN);
+    }
+
+    // 线程创建与执行
+    for(i=0;i&lt;t;i++)
+    {
+        pthread_create(&amp;p[i],NULL,thread,(void *)i);
+    }
+    for(i=0;i&lt;t;i++)
+    {
+        pthread_join(p[i],NULL);
+    }
+
+    // 销毁与释放所有用过的空间
+    for(i=0;i&lt;t;i++)
+    {
+        sem_destroy(&amp;sem[i]);
+        free(msg[i]);
+    }
+    free(msg);
+    free(sem);
+    free(p);
+
+    return 0;
+}
+</code></pre>
+            <p>信号量与互斥量最大的区别在于<strong>信号量没有个体拥有权</strong>，主线程将所有信号量初始化为
+                0，其他任何线程都能对任何信号量调用<code>sem_post</code>和<code>sem_wait</code>函数。</p>
+            <h3 id="路障">路障</h3>
+            <p>路障也称同步点，指线程到达此处进入阻塞状态，等所有进程到达后才能继续进行，主要应用于程序计时/调试等。</p>
+            <p>路障使用有以下几步：</p>
+            <pre><code>#include &lt;pthread.h&gt;
+
+// 定义路障
+pthread_barrier_t barrier;
+
+/*
+ * 路障初始化
+ * 第一个参数是路障变量地址
+ * 第二个参数是路障属性对象，一般为NULL
+ * 第三个参数是路障需要等待的线程数
+ */
+int pthread_barrier_init(pthread_barrier_t *barrier, const pthread_barrierattr_t *attr, unsigned int count);
+
+// 等待路障
+int pthread_barrier_wait(pthread_barrier_t *barrier);
+
+// 销毁路障
+int pthread_barrier_destroy(pthread_barrier_t *barrier);</code></pre>
+            <p>示例程序如下：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;time.h&gt;
+
+pthread_barrier_t barrier;
+
+void *thread(void * args)
+{
+    int i=(int)args;
+    printf(&quot;------ Thread %d is here! ------\n&quot;,i);
+    //模拟初始化
+    sleep(rand()%20);
+    // 到达路障
+    pthread_barrier_wait(&amp;barrier);
+    // 都到了，开始
+    printf(&quot;---- Thread %d starts to work! ----\n&quot;,i);
+    //模拟执行
+    sleep(rand()%200);
+    printf(&quot;---- Thread %d is done! ----\n&quot;,i);
+    return NULL;
+}
+
+int main()
+{
+    pthread_barrier_init(&amp;barrier,NULL,3);
+
+    printf(&quot;**** main thread barrier init done! ****\n&quot;);
+    pthread_t p[2];
+    pthread_create(&amp;p[0],NULL,thread,NULL);
+    pthread_create(&amp;p[1],NULL,thread,NULL);
+
+    // 主线程到达路障，等待
+    pthread_barrier_wait(&amp;barrier);
+
+    // 都到了，毁灭吧
+    pthread_barrier_destroy(&amp;barrier);
+
+    //开始执行
+    printf(&quot;**** main thread starts to work! ****\n&quot;);
+    sleep(rand()%100);
+    printf(&quot;**** main thread is done! ****\n&quot;);
+    pthread_join(p[0],NULL);
+    pthread_join(p[1],NULL);
+    return 0;
+}</code></pre>
+            <h3 id="条件变量">条件变量</h3>
+            <p>条件变量使线程在特定条件或事件之前处于挂起状态。</p>
+            <pre><code>#include &lt;pthread.h&gt;
+
+// 定义条件变量
+pthread_cond_t cond;
+
+/*
+ * 条件变量初始化
+ * 第一个参数是条件变量地址
+ * 第二个参数是条件变量属性对象，一般为NULL
+ */
+int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+
+/*
+ * 解锁一个阻塞的线程
+ */
+int pthread_cond_signal(pthread_cond_t *cond);
+
+/*
+ * 解锁所有阻塞的线程
+ */
+int pthread_cond_broadcast(pthread_cond_t *cond);
+
+/*
+ * 等待条件变量，即通过互斥锁阻塞线程
+ * 第一个参数是条件变量地址
+ * 第二个参数是互斥锁地址
+ */
+int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);</code></pre>
+            <p>示例程序，这个程序真没看明白：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;unistd.h&gt;
+
+pthread_mutex_t mutex[2];
+pthread_cond_t cond;
+
+void *thread_task0(void *args)
+{
+    int cnt=1;
+    while(1)
+    {
+        pthread_mutex_lock(&amp;mutex[0]);
+        printf(&quot;Thread 0: %d\n&quot;,cnt);
+        cnt++;
+        if(cnt%4==0)
+        {
+            // pthread_cond_signal(&amp;cond);
+            pthread_cond_broadcast(&amp;cond);
+        }
+        pthread_mutex_unlock(&amp;mutex[0]);
+        sleep(1);
+    }
+}
+
+void *thread_task1(void *args)
+{
+    while(1)
+    {
+        pthread_cond_wait(&amp;cond,&amp;mutex[1]);
+        printf(&quot;Thread 1: I&#39;m awake!\n&quot;);
+    }
+}
+
+int main()
+{
+    pthread_t p[2];
+
+    // 初始化互斥锁和条件变量
+    pthread_mutex_init(&amp;mutex[0],NULL);
+    pthread_mutex_init(&amp;mutex[1],NULL);
+    pthread_cond_init(&amp;cond,NULL);
+
+    // 创建线程
+    pthread_create(&amp;p[0],NULL,thread_task0,NULL);
+    pthread_create(&amp;p[1],NULL,thread_task1,NULL);
+
+    // 等待线程结束
+    pthread_join(p[0],NULL);
+    pthread_join(p[1],NULL);
+
+    // 销毁
+    pthread_mutex_destroy(&amp;mutex[0]);
+    pthread_mutex_destroy(&amp;mutex[1]);
+    pthread_cond_destroy(&amp;cond);
+
+    return 0;
+}</code></pre>
+            <h3 id="读写锁">读写锁</h3>
+            <p>读写锁在互斥量的基础上，<strong>把对共享资源的访问分为读者和写者</strong>，读者只能读、写者只能写，读者之间不互斥，写者之间互斥，读者和写者之间互斥。</p>
+            <pre><code>#include &lt;pthread.h&gt; // 哈哈，没想到吧
+
+// 定义读写锁
+pthread_rwlock_t rwlock;
+
+/*
+ * 读写锁初始化
+ * 第一个参数是读写锁地址
+ * 第二个参数是读写锁属性对象，一般为NULL
+ */
+int pthread_rwlock_init(pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr);
+
+// 读加锁
+int pthread_rwlock_rdlock(pthread_rwlock_t *rwlock);
+
+// 写加锁
+int pthread_rwlock_wrlock(pthread_rwlock_t *rwlock);
+
+// 解锁
+int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
+
+// 销毁
+int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);</code></pre>
+            <p>示例程序：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;pthread.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;errno.h&gt;
+
+#define MAX_DATA_LEN 1024
+
+struct test
+{
+    char data[MAX_DATA_LEN];
+    pthread_rwlock_t rwlock;
+};
+
+struct test share = { PTHREAD_RWLOCK_INITIALIZER };
+
+void *reader(void *args)
+{
+    pthread_rwlock_rdlock(&amp;share.rwlock);
+    printf(&quot;Reader starts to read!\n&quot;);
+    sleep(1);
+    printf(&quot;Reader read: %s\n&quot;,share.data);
+    pthread_rwlock_unlock(&amp;share.rwlock);
+    return NULL;
+}
+
+void *writer(void *args)
+{
+    char data_tmp[MAX_DATA_LEN];
+    pthread_rwlock_wrlock(&amp;share.rwlock);
+    printf(&quot;Writer starts to write!\n&quot;);
+    printf(&quot;Please input the data you want to write: &quot;);
+    gets(data_tmp);
+    strcat(share.data,data_tmp);
+    pthread_rwlock_unlock(&amp;share.rwlock);
+    return NULL;
+}
+
+int main(int argc,char *argv[])
+{
+    int i,readerCount,writerCount;
+    pthread_t *readers,*writers;
+    if(argc!=3)
+    {
+        printf(&quot;Usage: %s &lt;reader count&gt; &lt;writer count&gt;\n&quot;,argv[0]);
+        exit(1);
+    }
+
+    readerCount=atoi(argv[1]);
+    writerCount=atoi(argv[2]);
+    readers=(pthread_t *)malloc(sizeof(pthread_t)*readerCount);
+    writers=(pthread_t *)malloc(sizeof(pthread_t)*writerCount);
+
+    for(int i=0;i&lt;writerCount;i++)
+    {
+        pthread_create(&amp;writers[i],NULL,writer,NULL);
+    }
+    sleep(10);
+    for(int i=0;i&lt;readerCount;i++)
+    {
+        pthread_create(&amp;readers[i],NULL,reader,NULL);
+    }
+
+    for(int i=0;i&lt;writerCount;i++)
+    {
+        pthread_join(writers[i],NULL);
+    }
+    for(int i=0;i&lt;readerCount;i++)
+    {
+        pthread_join(readers[i],NULL);
+    }
+
+    free(readers);
+    free(writers);
+    pthread_rwlock_destroy(&amp;share.rwlock);
+    return 0;
+}</code></pre>
+            <h3 id="pthreads总结"><code>Pthreads</code>总结</h3>
+            <ul>
+                <li>线程的管理（创建/终止/分离/同步）</li>
+                <li>临界区，互斥量，信号量</li>
+                <li>路障，条件变量，读写锁</li>
+            </ul>
+            <h2 id="openmp的多线程并行"><code>OpenMP</code>的多线程并行</h2>
+            <p>通过在源代码(串行)中添加 OpenMP 指令和调 用 OpenMP 库函数来实现在共享内存系统上的并行。OpenMP 为共享内存并行程序员提供了一种简单灵活的开发 并行应用的接口模型，使程序既可以在台式机执行
+                ，也可以在超级计算机执行，具有良好的可移植性。</p>
+            <ul>
+                <li><code>Fortran/C/C++</code>自带 OpenMP 库，无需另外安装。</li>
+                <li>编译时需要代开 OpenMP 选项，如不打开则编译器会忽略 OpenMP 指令，生成纯串行的可执行程序（串行等价性）。
+                    <ul>
+                        <li>对于<code>gcc</code>，需要添加<code>-fopenmp</code>选项。</li>
+                        <li>对于<code>clang</code>，需要添加<code>-fopenmp=libomp</code>选项。</li>
+                        <li>对于<code>icc</code>，需要添加<code>-openmp</code>选项。</li>
+                    </ul>
+                </li>
+                <li>运行时需要设置环境变量<code>OMP_NUM_THREADS</code>，如不设置则默认为 1；也可以在程序中进行指定。</li>
+                <li>编程方式：增量并行。是一种基于线程的并行编程模型。</li>
+                <li>支持与 MPI 混合编程。</li>
+            </ul>
+            <h3 id="执行方式说明">执行方式说明</h3>
+            <p>OpenMP
+                采用<code>Fork-Join</code>的并行编程方式，开始于一个单独的主线程，一直串行执行（串行域），直到遇见并行域；在并行域中，根据指定的线程数，多线程并行执行；并行域结束后，所有线程汇合，继续串行执行。如此在串行域和并行域中循环往复，直到程序结束。
+            </p>
+            <p>需要注意的是，在并行域中，可以划分出更小的并行域，也就是一个线程再次划分为多个线程执行。</p>
+            <h3 id="使用指南">使用指南</h3>
+            <pre><code>// 头文件必不可少
+#include &lt;omp.h&gt;
+
+// 指定线程数，这是一个函数，参数就是线程数
+omp_set_num_threads(4);
+
+// OpenMP的指令标识符
+#pragma omp
+
+/*
+ * 一个并行域
+ * 需要注意的是，如同C语言的一般规定一样，大括号内是一个代码块
+ * 如果没有大括号，那就只有第一句属于上边的并行域/会被并行执行
+ */
+#pragma omp parallel
+{
+    // some codes here.
+}</code></pre>
+            <p>编译的时候，使用<code>-fopenmp</code>选项是万万不能忘记的：</p>
+            <div class="sourceCode" id="cb14">
+                <pre
+                    class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="fu">gcc</span> -g -o test test.c -fopenmp</span></code></pre>
+            </div>
+            <p>在 OpenMP 程序编写中，需要注意以下几点：</p>
+            <ul>
+                <li>通常采用增量并行，也局势每次只对部分代码并行化，这样可以<strong>逐步改造</strong>，方便调试</li>
+                <li>OpenMP 指令<strong>区分大小写</strong></li>
+            </ul>
+            <p>先来一段小实例：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;omp.h&gt;
+
+int main()
+{
+    omp_set_num_threads(10); // 设置线程数
+    #pragma omp parallel
+    printf(&quot;Hello World! I&#39;m thread %d\n&quot;,omp_get_thread_num());
+    printf(&quot;Hello World! I&#39;m the master thread\n&quot;);
+    return 0;
+}</code></pre>
+            <p>可以看到一般的结果为：</p>
+            <pre class="plain"><code>Hello World! I&#39;m thread 1
+Hello World! I&#39;m thread 2
+Hello World! I&#39;m thread 3
+Hello World! I&#39;m thread 5
+Hello World! I&#39;m thread 6
+Hello World! I&#39;m thread 7
+Hello World! I&#39;m thread 0
+Hello World! I&#39;m thread 8
+Hello World! I&#39;m thread 4
+Hello World! I&#39;m thread 9
+Hello World! I&#39;m the master thread</code></pre>
+            <h3 id="openmp-编程三要素">OpenMP 编程三要素</h3>
+            <p>OpenMP 编程三大要素：</p>
+            <ul>
+                <li>编译制导指令</li>
+                <li>运行时库函数</li>
+                <li>环境变量</li>
+            </ul>
+            <h4 id="编译制导指令">编译制导指令</h4>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">语言</th>
+                        <th style="text-align: left;">编译制导指令</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">Fortran</td>
+                        <td style="text-align: left;"><code>!$OMP construct [clause [clause]...]</code></td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">C/C++</td>
+                        <td style="text-align: left;"><code>#pragma omp construct [clause [clause]...]</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>其中：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;"><code>#pragma omp</code></th>
+                        <th style="text-align: left;"><code>construct</code></th>
+                        <th style="text-align: left;"><code>clause</code></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">制导指令的前缀<br>所有指令必须有</td>
+                        <td style="text-align: left;">制导指令<br>具体的指令，指导编译器进行并行化</td>
+                        <td style="text-align: left;">子句<br>负责添加一些补充设置</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>编译制导指令有如下几种：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">指令类型</th>
+                        <th style="text-align: left;">说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">并行域指令</td>
+                        <td style="text-align: left;">创建并行域</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">工作共享指令</td>
+                        <td style="text-align: left;">负责任务划分并分发给各个线程，不会产生新线程，必须放在并行域中</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">同步指令</td>
+                        <td style="text-align: left;">并行线程之间的同步（也许类似于路障？）</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">数据环境</td>
+                        <td style="text-align: left;">负责并行域内变量的属性（共享或私有）以及串行域与并行域边界上的数据传递</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>再次说明，不支持 OpenMP 的编译器也能编译 OpenMP 程序，不过是忽略了这部分语句，也就是直接串行执行。</p>
+            <h4 id="并行域指令">并行域指令</h4>
+            <p>并行域指令前边写了，就不废话了。需要注意的是结尾处有隐式同步（等待所有线程结束才进入下一个串行域）。另外，可用的字句包括以下几种：</p>
+            <pre><code>if(scalar-logical-expression)
+num_threads(scalar-integer-expression)
+default(shared|none)
+private(list)
+firstprivate(list)
+shared(list)
+copyin(list)
+reduction(operator:list)</code></pre>
+            <h4 id="工作共享指令">工作共享指令</h4>
+            <p>工作共享指令，负责任务的划分和分配，在每个工作分享结构入口处无需同步，分享结构结束处会有隐式路障实现同步。工作共享指令主要有以下几种：</p>
+            <ul>
+                <li><code>for</code>指令</li>
+                <li><code>sections</code>指令</li>
+                <li><code>single</code>指令</li>
+                <li><code>master</code>指令</li>
+                <li><code>task</code>指令</li>
+            </ul>
+            <h5 id="for-指令">for 指令</h5>
+            <pre><code>/*
+ * for指令，自动划分和分配循环任务
+ * 需要注意，循环变量只能是整形或指针
+ */
+#pragma omp for [clause [clause]...]
+{
+    // 这里写一个for循环
+}
+/*
+ * 结尾处有隐式同步，可用的子句包括：
+ * private(list),firstprivate(list),lastprivate(list)
+ * reduction(operator:list)
+ * schedule(kind[,chunk_size])
+ * ordered
+ * nowait
+ */</code></pre>
+            <p>示例程序：</p>
+            <pre><code>#include &lt;omp.h&gt;
+#include &lt;stdio.h&gt;
+#define N 10000
+
+int main()
+{
+    int a[N],b[N],i;
+    // 当并行域中就一个循环共享结构，
+    // 则for指令与parallel指令结合使用也可以的
+    #pragma omp parallel for num_threads(4)
+    {
+        for(i=0;i&lt;N;i++)
+        {
+            b[i]=i;
+            a[i]=2*b[i];
+        }
+    }
+    // 也可以这样写
+    // #pragma omp parallel num_threads(4)
+    // {
+    //     #pragma omp for
+    //     {
+    //         for(i=0;i&lt;N;i++)
+    //         {
+    //             b[i]=i;
+    //             a[i]=2*b[i];
+    //         }
+    //     }
+    // }
+    printf(&quot;a[0]=%d,a[%d]=%d\n&quot;,a[0],N-1,a[N-1]);
+    return 0;
+}</code></pre>
+            <h5 id="schedule-任务调度">Schedule 任务调度</h5>
+            <ul>
+                <li>在上述循环共享结构中，将任务划分给各个线程的行为称为<strong>调度</strong></li>
+                <li>任务调度方式直接影响程序效率：
+                    <ul>
+                        <li>任务的均衡程度</li>
+                        <li>循环体内数据访问顺序与相应 Cache 冲突的情况</li>
+                    </ul>
+                </li>
+                <li>循环体任务调度基本原则：
+                    <ul>
+                        <li>分解代价低</li>
+                        <li>任务计算量均衡</li>
+                        <li>尽量避免缓存冲突，提高缓存命中率</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>OpenMP 提供了以下几种调度方式（<code>schedule</code>子句）：</p>
+            <pre><code>schedule(static,chunk_size) // 静态分配，chunk_size为任务块大小
+schedule(dynamic,chunk_size) // 动态分配，chunk_size为任务块大小，按照先来先服务原则分配
+schedule(guided,chunk_size) // 动态分配。任务块大小可变，先大后小，chunk_size为最小任务块大小
+schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`OMP_SCHEDULE`指定</code></pre>
+            <p>调度策略适用场景：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">调度策略</th>
+                        <th style="text-align: left;">适用场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">static</td>
+                        <td style="text-align: left;">每次迭代的工作可预测且相似</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">dynamic</td>
+                        <td style="text-align: left;">每次迭代的工作不可预测，高度不规则</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">guided</td>
+                        <td style="text-align: left;">dynamic 的特例，可减少 dynamic 策略的负载</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h5 id="sections-指令">sections 指令</h5>
+            <ul>
+                <li>指令<code>sections</code>创建一个共享工作域</li>
+                <li>域中子任务由<code>section</code>创建，必须是一个相对独立完整的代码块</li>
+                <li>每个子任务<strong>只会</strong>被一个线程执行</li>
+                <li>结尾处隐式同步，除非有子句<code>nowait</code></li>
+            </ul>
+            <pre><code>/*
+ * 可用子句：
+ * private(list)
+ * firstprivate(list)
+ * lastprivate(list)
+ * reduction(op : list)
+ * nowait
+ */
+#pragma omp sections [clause clause ...]
+{
+    #pragma omp section
+    {
+        // 代码
+    }
+    #pragma omp section
+    {
+        // 代码
+    }
+}
+// 并行域内只有sections时，二者也可以合写：
+// #pragma omp parallel sections num_threads(4)</code></pre>
+            <ul>
+                <li>注意<code>section</code>与<code>sections</code>的区别</li>
+                <li>子任务个数小于线程个数时，多余的线程空闲等待</li>
+                <li>子任务多于线程个数，任务分配由编译器指定，尽量负载平衡</li>
+            </ul>
+            <h5 id="single-结构">single 结构</h5>
+            <p>single 结构用在并行域中，指定该部分代码只能有一个线程执行（不一定是主线程）。执行过程中第一个遇到 single 指令的线程执行相应代码，其余线程在 singl
+                结尾处等待（隐式同步），除非显式指明<code>nowait</code>。可用的子句：</p>
+            <ul>
+                <li><code>private(list)</code></li>
+                <li><code>firstprivate(list)</code></li>
+                <li><code>copyprivate(list)</code></li>
+                <li><code>nowait</code></li>
+            </ul>
+            <pre><code>#pragma omp parallel
+{
+    // 代码
+    #pragma omp single [clause [clause]...]
+    {
+        // 代码
+    }
+    // 代码
+}</code></pre>
+            <h5 id="master-结构">master 结构</h5>
+            <p>master
+                块仅由线程组之中的<strong>主线程执行</strong>，其他线程<strong>跳过并继续执行后续代码</strong>，即结尾处<strong>没有隐式同步</strong>。该结构通常用于
+                I/O。注意其与 single 结构的区别。</p>
+            <pre><code>#pragmaomp parallel private(tid)
+{
+    tid=omp_get_thread_num();
+    printf(&quot;Thread %d is here!\n&quot;,tid);
+    #pragma omp master
+    {
+        printf(&quot;I&#39;m the master thread!\n&quot;);
+    }
+    #pragma omp barrier // 这里可以加路障，实现显式同步，也可以不加
+    printf(&quot;Thread %d is here again!\n&quot;,tid);
+}</code></pre>
+            <h5 id="task-结构">task 结构</h5>
+            <p>task 指令主要用于不规则循环迭代（如<code>do-while</code>循环）和递归的函数调用。</p>
+            <pre><code>#pragma omp parallel
+{
+    #pragma omp single
+    {
+        node *p=head;
+        while(p)
+        {
+            #pragma omp task firstprivate(p)
+            {
+                process(p);
+            }
+            p=p-&gt;next;
+        }
+    }
+}</code></pre>
+            <h4 id="变量作用域与属性">变量作用域与属性</h4>
+            <p>变量作用域可以通过如下方式修改：</p>
+            <pre><code>default(shared|none)</code></pre>
+            <p>作用域属性语句：</p>
+            <pre><code>shared(varname,...)
+private(varname,...)</code></pre>
+            <p>变量究竟应该是共享的还是私有的？</p>
+            <ul>
+                <li>循环变量、临时变量、写变量一般私有</li>
+                <li>数组变量、只读变量一般共享</li>
+                <li>能设置为共享的建议共享</li>
+                <li><code>default(none)</code>:所有变量必须显式指定私有或共享</li>
+                <li>紧跟 for 结构后边的循环变量默认私有，其它循环变量需显式声明为私有</li>
+            </ul>
+            <p>其中，私有变量在每个线程中都有一份存储。私有变量在创建时处于为初始化状态，即使在进入并行代码块之前已经初始化，在进入并行时仍然是未初始化的。</p>
+            <h4 id="数据共享属性子句">数据共享属性子句</h4>
+            <table>
+                <colgroup>
+                    <col style="width: 7%" />
+                    <col style="width: 81%" />
+                    <col style="width: 11%" />
+                </colgroup>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">子句</th>
+                        <th style="text-align: left;">说明</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">private(list)</td>
+                        <td style="text-align: left;">
+                            创建一个或多个变量的私有拷贝，即每个线程中都创建一个同名变量，但没有初始值；列表中的变量必须已定义，且不能是常量或引用；多个变量逗号隔开</td>
+                        <td></td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">firstprivate(list)</td>
+                        <td style="text-align: left;">private 的扩展，创建私有拷贝的同时将主线程变量的值作为初始值</td>
+                        <td></td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">lastprivate(list)</td>
+                        <td style="text-align: left;">private 的扩展，推出并行域时，将制定的私有拷贝的“最后”值赋值给主线程变量。“最后”指循环的最后一次迭代、sections
+                            的最后一个
+                            section 等。可能会增加额外开销，一般不建议使用，可用共享变量等方式实现</td>
+                        <td></td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">shared(list)</td>
+                        <td style="text-align: left;">指定共享变量</td>
+                        <td></td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">default(shared</td>
+                        <td style="text-align: left;">none)</td>
+                        <td>指定并行域内变量的默认属性</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">copyin(list)</td>
+                        <td style="text-align: left;">配合 threadprivatee，用主线程同名变量的值给 threadprivate 等私有拷贝进行初始化</td>
+                        <td></td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">copyprivate(list)</td>
+                        <td style="text-align: left;">配合 single，将 single 块中串行计算得到的变量值广播到其他线程同名变量</td>
+                        <td></td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">reduction(op:list)</td>
+                        <td style="text-align: left;">创建一个或多个变量的私有拷贝，在并行结束后对其进行规约操作（如求和），返回给主线程同名变量</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>对于<code>reduction</code>规约，支持的规约操作有：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">操作符</th>
+                        <th style="text-align: left;">对应私有变量初始值</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">+</td>
+                        <td style="text-align: left;">0</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">-</td>
+                        <td style="text-align: left;">0</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">*</td>
+                        <td style="text-align: left;">1</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">&amp;&amp;</td>
+                        <td style="text-align: left;">1</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">||, &amp;</td>
+                        <td style="text-align: left;">0</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">|</td>
+                        <td style="text-align: left;">~0, 0</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">^</td>
+                        <td style="text-align: left;">0</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">max</td>
+                        <td style="text-align: left;">相应变量类型最小值</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">min</td>
+                        <td style="text-align: left;">相应变量类型最大值</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>我们仍然以计算$\pi$为例子：</p>
+            <!-- <p><br /><span class="math display">$$
+                    \begin{align*}
+                    \pi = 4\Sigma_{i=0}^{+\infty}\frac {(-1)^i}{2i+1}
+                    \end{align*}
+                    $$</span><br /></p> -->
+            <p><br />$$
+                    \begin{align*}
+                    \pi = 4\Sigma_{i=0}^{+\infty}\frac {(-1)^i}{2i+1}
+                    \end{align*}
+                    $$<br /></p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;omp.h&gt;
+#define NUM_OF_CYCLES 1000000000
+
+int main()
+{
+    double sum=0.0;
+    double step=1.0/NUM_OF_CYCLES;
+    #pragma omp parallel for reduction(+:sum)
+    {
+        for(int i=0;i&lt;NUM_OF_CYCLES;i++)
+        {
+            double x=(i+0.5)*step;
+            sum+=4.0/(1.0+x*x);
+        }
+    }
+    printf(&quot;pi=%.20lf\n&quot;,sum*step);
+    return 0;
+}</code></pre>
+            <h4 id="openmp-其他子句">OpenMP 其他子句</h4>
+            <p>太多了，这里写不下。</p>
+            <h1 id="基于分布式内存的并行计算">基于分布式内存的并行计算</h1>
+            <p>在分布式内存的并行计算中，每个节点具有自己私有的存储器，而不是共享内存中的公用（不论是实体还是虚拟）存储器。每个处理器运行一个单独的进程（子程序/任务），进程之间通过消息传递来通信。</p>
+            <h2 id="消息传递编程的原理">消息传递编程的原理</h2>
+            <ul>
+                <li>支持消息传递范式的机器，逻辑视图由 P 个进程组成，各进程有自己<strong>专用地址空间</strong></li>
+                <li>所有变量都是<strong>私有的</strong>，每个数据元素必须属于空间的一个分区，也就是在某个节点的进程中（这不纯废话吗），因此必须对数据进行显式分区和放置</li>
+                <li>通过特殊的<strong>子函数调用</strong>进行通信，所有交互都需要两个进程的协作</li>
+            </ul>
+            <p>消息传递编程又分为两种：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">缩写</th>
+                        <th style="text-align: left;">全称</th>
+                        <th style="text-align: left;">说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">SPMD</td>
+                        <td style="text-align: left;">单程序多数据</td>
+                        <td style="text-align: left;">所有进程执行同一个程序<br>每个进程只知道/操作一小部分数据</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPMD</td>
+                        <td style="text-align: left;">多程序多数据</td>
+                        <td style="text-align: left;">每个进程执行不同的功能<br>（输入/问题设置/解决方案/输出/显示）</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2 id="mpi-编程">MPI 编程</h2>
+            <p>MPI(Message Passing
+                Interface)是一个消息传递编程标准，提供一个高效/可扩展/统一的并行编程环境，是目前<strong>最为通用的分布式并行编程方式</strong>。它通过提供库函数实现进程间通信、从而实现并行计算。目前所有并行机制造商都提供对
+                MPI 的支持。</p>
+            <p><strong>MPI 是一个库，不是一门语言</strong>，其最终目的是服务于进程间通信。</p>
+            <h3 id="一般结构">一般结构</h3>
+            <p>MPI 程序的一般结构为: 包含MPI头文件-->初始化MPI环境-->信息交换处理及计算等-->退出MPI环境。</p>
+            <p>写程序罢。</p>
+            <pre><code>// hello.c
+#include &lt;stdio.h&gt;
+#include &lt;mpi.h&gt; // MPI的头文件
+
+int main(int argc,char *argv[])
+{
+    MPI_init(&amp;argc,&amp;argv); // 初始化MPI环境
+    // 一些计算，这里用hello代替
+    printf(&quot;Hello World!\n&quot;);
+    MPI_Finalize(); // 退出MPI环境
+    return 0;
+}</code></pre>
+            <p>编译运行：</p>
+            <div class="sourceCode" id="cb30">
+                <pre
+                    class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="co"># 编译MPI程序，需要专用的编译器mpicc</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a><span class="ex">mpicc</span> -O2 hello hello.c</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a><span class="co"># 运行的命令也比较特别</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a><span class="ex">mpirun</span> -np 4 ./hello</span></code></pre>
+            </div>
+            <h3 id="mpi-通信器">MPI 通信器</h3>
+            <p>现在我们已经学会了$1+1=2$，让我们来<del>手搓一下$e^\pi$的值</del>看看第二个程序罢。</p>
+            <p>通信器/通信子是什么？</p>
+            <ul>
+                <li>一个通信器定义一个通信域，也就是一组允许相互通信的进程</li>
+                <li>有关通信域的信息存储在<code>MPI_Comm</code>类型的变量中</li>
+                <li>MPI 程序的进程间通信必须由通信器进行</li>
+                <li>执行完<code>MPI_Init</code>后，一个 MPI 程序所有进程形成一个缺省的组，该组的通信域就是<code>MPI_COMM_WORLD</code></li>
+                <li>通信域是 MPI 通信操作函数必不可少的参数，用来限定参加通信的进程的范围</li>
+            </ul>
+            <p>这里提到了 MPI 进程的概念。解释一下：</p>
+            <ul>
+                <li>MPI 进程是 MPI 程序中一个独立参与通信的个体</li>
+                <li>MPI 进程组事由一些进程构成的有序集合</li>
+                <li>进程号是相对于进程组或通信器而言的，同一进程在不同的进程组可以有不同的进程号</li>
+                <li>进程号在进程组或通信器被创建时赋予，取值范围为$[0, np-1]$</li>
+            </ul>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+#include &lt;mpi.h&gt;
+int main(int argc,char *argv[])
+{
+    int myId,mp;
+    int nameLen;
+    // MPI_MAX_PROCESSOR_NAME是MPI的一个宏，表示处理器名字的最大长度
+    char procName[MPI_MAX_PROCESSOR_NAME];
+
+    MPI_init(&amp;argc,&amp;argv);
+
+    /*
+     * 函数原型：
+     * int MPI_Comm_rank(MPI_Comm comm, int *rank);
+     * comm：通信域，一般为MPI_COMM_WORLD
+     * rank：进程号，从0开始
+     * 返回值为本进程的进程号，范围为0刀通信器的大小减1
+     */
+    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myId);
+
+    /*
+     * 函数原型：
+     * int MPI_Comm_size(MPI_Comm comm, int *size);
+     * 返回所有参加运算的进程的个数
+     */
+    MPI_Comm_size(MPI_COMM_WORLD,&amp;mp);
+
+    // 顾名思义，略
+    MPI_Get_processor_name(procName,&amp;nameLen);
+    printf(&quot;I&#39;m proc. %d of %d on %s\n&quot;,myId,mp,procName);
+
+    MPI_Finalize();
+
+    return 0;
+}</code></pre>
+            <h3 id="mpi-编程惯例">MPI 编程惯例</h3>
+            <ul>
+                <li>所有常量、变量、函数以<code>MPI_</code>开头
+                    <ul>
+                        <li>所有常数定义均为下划线分割大写字母</li>
+                        <li>所有函数与数据类型定义，<code>MPI_</code>后第一个字母大写，剩下的全是下划线和小写字母；除<code>MPI_Wtime</code>与<code>MPI_Wtick</code>外，所有函数调用的返回值都是整形的错误信息码
+                        </li>
+                        <li>既然有了错误码，函数也都需要输出能用的东西，因而所有函数只要有输出的，输出参数都是指针</li>
+                    </ul>
+                </li>
+                <li>MPI 按照进程组工作，最开始只有一个进程组<code>MPI_COMM_World</code>，之后可以根据需要建立其它进程组。</li>
+                <li>所有通信在通信器中进行（知道啦！）</li>
+            </ul>
+            <h3 id="消息收发">消息收发</h3>
+            <blockquote>
+                <p>Talking is cheap, show me the code.</p>
+                <p>Read the fxxking source code!</p>
+            </blockquote>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;mpi.h&gt;
+
+const int MAX_STRING=100;
+
+int main()
+{
+    char greeting[MAX_STRING+1];
+    int comm_sz;
+    int my_rank;
+
+    MPI_Init(NULL,NULL);
+    MPI_Comm_size(MPI_COMM_WORLD,&amp;comm_sz);
+    MPI_Comm_rank(MPI_COMM_WORLD,&amp;my_rank);
+
+    // MPI 的消息发送与接收使用函数MPI_Send和MPI_Recv，也称为点对点通信
+    if(my_rank!=0)
+    {
+        sprintf(greeting,&quot;Greetings from process %d of %d!&quot;,my_rank,comm_sz);
+        /*
+         * 函数原型：
+         * int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+         * buf：发送缓冲区的地址
+         * count：发送数据的个数
+         * datatype：发送数据的类型
+         * 这三个参数组成了消息数据
+         * dest：目标进程的进程号
+         * tag：消息标签，用于区分不同的消息
+         * comm：通信器
+         * 这三个数据组成了消息信封
+         */
+        MPI_Send(greeting,strlen(greeting)+1,MPI_CHAR,0,0,MPI_COMM_WORLD);
+    }
+    else
+    {
+        printf(&quot;Greetings from process %d of %d!\n&quot;,my_rank,comm_sz);
+        for(int q=1;q&lt;comm_sz;q++)
+        {
+            /*
+             * 函数原型：
+             * int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+             * buf：接收缓冲区的地址
+             * count：接收数据的个数
+             * datatype：接收数据的类型
+             * 这三个参数组成了消息数据
+             * source：源进程的进程号
+             * tag：消息标签，用于区分不同的消息
+             * comm：通信器
+             * 这三个数据组成了消息信封
+             */
+            MPI_Recv(greeting,MAX_STRING+1,MPI_CHAR,q,0,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+            printf(&quot;%s\n&quot;,greeting);
+        }
+    }
+
+    MPI_Finalize();
+    return 0;
+}</code></pre>
+            <p>其中提到了 MPI 数据类型。MPI 数据类型有以下几种，需要注意的是只能用于消息传递：</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">MPI datatype</th>
+                        <th style="text-align: left;">C datatype</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_CHAR</td>
+                        <td style="text-align: left;">signed char</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_SHORT</td>
+                        <td style="text-align: left;">signed short int</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_INT</td>
+                        <td style="text-align: left;">signed int</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_LONG</td>
+                        <td style="text-align: left;">signed long int</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_UNSIGNED_CHAR</td>
+                        <td style="text-align: left;">unsigned char</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_UNSIGNED_SHORT</td>
+                        <td style="text-align: left;">unsigned short int</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_UNSIGNED</td>
+                        <td style="text-align: left;">unsigned int</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_UNSIGNED_LONG</td>
+                        <td style="text-align: left;">unsigned long int</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_FLOAT</td>
+                        <td style="text-align: left;">float</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_DOUBLE</td>
+                        <td style="text-align: left;">double</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_LONG_DOUBLE</td>
+                        <td style="text-align: left;">long double</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">MPI_BYTE</td>
+                        <td style="text-align: left;">无对应</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">MPI_PACKED</td>
+                        <td style="text-align: left;">无对应</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>现在我们已经学会了六个最基本的 MPI 函数：</p>
+            <pre><code>int MPI_Init(int *argc,char ***argv);
+int MPI_Comm_size(MPI_Comm comm,int *size);
+int MPI_Comm_rank(MPI_Comm comm,int *rank);
+int MPI_Send(const void *buf,int count,MPI_Datatype datatype,int dest,int tag,MPI_Comm comm);
+int MPI_Recv(void *buf,int count,MPI_Datatype datatype,int source,int tag,MPI_Comm comm,MPI_Status *status);
+int MPI_Finalize();</code></pre>
+            <h3 id="阻塞与非阻塞通信">阻塞与非阻塞通信</h3>
+            <p>MPI 点对点通信提供了阻塞和非阻塞两种通信机制，也支持多种通信模式。二者结合，产生了丰富的点对点通信函数。</p>
+            <h4 id="对比">对比</h4>
+            <p>阻塞与非阻塞通信的区别在返回后的<strong>资源可用性</strong>。</p>
+            <p>对于阻塞通信而言，其返回条件为：</p>
+            <ul>
+                <li>通信操作完成，即消息已经收发</li>
+                <li>调用的缓冲区可用
+                    <ul>
+                        <li>若是发送操作，该缓冲区已经可以被其他操作更新</li>
+                        <li>若是接收操作，该缓冲区数据已经完整可被正确引用</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>非阻塞通信返回就不意味着通信完成。MPI 提供了对非阻塞通信是否完成的检测，主要是<code>MPI_Wait</code>与<code>MPI_Test</code>函数。</p>
+            <p>换言之，阻塞通信就是需要等待通讯结束再继续进行，而非阻塞则是<strong>计算与通信时间重叠</strong>，从而提高了系统性能。</p>
+            <!-- 这幅图记得改，改成非阻塞通信的发送方与接收方的时序图 -->
+            <h4 id="非阻塞通信">非阻塞通信</h4>
+            <p>no bb：</p>
+            <pre><code>/*
+ * 非阻塞发送
+ * buf: 发送缓冲区的地址
+ * count: 发送数据的个数
+ * datatype: 发送数据的类型
+ * dest: 目标进程的进程号
+ * tag: 消息标签，用于区分不同的消息
+ * comm: 通信器
+ * request: 请求句柄，用于检测通信是否完成（也就是非阻塞通信完成对象）
+ */
+int MPI_Isend(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm, MPI_Request *request);
+
+/*
+ * 非阻塞接收
+ */
+int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Request *request);</code></pre>
+            <p>判断非阻塞通信的完成：</p>
+            <ul>
+                <li>发送完成：发送缓冲区的数据已送出，缓冲区可以重新使用（并不代表数据已被接收方接受）。数据有可能被缓冲。</li>
+                <li>接收完成：数据已经写入接收缓冲区，可以正常访问与使用</li>
+            </ul>
+            <pre><code>// 阻塞型函数，必须等待指定通信请求完成后才能返回和继续执行下一步
+int MPI_Wait(MPI_Request *request, MPI_Status *status);
+// 检测指定的通信请求，不论是否完成都立刻返回，若完成则返回flag=true，反之返回false
+int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);</code></pre>
+            <h4 id="通信模式">通信模式</h4>
+            <p>通信模式指缓冲管理以及收发双方的同步方式。通信模式主要有以下四种：</p>
+            <ul>
+                <li>标准模式
+                    <ul>
+                        <li>是否对发来的数据进行缓冲由 MPI 的实现来决定，而不是用户控制</li>
+                        <li>发送可以是同步的或缓冲的</li>
+                        <li>对应<code>MPI_Send</code></li>
+                    </ul>
+                </li>
+                <li>缓冲模式
+                    <ul>
+                        <li>缓冲模式的发送不管接收操作是否已经启动都可以执行</li>
+                        <li>需要事先申请一块足够大的缓冲区，通过<code>MPI_Buffer_attach</code>实现，通过`<code>MPI_Buffer_detach</code>释放</li>
+                        <li>对应<code>MPI_Bsend</code></li>
+                    </ul>
+                </li>
+                <li>同步模式
+                    <ul>
+                        <li>只有相应的接收过程已经启动，发送过程才能正常返回</li>
+                        <li>同步发送返回后，表示发送缓冲区已经被系统缓冲区缓存并已经开始发送数据</li>
+                        <li>对应<code>MPI_Ssend</code></li>
+                    </ul>
+                </li>
+                <li>就绪模式
+                    <ul>
+                        <li>发送操作只有在接受进程的接收操作已经开始时才能开始发送</li>
+                        <li>发送操作启动但接收尚未启动，发送就会出错</li>
+                        <li>对应<code>MPI_Rsend</code></li>
+                    </ul>
+                </li>
+            </ul>
+            <p>于是两种通信与四种通信模式组合产生了八种通信发送操作，但接收操作只有阻塞接收和非阻塞接收。</p>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">MPI 原语</th>
+                        <th style="text-align: left;">阻塞</th>
+                        <th style="text-align: left;">非阻塞</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;">标准</td>
+                        <td style="text-align: left;">MPI_Send</td>
+                        <td style="text-align: left;">MPI_Isend</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">缓冲</td>
+                        <td style="text-align: left;">MPI_Bsend</td>
+                        <td style="text-align: left;">MPI_Ibsend</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">同步</td>
+                        <td style="text-align: left;">MPI_Ssend</td>
+                        <td style="text-align: left;">MPI_Issend</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">就绪</td>
+                        <td style="text-align: left;">MPI_Rsend</td>
+                        <td style="text-align: left;">MPI_Irsend</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;">接收</td>
+                        <td style="text-align: left;">MPI_Recv</td>
+                        <td style="text-align: left;">MPI_Irecv</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;">完成检查</td>
+                        <td style="text-align: left;">MPI_Wait</td>
+                        <td style="text-align: left;">MPI_Test</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h3 id="编写安全的-mpi-程序">编写安全的 MPI 程序</h3>
+            <ul>
+                <li>将发送接收操作按照次序进行匹配
+                    <ul>
+                        <li>一个先发后收，另一个先收后发</li>
+                    </ul>
+                </li>
+                <li>若两个进程的发送与接受次序互换，消息传递过程仍是安全的</li>
+            </ul>
+            <h3 id="聚合通信">聚合通信</h3>
+            <p>内容和图片都太多，这里写不下。</p>
+            <h3 id="示例程序">示例程序</h3>
+            <p>我们还是算算可爱的$\pi$罢，这次利用另一个柿子：</p>
+            <!-- <p><br /><span class="math display">$$
+                    \begin{align*}
+                    \pi = \int_0^1 \frac 4 {1+x^2} \mathrm{d}x
+                    \end{align*}
+                    $$</span><br /></p> -->
+            <p><br />$$
+                    \begin{align*}
+                    \pi = \int_0^1 \frac 4 {1+x^2} \mathrm{d}x
+                    \end{align*}
+                    $$<br /></p>
+            <h4 id="串行程序">串行程序</h4>
+            <pre><code>#include &lt;stdio.h&gt;
+
+int num_steps=1000;
+double width;
+
+int main()
+{
+    int i;
+    double x,pi,sum=0;
+    width=(double)1/num_steps;
+
+    x=0.5*width;
+    for(i=0;i&lt;num_steps;i++,x+=width)
+    {
+        sum+=4/(1+x*x);
+    }
+    pi=sum*width;
+    printf(&quot;The value of pi is %.15lf\n&quot;,pi);
+    return 0;
+}</code></pre>
+            <h4 id="并行程序">并行程序</h4>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+#include &lt;mpi.h&gt;
+
+int main(int argc,char *argv[])
+{
+    int n,myId,numOfProcs,i;
+    double myPi,pi,h,sum,x;
+    MPI_Status status;
+
+    MPI_Init(&amp;argc,&amp;argv);
+    MPI_Comm_size(MPI_COMM_WORLD,&amp;numOfProcs);
+    MPI_Comm_rank(MPI_COMM_WORLD,&amp;myId);
+    if(myId==0)
+    {
+        printf(&quot;Input the number of intervals: &quot;);
+        scanf(&quot;%d&quot;,&amp;n);
+        for(i=1;i&lt;numOfProcs;;i++)
+        {
+            MPI_Send(&amp;n,1,MPI_INT,i,0,MPI_COMM_WORLD);
+        }
+    }
+    else
+    {
+        MPI_Recv(&amp;n,1,MPI_INT,0,0,MPI_COMM_WORLD,&amp;status);
+    }
+
+    h=1.0/n;
+    sum=0.0;
+    for(i=myId+1;i&lt;=n;i+=numOfProcs)
+    {
+        x=h*(i-0.5);
+        sum+=4.0/(1.0+x*x);
+    }
+    myPi=h*sum;
+
+    if(myId!=0)
+    {
+        MPI_Send(&amp;myPi,1,MPI_DOUBLE,0,0,MPI_COMM_WORLD);
+    }
+    else
+    {
+        pi=myPi;
+        for(i=1;i&lt;numOfProcs;i++)
+        {
+            MPI_Recv(&amp;myPi,1,MPI_DOUBLE,i,0,MPI_COMM_WORLD,&amp;status);
+            pi+=myPi;
+        }
+        printf(&quot;The value of pi is %.15lf\n&quot;,pi);
+    }
+
+    MPI_Finalize();
+    return 0;
+}</code></pre>
+            <h1 id="基于异构系统的并行计算">基于异构系统的并行计算</h1>
+            <h2 id="gpu-计算">GPU 计算</h2>
+            <p>GPU 为高度并行的实时 3D 渲染计算而设计，高 GFLOPS、高带宽。3D 渲染技术的发展，，促进了 GPU 向着通用计算处理器方向前进。英伟达 GPU 为通用计算专门优化设计，于 2007 年推出了
+                CUDA（Compute Unified Device Architecture）</p>
+            <h3 id="gpu-与-cpu-对比">GPU 与 CPU 对比</h3>
+            <p>硬件架构上：</p>
+            <ul>
+                <li>与 CPU 相比，GPU 具有更多计算单元</li>
+                <li>GPU 更适用于进行大量、简单、统一的操作，对于复杂控制过程的处理比 CPU 差</li>
+            </ul>
+            <p>应用范围上：</p>
+            <ul>
+                <li>CPU：控制处理器
+                    <ul>
+                        <li>不规则数据结构</li>
+                        <li>不可预测存取模式</li>
+                        <li>递归算法</li>
+                        <li>分支密集型算法</li>
+                        <li>单线程程序</li>
+                    </ul>
+                </li>
+                <li>GPU：数据处理器
+                    <ul>
+                        <li>规则数据结构</li>
+                        <li>可预测存取模式</li>
+                        <li>油气勘探、金融分析、医疗成像、有限元、基因分析、地理信息系统、深度学习等……</li>
+                    </ul>
+                </li>
+            </ul>
+            <h3 id="gpu-基本架构">GPU 基本架构</h3>
+            <ul>
+                <li>流多处理器（SM, Stream）</li>
+                <li>流处理器（SP, Stream Processor）</li>
+                <li>共享内存</li>
+                <li>板载显存</li>
+            </ul>
+            <h3 id="异构计算">异构计算</h3>
+            <p>GPU 不是独立运行的计算平台，需要与 CPU 协同工作，所以 GPU 的计算实际上是 CPU+GPU 的异构计算。在异构计算中，二者通过 PCle 总线连接，CPU 所在位置称为主机端，GPU
+                所在称为设备端。</p>
+            <ul>
+                <li>GPU 包括更多运算核心，适合数据并行的计算密集型任务，如大型矩阵运算</li>
+                <li>CPU 运算核心较少，但可以实现复杂逻辑，适合控制密集型任务</li>
+                <li>CPU 上的线程是重量级的，上下文切换开销大；GPU 存在大量核心，，因而线程是轻量级的，上下文切换开销小</li>
+                <li>CPU+GPU 的异构系统优势互补</li>
+            </ul>
+            <h3 id="cuda">CUDA</h3>
+            <p>CUDA 是英伟达公司开发的 GPU 编程模型，提供了 GPU 编程的简易接口。CUDA 提供了对 C/C++/Python/Fortran 等语言的支持。CUDA
+                编程的硬件可以是专门的科学计算卡，也可以是普通游戏显卡；软件是 CUDA Toolkit，在 Windows、Mac、大多数 Linux 发行版都支持。</p>
+            <h2 id="cpu-gpu-协同处理流程">CPU-GPU 协同处理流程</h2>
+            <ul>
+                <li>输入数据从 host 内存复制到 device 内存
+                    <ul>
+                        <li>分配 host 内存并进行初始化</li>
+                        <li>分配 device 内存，将 host 内存数据复制到 device 内存</li>
+                    </ul>
+                </li>
+                <li>调用 CUDA 的核函数，在 device 上完成指定运算，芯片上缓存数据以提高性能</li>
+                <li>将结果从 device 内存复制到 host，释放 device 和 host 上分配的内存</li>
+            </ul>
+            <p>在编写代码时，需要使用 NVIDIA 的编译器 nvcc。它也可以用于编译没有 device 代码的程序（也就是 1 一般的 C 程序）。</p>
+            <pre><code>// hello.cu
+#include &lt;stdio.h&gt;
+
+__global__ void helloFromGPU(void)
+{
+    printf(&quot;Hello World from GPU!\n&quot;);
+}
+
+int main()
+{
+    printf(&quot;Hello World from CPU!\n&quot;);
+
+    helloFromGPU&lt;&lt;&lt;1,10&gt;&gt;&gt;();
+
+    cudaDeviceReset();
+    return 0;
+}</code></pre>
+            <p>编译运行：</p>
+            <div class="sourceCode" id="cb40">
+                <pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true"></a><span class="co"># nvcc编译为hello</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true"></a><span class="ex">nvcc</span> -o hello hello.cu</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true"></a><span class="co"># 运行</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true"></a><span class="ex">./hello</span></span></code></pre>
+            </div>
+            <p>在这段示例程序里，我们需要明白：</p>
+            <ul>
+                <li>nvcc 将源码分为 host 和 device 两部分，其中 device 部分由 nvcc 编译，host 由标准的主机编译器（如 gcc）编译</li>
+                <li>划分的依据是 CUDA 的扩展关键字<code>global</code>，它表示一个 kernel 函数：
+                    <ul>
+                        <li>从 host 代码调用</li>
+                        <li>在 device 上执行</li>
+                    </ul>
+                </li>
+                <li><code>&lt;&lt;&lt; &gt;&gt;&gt;</code>表示从 host 代码到 device 代码的调用，也称为<code>kernel launch</code>(kernel
+                    启动)
+                    <ul>
+                        <li>第一个参数表示 kernel 执行时使用的线程块数量</li>
+                        <li>第二个参数表示每个块中线程的数量</li>
+                    </ul>
+                </li>
+            </ul>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th style="text-align: left;">函数声明</th>
+                        <th style="text-align: left;">调用者</th>
+                        <th style="text-align: left;">执行者</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td style="text-align: left;"><code>__global__ void FuncName()</code></td>
+                        <td style="text-align: left;">Host</td>
+                        <td style="text-align: left;">Device</td>
+                    </tr>
+                    <tr class="even">
+                        <td style="text-align: left;"><code>__device__ char FuncName()</code></td>
+                        <td style="text-align: left;">Device</td>
+                        <td style="text-align: left;">Device</td>
+                    </tr>
+                    <tr class="odd">
+                        <td style="text-align: left;"><code>__host__ float FuncName()</code></td>
+                        <td style="text-align: left;">Host</td>
+                        <td style="text-align: left;">Host</td>
+                    </tr>
+                </tbody>
+            </table>
+            <ul>
+                <li><code>__global__</code>定义的 kernel 函数
+                    <ul>
+                        <li>必须返回<code>void</code></li>
+                        <li>所有 kernel 函数必须异步执行</li>
+                    </ul>
+                </li>
+                <li><code>__device__</code>与<code>__host__</code>两个关键字可以组合使用，此时这个函数在 host 和 device 都被编译</li>
+                <li>不加限定，默认为<code>__host__</code></li>
+            </ul>
+            <h2 id="内存管理">内存管理</h2>
+            <p>host 内存和 device 内存是独立的实体：</p>
+            <ul>
+                <li>host 指针指向 CPU 内存</li>
+                <li>device 指针指向 GPU 内存</li>
+            </ul>
+            <p>因而，在处理 device 内存时候，需要调用 CUDA 的内存管理函数：</p>
+            <pre><code>/*
+ * 第一个参数是指向指针的指针，也就是指针地址
+ * 因为函数返回值是void，需要把申请下来的内存指针写到这个指针地址里
+ * 所以只有申请的时候使用二级指针，使用的时候使用一级指针
+ * 第二个参数是申请的内存大小
+ */
+cudaError_t cudaMalloc(void **devPtr, size_t size);
+cudaError_t cudaFree(void *devPtr);
+
+/*
+ * kind参数有以下几种：
+ * cudaMemcpyHostToHost: 从 host 复制到 host
+ * cudaMemcpyHostToDevice: 从 host 复制到 device
+ * cudaMemcpyDeviceToHost: 从 device 复制到 host
+ * cudaMemcpyDeviceToDevice: 从 device 复制到 device
+ */
+cudaError_t cudaMemcpy(void *dst, const void *src, size_t count, cudaMemcpyKind kind);</code></pre>
+            <p>需要注意的是，<code>cudaMemcpy</code>函数是同步的，也就是说，只有当数据复制完成后，才会返回。若需要异步，也就是调用函数之后立刻返回而不是等待数据传输完成，则可以使用<code>cudaMemcpyAsync</code>函数：
+            </p>
+            <pre><code>cudaError_t cudaMemcpyAsync(void *dst, const void *src, size_t count, cudaMemcpyKind kind, cudaStream_t stream = 0);</code></pre>
+            <p>简单的示例程序：</p>
+            <pre><code>#include &lt;stdio.h&gt;
+#include &lt;cuda_runtime.h&gt;
+
+__global__ void add(int *a,int *b,int *c)
+{
+    *c=*a+*b;
+}
+
+int main()
+{
+    int a,b,c;
+    int *d_a,*d_b,*d_c;
+    printf(&quot;Input nums: &quot;);
+    scanf(&quot;%d%d&quot;,&amp;a,&amp;b);
+
+    // 申请GPU内存
+    cudaMalloc((void**)&amp;d_a,sizeof(int));
+    cudaMalloc((void**)&amp;d_b,sizeof(int));
+    cudaMalloc((void**)&amp;d_c,sizeof(int));
+
+    // 数据写入GPU内存
+    cudaMemcpy(d_a,&amp;a,sizeof(int),cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b,&amp;b,sizeof(int),cudaMemcpyHostToDevice);
+
+    add&lt;&lt;&lt;1,1&gt;&gt;&gt;(d_a,d_b,d_c);
+
+    // 抄回来
+    cudaMemcpy(&amp;c,d_c,sizeof(int),cudaMemcpyDeviceToHost);
+
+    printf(&quot;a + b = %d\n&quot;,c);
+    cudaFree(d_a);
+    cudaFree(d_b);
+    cudaFree(d_c);
+    return 0;
+}</code></pre>
+            <h3 id="cuda-线程与硬件">CUDA 线程与硬件</h3>
+            <ul>
+                <li>每个核函数对应一个 Grid，包含多个线程</li>
+                <li>每个线程以相同顺序执行程序</li>
+                <li>线程划分为线程块，同一块内的线程可以通过共享 SM 资源或同步来实现相互协作
+                    <ul>
+                        <li>共享 SM 资源不一定是块内的所有线程，可能块内有若干 SM，每个 SM 有几个线程。这一点具体与硬件设备有关。</li>
+                    </ul>
+                </li>
+                <li>每个线程、每个块都具有唯一 id，通过内置变量读取</li>
+                <li>层次结构：Grid-&gt;Block-&gt;Thread</li>
+            </ul>
+            <p>在任何时间，warp 中所有线程必须执行相同的指令，但如果遇到条件控制就会出现问题，这时候可以选择为块中的线程创建一个不同的控制路径，将执行相同分支行为的线程放在同一个 warp
+                中，从而减少分支分歧/提高性能。</p>
+            <h3 id="向量加法">向量加法</h3>
+            <pre><code>#define N 512
+
+__global__ void add(int *a,int *b,int *c)
+{
+    /*
+     * 由于用的时候规定一个block只有一个线程，因而这里可以用block的id
+     * 否则最好使用线程ID也就是threadIdx
+     * 而当每个block线程过多（一般最大1024）时，需要联合设置多个block
+     * 此时获取索引可以用int index=blockIdx.x*blockDim.x+threadIdx.x
+     * 其中blockDim.x是每个block的线程数
+     */
+    c[blockIdx.x]=b[blockIdx.x]+a[blockIdx.x];
+}
+
+int main()
+{
+    int *a,*b,*c;
+    int *d_a,*d_b,*d_c;
+    int size=N*sizeof(int);
+
+    cudaMalloc((void **)&amp;d_a,size);
+    cudaMalloc((void **)&amp;d_b,size);
+    cudaMalloc((void **)&amp;d_c,size);
+
+    a=(int *)malloc(size);
+    b=(int *)malloc(size);
+    c=(int *)malloc(size);
+
+    // 假装这里有输入
+
+    cudaMemcpy(d_a,a,size,cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b,b,size,cudaMemcpyHostToDevice);
+    cudaMemcpy(d_c,c,size,cudaMemcpyHostToDevice);
+
+    add&lt;&lt;&lt;N,1&gt;&gt;&gt;(d_a,d_b,d_c);
+
+    cudaMemcpy(c,d_c,size,cudaMemcpyDeviceToHost);
+
+    free(a),free(b),free(c);
+    cudaFree(d_a),cudaFree(d_b),cudaFree(d_c);
+
+    // 假装这里有输出
+
+    return 0;
+}</code></pre>
+            <p>CUDA 后续的理论讲解较多，恕不能一一列举于此。直接看 PPT 罢。</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

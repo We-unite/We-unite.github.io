@@ -135,8 +135,8 @@ document.writeln("            <a onclick=\"clickit(\'grandson21\')\">-美好Linu
 document.writeln("            <div class=\"grandson\" id=\"grandson21\" style=\"display:none\">");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/linux/aliyun_cloud.html\">-我的免费云服</a>");
 document.writeln("                <a href=\"https://code.qin-juan-ge-zhu.top\">-VSCode Online</a>");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/linux/vim/vim.html\">-vim学习与配置</a>");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/linux/vim/keymap.html\">-键盘映射</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/linux/vim.html\">-vim学习与配置</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/linux/keymap.html\">-键盘映射</a>");
 document.writeln("            </div>");
 document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/code/cpppp.html\">-C++ Primer");
 document.writeln("                Plus<br>&nbsp;&nbsp;&nbsp;基础知识整理</a>");
@@ -159,7 +159,7 @@ document.writeln("        </div>");
 document.writeln("        <div class=\"main-menu\" is=\"main4\" onclick=\"clickit(\'child4\')\">-贪玩蓝月</div>");
 document.writeln("        <div class=\"child\" id=\"child4\" style=\"display:none\">");
 document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/play/travel-card-ce\">-行程卡纪念版</a>");
-document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/play/calendar/index.htm\">通用寿星历</a>");
+document.writeln("            <a href=\"https://www.qin-juan-ge-zhu.top/play/calendar/index.htm\">-通用寿星历</a>");
 document.writeln("        </div>");
 document.writeln("    </div>");
 document.writeln("    <!-- 目录结束 -->");
@@ -187,7 +187,7 @@ document.writeln("                d=\"M115.0,115.0 C114.9,115.1 118.7,116.5 119.
 document.writeln("                fill=\"white\"></path>");
 document.writeln("        </svg></a>");
 document.writeln("    <footer class=\"footer\" style=\"font-size: large;\"><a class=\"copyright\"");
-document.writeln("            href=\"https://www.qin-juan-ge-zhu.top/SecretNotes\" target=\"_blank\">CYH</a></footer>");
+document.writeln("            href=\"https://www.qin-juan-ge-zhu.top/courseNotes\" target=\"_blank\">HIT</a></footer>");
 document.writeln("</body>");
 document.writeln("");
 document.writeln("</html>");

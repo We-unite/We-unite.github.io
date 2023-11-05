@@ -156,7 +156,7 @@ ssh aliyun
 
 既然我们选择了在命令行里使用，编辑文件当然是比较常用 vim 了。当然 neovim 与其他命令行编辑器也很好，但我不熟悉，请参照网上其他教程进行配置。
 
-我的 vim 学习与配置[链接](https://www.qin-juan-he-zhu.top/code/vim/vim.html)中有如下一些基本配置：
+我的 vim 学习与配置[链接](https://www.qin-juan-he-zhu.top/code/linux/vim.html)中有如下一些基本配置：
 
 - 同时开启绝对行号与相对行号，则当前行显示真实行号，其他行显示相对于当前行为上/下第几行，方便跳转。
 - 代码中常常需要的`()[]{}`自动匹配

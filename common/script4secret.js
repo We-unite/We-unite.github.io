@@ -31,7 +31,7 @@ document.writeln("");
 document.writeln("    <div class=\"sidebar\" name=\"sizebar\">");
 document.writeln("        <img name=\"room\" src=\"https://www.qin-juan-ge-zhu.top/common/room.png \" alt=\"勤倦阁\" width=\"280\" usemap=\"#room\">");
 document.writeln("        <map name=\"room\">");
-document.writeln("            <area shape=\"rect\" coords=\"192,32,207,50\" href=\"https://www.qin-juan-ge-zhu.top/SecretNotes\">");
+document.writeln("            <area shape=\"rect\" coords=\"192,32,207,50\" href=\"https://www.qin-juan-ge-zhu.top/courseNotes\">");
 document.writeln("            <area shape=\"rect\" coords=\"27,27,192,96\" href=\"https://www.qin-juan-ge-zhu.top\">");
 document.writeln("            <area shape=\"rect\" coords=\"192,27,207,32\" href=\"https://www.qin-juan-ge-zhu.top\">");
 document.writeln("            <area shape=\"rect\" coords=\"192,50,207,96\" href=\"https://www.qin-juan-ge-zhu.top\">");

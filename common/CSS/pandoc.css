@@ -144,6 +144,9 @@ table {
     /* 改的 */
     display: inline;
     text-align: left;
+    /* 表格本身居中显示 */
+    margin-left: auto;
+    margin-right: auto;
 }
 
 table caption {
@@ -478,8 +481,8 @@ code span.wa {
 
 /* 下边是自己写的 */
 .pandoc {
-    margin: 0 auto;
-    max-width: 40em;
+    /* margin: 0 auto; */
+    /* max-width: 40em; */
     /* padding-left: 50px;
     padding-right: 50px;
     padding-top: 50px;
@@ -509,4 +512,67 @@ pre code.hljs {
 
 .menu a {
     color: #4183c4 !important;
+}
+
+.navigation {
+    flex: 0 0 40px;
+    /* position: fixed;
+            top: 0;
+            left: 20px; */
+    height: 100%;
+    overflow-y: auto;
+    background-color: #f0f0f0;
+    padding: 20px;
+    /* width: 80px; */
+    /* width: 10em; */
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #4183c4;
+    display: block;
+    margin-left: 10px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.toggle::before {
+    content: '+';
+    float: left;
+}
+
+.toggle.expanded::before {
+    content: '-';
+}
+
+nav {
+    position: sticky;
+    top: 100px;
+    margin-top: 150px;
+    display: inline-block;
+    /* order: 1; */
+    float: left;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar {
+    order: -1;
+}
+
+.main {
+    margin: 0 auto;
+    box-sizing: border-box;
+    max-width: 40em;
 }
