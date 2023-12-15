@@ -118,6 +118,8 @@ h3 {
 
 .background {
     background: linear-gradient(#4a96cd, #7cb6dd, #4a96cd);
+    /* 设置为彩虹色 */
+    /* background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8f00ff); */
     width: 100%;
     padding: 0;
     margin: 0;

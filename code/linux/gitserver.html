@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>自己的git托管</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
+</head>
+
+<body>
+    <div class="pandoc">
+        <div class="main">
+            <p class="title">自己的git托管</p>
+            <!-- git 远程存储 -->
+            <blockquote>
+                <p>争名夺利几时休，早起迟眠不自由。</p>
+                <p>骑着驴骡思骏马，官居宰相望王侯。</p>
+            </blockquote>
+            <p>自打在服务器上完成了代码环境的配置，我就在想，要是有一个自己的远程 git 存储库该多好？</p>
+            <h1 id="gitlab">gitlab</h1>
+            <p>我按照网上的教程，我更新了清华镜像源，下载安装 gitlab。孰料一次一次在安装过程卡死，而且情况十分严重，CPU 占用率长期维持在 50%以上，内存更是飙升到
+                90%，不仅安装进行不下去了，甚至一切操作都无法执行，包括<kbd>Ctrl+C</kbd>想要杀死当前进程的请求也会石沉大海。没办法，只得强制重启。</p>
+            <p>如是反复若干次，最终死心，将 gitlab 彻底从云服务器卸载，“革职为民，永不叙用”。</p>
+            <p>经过上网查找，原因果然出现在配置上。<strong>gitlab 推荐的最小内存是 4G，但是目前我们只有
+                    2G，内存爆满也就理所当然了。</strong>没办法，期限之内不能更改配置，就算能更改，我都穷到薅资本主义羊毛了，还能有钱升级配置？笑死。</p>
+            <p>就因为这个问题，我们就不干了？这是不行滴，小同志。</p>
+            <p>不久之后，黄四郎同志发来了一篇阮一峰的博客：<a href="https://www.ruanyifeng.com/blog/2022/10/git-server.html">最简单的 git
+                    服务器</a>。看起来似乎不错，但是失之简略。幸好，我在 git 官方教程<a href="https://git-scm.com/book/zh/v2">Pro
+                    Git</a>上找到了另一部分，两个拼一拼、试一试，最终成功了。</p>
+            <h1 id="前置">前置</h1>
+            <p>首先，我建议为 git 托管创建专门的用户。这样做有以下几个目的：</p>
+            <ul>
+                <li>安全
+                    <ul>
+                        <li>如果使用常用用户，仓库托管在家目录下的某一级目录，容易一个不注意自己把仓库删了</li>
+                        <li>如果使用 root 用户，找一个目录进行管理，则权限过高，也容易被误操作；除此之外，root 用户一般不会设置为 ssh 登录，这就意味着想简单创建一个库，我们需要先 ssh
+                            登陆，然后切换到 root 用户、进入存放目录/创建，最后退出，整个操作过程较为烦人且无法自动化实现</li>
+                    </ul>
+                </li>
+                <li>方便使用。创建专门用户后，我们可以为之配置 ssh 密钥，从而实现免密登陆，而且创建新仓库、clone 仓库都较为简单（因为直接托管在家目录之下，不需要记较长的路径名）</li>
+            </ul>
+            <p>当然，创建单独用户的理由不止这么简单，它在我们使用 http 来托管仓库的时候有专门的作用，下文会讨论到。</p>
+            <p>我为其创建了一个名为<code>git</code>的用户，家目录<code>/home/git</code>，但不授予 sudo 权限。</p>
+            <h1 id="ssh-服务">ssh 服务</h1>
+            <p>首先，本方法要求有一个本地 git 存储库，并且已经有 commit。如果是本地新建的仓库，需要先有一个 commit，然后继续操作。这个 commit
+                可以用编写<code>.gitignore</code>或者<code>push.sh</code>等不甚重要的文件来凑数。</p>
+            <h2 id="远程仓库">远程仓库</h2>
+            <pre><code># 创建远程仓库，这里也叫test吧
+ssh git@127.0.0.1 git init --bare test.git</code></pre>
+            <p>注意，本处指明的 git 为远程用户名，127.0.0.1 代表云服务器的公网 ip，test.git
+                为远程仓库名。使用的时候都需要换成自己的。如果仓库不想直接存储在用户目录下，需要指出其存储路径，如<code>code/fuck/test.git</code></p>
+            <h2 id="本地与远程连接">本地与远程连接</h2>
+            <p>本地和远程都有了，下一步就是建立联系了。</p>
+            <pre><code># 本地添加远程库信息
+git remote add origin git@127.0.0.1:test.git
+
+# 此时尚不能直接推送，因为并未指定上游对应分支，需要指定
+git push --set-upstream origin master
+
+# 之后就可以直接推送了
+bash push.sh</code></pre>
+            <h2 id="自动化">自动化</h2>
+            <p>整体操作过程可以说比较简单了。既然如此，<strong>脚本，启动！</strong></p>
+            <pre><code>#!/bin/bash
+
+read -p &quot;Local repo name: &quot; local_name
+read -p &quot;Remote repo name: &quot; remote_name
+
+# 远程仓库创建
+tmp=&quot;ssh aliyun-git git init --bare $remote_name.git&quot;
+eval &quot;$tmp&quot;
+
+# 本地仓库创建
+mkdir &quot;$local_name&quot;
+cd &quot;$local_name&quot;
+git init
+
+# 本地仓库初始化
+# 编写.gitignore
+cat &gt; .gitignore &lt;&lt; EOF
+*.sh
+*.bat
+*.exe
+*.[oa]
+*.pyc
+__pycache__
+*.vscode
+*.swp
+EOF
+
+# 编写push.sh
+cat &gt; push.sh &lt;&lt; EOF
+git add .
+git commit
+git push
+EOF
+chmod +x push.sh
+
+# 提交初始化commit
+git add .
+git commit -m &quot;Initial commit&quot;
+tmp=&quot;git remote add origin aliyun-git:$remote_name.git&quot;
+eval &quot;$tmp&quot;
+git push --set-upstream origin master
+
+echo &quot;Success!&quot;</code></pre>
+            <p><strong>Attention please:</strong></p>
+            <ul>
+                <li>本地仓库名和远程仓库名不要加.git 后缀，程序会自动添加</li>
+                <li>如果要把这个脚本改写为其他语言的脚本的话，在转换本地当前工作目录（进入本地新创建的仓库）的时候，<strong>一定要使用语言自带的调整当前工作目录的函数，不要调用系统命令</strong>（如写为
+                    C
+                    语言程序的时候，应当是调用库函数<code>chdir()</code>而不是选择<code>system("cd &lt;目录名&gt;")</code>），否则编译器/解释器自动在这里作多线程执行，创建一个新的线程，运行一个终端，进入了该目录，然后没有后续，线程挂了；另一个线程在原来的代码上继续执行，但根本没进入目录，也就是执行操作的位置不对，最终出现错误。
+                </li>
+            </ul>
+            <h1 id="https服务">http(s)服务</h1>
+            <p>到这里似乎已经万事俱备了，但在服务器迁移的过程中，我发现了问题：使用 ssh 服务，就意味着每个仓库记录的远程库都是其 ip
+                地址（或者自己在<code>~/.ssh/config</code>里规定的服务器别名），当服务器迁移后，需要手动进入一个个本地仓库修改远程库地址，非常麻烦。相比之下，如果使用像 github 一样的
+                http(s)服务，我们就只需要做好远程库迁移、dns 信息修改和服务器设置即可，本地仓库完全不需要改动。</p>
+            <p>于是，我发现了一篇<a
+                    href="https://www.aneasystone.com/archives/2018/12/build-your-own-git-server.html">教程</a>，照葫芦画瓢起来。
+            </p>
+            <p>需要注意的是，<strong>上面的 ssh 服务不一定需要专门创建用户，但 http(s)服务这里我推荐新建用户</strong>。</p>
+            <h2 id="配套软件安装">配套软件安装</h2>
+            <p>首先，我们需要安装<code>git</code>和<code>nginx</code>，这里不再赘述。除此之外，我们会用到以下软件：</p>
+            <ul>
+                <li><code>git-http-backend</code>：git 官方提供的 git 的 http(s) 服务后端。该软件包含在<code>git-core</code>中，一般会在安装 git
+                    时就默认装了，可以通过<code>which git-http-backend</code>查看是否安装，没有的话需要安装<code>git-core</code>。默认安装位置在<code>/usr/lib/git-core/git-http-backend</code>，需要查看自己的路径，后边会用。
+                </li>
+                <li><code>fcgiwrap</code>：一个用于将 FastCGI 转换为 HTTP 协议的工具。</li>
+                <li><code>htpasswd</code>：用于创建和更新基于文本的认证文件，用于存储用户名和密码。它是<code>apache2-utils</code>的一部分，可以通过<code>which htpasswd</code>查看是否安装，没有的话需要安装<code>apache2-utils</code>。
+                </li>
+            </ul>
+            <h2 id="nginx-配置与说明">nginx 配置与说明</h2>
+            <p>最初的设置是这样的：</p>
+            <pre><code>server
+{
+    # 这里用于将 http 请求重定向到 https，是一种常用的方式
+    listen 80;
+    server_name git.player.com;
+    return 301 https://$host$request_uri;
+}
+server
+{
+    server_name git.player.com;
+    listen 443 ssl;
+
+    ssl_certificate /etc/letsencrypt/live/git.player.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/git.player.com/privkey.pem;
+
+    location / {
+        include fastcgi_params;
+        # git-http-backend的路径，每次请求都会转发到这个脚本
+        fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
+        # git-http-backend默认只能访问目录下有git-daemon-export-ok的仓库
+        # 这里设置为可以访问所有仓库
+        fastcgi_param GIT_HTTP_EXPORT_ALL &quot;&quot;;
+        # git仓库根目录
+        fastcgi_param GIT_PROJECT_ROOT /home/git/;
+        fastcgi_param PATH_INFO $uri;
+        # 如果有认证，传递给cgi脚本git-http-backend
+        fastcgi_param REMOTE_USER $remote_user;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+    }
+}</code></pre>
+            <p>nginx 重新加载配置之后，我们就可以正常<code>git clone https://git.player.com/test.git</code>了。但当我们 push 时，会出现 403 错误：</p>
+            <pre><code>$ git push
+fatal: unable to access &#39;https://git.player.com/test.git/&#39;: The requested URL returned error: 403</code></pre>
+            <p>为了解决这个错误，我们可以在 <code>git-http-backend</code> 的官网文档 上找到这样的一段描述：</p>
+            <blockquote>
+                <p>By default, only the upload-pack service is enabled, which serves git fetch-pack and git ls-remote
+                    clients, which are invoked from git fetch, git pull, and git clone. If the client is authenticated,
+                    the receive-pack service is enabled, which serves git send-pack clients, which is invoked from git
+                    push.</p>
+            </blockquote>
+            <p>第一次读这段话可能会有些不知所云，这是因为我们对这里提到的 <code>upload-pack/fetch-pack/receive-pack/send-pack</code>
+                这几个概念还没有什么认识。但是我们大抵可以猜出来，默认情况下，只有认证的用户才可以 push 代码。</p>
+            <p>我们可以在仓库中执行 <code>git config http.receivepack true</code> 来开启 push 权限，但是这样的话，所有人都可以 push
+                代码了，这显然不是我们想要的。我们可以通过 <code>git config http.receivepack false</code> 来关闭 push 权限，这样的话，所有人都不能 push
+                代码了，这也不是我们想要的。那么，我们应该怎么做呢？更好的做法是这样的：</p>
+            <pre><code>$HTTP[&quot;querystring&quot;] =~ &quot;service=git-receive-pack&quot; {
+    include &quot;git-auth.conf&quot;
+}
+$HTTP[&quot;url&quot;] =~ &quot;^/git/.*/git-receive-pack$&quot; {
+    include &quot;git-auth.conf&quot;
+}</code></pre>
+            <p>看上去挺简单，但是想要理解为什么这样配置，就必须了解下 Git 的内部原理。正如上面 git-http-backend 文档上的那段描述，当 Git 客户端执行
+                <code>git fetch/git pull/git clone</code>时，会调用 <code>upload-pack</code> 服务，当执行 <code>git push</code>
+                时，会调用 <code>receive-pack</code> 服务。我们可以查看 nginx 的访问日志，目录在<code>/var/log/nginx/access.log</code>：
+            </p>
+            <p>执行 git clone：</p>
+            <pre><code>[27/Nov/2018:22:18:00] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
+[27/Nov/2018:22:18:00] &quot;POST /test.git/git-upload-pack HTTP/1.1&quot; 200 306 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
+            <p>执行 git pull：</p>
+            <pre><code>[27/Nov/2018:22:20:25] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
+[27/Nov/2018:22:20:25] &quot;POST /test.git/git-upload-pack HTTP/1.1&quot; 200 551 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
+            <p>执行 git push：</p>
+            <pre><code>[27/Nov/2018:22:19:33] &quot;GET /test.git/info/refs?service=git-receive-pack HTTP/1.1&quot; 401 204 &quot;-&quot; &quot;git/1.9.1&quot;
+admin [27/Nov/2018:22:19:33] &quot;GET /test.git/info/refs?service=git-receive-pack HTTP/1.1&quot; 200 193 &quot;-&quot; &quot;git/1.9.1&quot;
+admin [27/Nov/2018:22:19:33] &quot;POST /test.git/git-receive-pack HTTP/1.1&quot; 200 63 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
+            <p>可以看到执行 clone 和 pull 请求的接口是一样的，先请求 <code>/info/refs?service=git-upload-pack</code>，然后再请求
+                <code>/git-upload-pack</code>；而 push 是先请求 <code>/info/refs?service=git-receive-pack</code>，然后再请求
+                <code>/git-receive-pack</code>，所以在上面的的配置中我们看到了两条记录，如果要对 push 做访问控制，那么对这两个请求都要限制。关于 Git 传输的原理可以参考 《Pro
+                Git》的 <a
+                    href="https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">Git
+                    内部原理 - 传输协议</a> 这一节。
+            </p>
+            <p>于是，我们对 nginx 的配置文件进行修改：</p>
+            <pre><code>server
+{
+    listen 80;
+    server_name git.qin-juan-ge-zhu.top;
+    return 301 https://$host$request_uri;
+}
+server
+{
+    server_name git.qin-juan-ge-zhu.top;
+    listen 443 ssl;
+
+    ssl_certificate /etc/letsencrypt/live/git.qin-juan-ge-zhu.top/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/git.qin-juan-ge-zhu.top/privkey.pem;
+
+    location @auth {
+        auth_basic &quot;Git Server&quot;;
+        # 生成的认证文件，下文专门说明
+        auth_basic_user_file /etc/nginx/conf.d/git.htpasswd;
+
+        include fastcgi_params;
+        # git-http-backend的路径，每次请求都会转发到这个脚本
+        fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
+        # git-http-backend默认只能访问目录下有git-daemon-export-ok的仓库
+        # 这里设置为可以访问所有仓库
+        fastcgi_param GIT_HTTP_EXPORT_ALL &quot;&quot;;
+        # git仓库根目录
+        fastcgi_param GIT_PROJECT_ROOT /home/git/;
+        fastcgi_param PATH_INFO $uri;
+        # 如果有认证，传递给cgi脚本git-http-backend
+        fastcgi_param REMOTE_USER $remote_user;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+    }
+
+    location / {
+        error_page 418 = @auth;
+        if ( $query_string = &quot;service=git-receive-pack&quot; ) {
+            return 418;
+        }
+        if ( $uri ~ &quot;git-receive-pack$&quot; ) {
+            return 418;
+        }
+        include fastcgi_params;
+
+        fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
+        fastcgi_param GIT_HTTP_EXPORT_ALL &quot;&quot;;
+        fastcgi_param GIT_PROJECT_ROOT /home/git/;
+        fastcgi_param PATH_INFO $uri;
+        fastcgi_param REMOTE_USER $remote_user;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+    }
+}</code></pre>
+            <p>这里我们可以看到，我们对<code>/git/.*/git-receive-pack</code>和<code>/info/refs?service=git-receive-pack</code>进行了限制，如果没有认证，就会返回
+                418 错误，然后 nginx 会将其转发到<code>@auth</code>这个 location，这个 location
+                会对请求进行认证，如果认证成功，就会将请求转发到<code>fastcgi_pass</code>指定的脚本，也就是<code>git-http-backend</code>，这样就可以正常 push 了。
+            </p>
+            <blockquote>
+                <p>为什么不直接在<code>/git/.*/git-receive-pack</code>和<code>/info/refs?service=git-receive-pack</code>这两个
+                    location 中进行认证呢？如果这样做的话，会导致 clone 和 pull 也需要认证，那多不合适了~</p>
+                <p>418 是什么，http 协议没见过这个啊？这是 http 协议中的一个状态码，叫做 <strong>I’m a
+                        teapot（我是一个茶壶）</strong>，这个状态码是作为一个愚人节玩笑而创建的，但是它确实存在，可以参考 <a
+                        href="https://tools.ietf.org/html/rfc2324">RFC 2324</a>。我们这里用它来做认证标识，以免和别的状态码冲突。当然你也可以自己规定状态码。
+                </p>
+            </blockquote>
+            <h2 id="认证文件">认证文件</h2>
+            <p>nginx 的配置中我们用到了认证文件，它的生成是这样的：</p>
+            <pre><code># 创建认证文件并添加第一个用户
+htpasswd -cd &lt;文件名&gt; &lt;用户名&gt; &lt;密码&gt;
+# 在已有的文件中继续添加用户
+htpasswd -d &lt;文件名&gt; &lt;用户名&gt; &lt;密码&gt;</code></pre>
+            <p>到了这里，我们重启 nginx 然后进行测试，也许就可以正常使用了……吗？</p>
+            <h2 id="问题">问题</h2>
+            <p>我在测试的时候发现了一个问题：</p>
+            <pre><code>$ git clone https://git.player.com/test.git
+Cloning into &#39;test&#39;...
+fatal: repository &#39;https://git.player.com/test.git/&#39; not found</code></pre>
+            <p>看起来很匪夷所思：我们明明把仓库放进了指定目录啊，nginx 也已经配置好了，为什么就是找不到呢？我在网上找了很久也没找到答案。最后自己发现了问题所在：<strong>仓库文件夹权限不对</strong>。
+            </p>
+            <h3 id="linux-权限描述">Linux 权限描述</h3>
+            <p>当我们使用<code>ls -l</code>命令查看文件夹时，会看到类似这样的输出：</p>
+            <pre><code>drwxr-xr-x 2 git git 4096 Nov 27 22:19 test.git</code></pre>
+            <p>其中前 10 个字符就是用来描述该目录权限的。</p>
+            <ul>
+                <li>第一位字符代表文件类型
+                    <ul>
+                        <li><code>d</code>表示目录</li>
+                        <li><code>-</code>表示文件</li>
+                        <li><code>l</code>表示链接文件</li>
+                        <li><code>b</code>表示块设备文件</li>
+                        <li><code>c</code>表示字符设备文件</li>
+                        <li><code>p</code>表示管道文件</li>
+                        <li><code>s</code>表示套接字文件。</li>
+                    </ul>
+                </li>
+                <li>接下来 9 个字符每 3 个一组，分别表示文件所有者、文件所有者所在组、其他用户对该文件的权限。
+                    <ul>
+                        <li><code>r</code>表示可读</li>
+                        <li><code>w</code>表示可写</li>
+                        <li><code>x</code>表示可执行</li>
+                        <li><code>-</code>表示无对应权限</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>其中，读权限和写权限时不言自明的，可是<strong>当我们在讨论文件夹的执行权限的时候，我们究竟在说什么？</strong>其实，这里的执行权限指的是<strong>进入该文件夹的权限</strong>。如果一个文件夹没有执行权限，那么我们就无法进入该文件夹，也就无法访问该文件夹下的文件，即使有对应权限。
+            </p>
+            <p>回到这个问题，我们可以看到，我们仓库存放的文件夹的权限很有可能是没有对应读写或进入权限。所以修改办法也很简单，改权限。</p>
+            <h3 id="解决方案">解决方案</h3>
+            <p>修改权限的方法有以下几种：</p>
+            <ul>
+                <li>直接把对应库及其下的所有文件/文件夹对所有其他用户赋予读写执行权限（权限使用<code>chmod -R 777 test.git</code>）。缺点很明显：
+                    <ul>
+                        <li>不安全，任何人都可以访问该文件夹下的文件，尤其是 root 和 nginx 用户，前者权限太高，一旦出错足以破坏一切，后者容易导致危险（如强制停止或内存泄漏时）</li>
+                        <li>不方便。每次创建库都需要手动修改仓库及文件的权限，十分不便</li>
+                    </ul>
+                </li>
+                <li>不为 git 仓库设立单独用户，直接由原有用户或 root 用户接管一切。缺点：
+                    <ul>
+                        <li>如果使用原有用户，仓库会和其他文件混在一起，不方便管理，且容易误操作</li>
+                        <li>如果使用 root 用户，权限太高，而且一般 root 不会设置为 ssh 登陆，这就意味着想简单创建一个库操作比较复杂</li>
+                    </ul>
+                </li>
+                <li>设立单独用户，将 nginx 的工作用户（一般为 www-data 或
+                    root，在<code>/etc/nginx/nginx.conf</code>文件第一行规定）添加到该用户所在组。这种方式避免了文件混杂不方便管理的问题，也一定程度上避免了权限过高问题（注意，权限问题依然存在），可以说是一个比较好的解决办法。
+                </li>
+            </ul>
+            <p><strong>这也就是上文我推荐为 git 仓库托管设立单独用户的原因。</strong>因而，最后我选择了第三种方案。具体操作如下：</p>
+            <pre><code>usermod -aG git root
+usermod -aG git www-data</code></pre>
+            <p>此时再进行测试，应该就可以正常使用了。</p>
+            <h2 id="其他存在的问题">其他存在的问题</h2>
+            <p>除了上述问题已经解决之外，还有一些问题依然存在：</p>
+            <ul>
+                <li>不管是 nginx 还是 git，在使用 http 上传的时候都会有一定的缓冲区限制，如果上传文件过大或累计多个 commit 才上传，很可能被拒收导致上传失败。这个问题在 github
+                    上也存在，但是 github 的缓冲区限制比较大，一般不会出现这个问题。但是我们的服务器配置比较低，所以这个问题就比较严重了。解决办法是在 nginx
+                    的配置文件中添加<code>client_max_body_size 100m;</code>，这样就可以将缓冲区限制扩大到 100M，一般来说足够了。</li>
+                <li>即使解决了缓冲区大小，偶尔也会被拒收，原因尚未查清</li>
+                <li>尚未能通过访问特定链接来实现 git 仓库的创建。据说是用 nginx 调用脚本，但暂时没弄出来</li>
+                <li>没有一个比较好用且功能较为完备的图形化界面（就像 github 那样）。
+                    <ul>
+                        <li>GitList 的界面看起来不错，而且能展示源码、clone 链接之类的，整体非常像 github 的界面，可惜使用的是我不会的 php 语言，而且没有找到详细一些的安装使用教程
+                        </li>
+                        <li>cgit 是一个用纯 C 语言开发的一个 git 裸库展示，虽然界面看起来比较古早，但功能也很不错，能展示源码、自由切换分支、方便地查看提交历史（diss 一下
+                            github，github 查看提交历史看起来真的很不方便很不直观）。美中不足的是<strong>无法在界面上提供 clone
+                                和源码下载功能</strong>。不过毕竟是个开源软件，而且是我比较熟悉的 C，等有时间有能力了看看自己能不能实现这个功能吧。</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>这篇博客前前后后有二十多天了，该结束了。闲言少叙，看电视去也~</p>
+            <p class="time">2024.1.3</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

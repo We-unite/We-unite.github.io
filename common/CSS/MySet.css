@@ -1,4 +1,7 @@
 /* 以下部分为自行开发 */
+.wall{
+    width:100%;
+}
 
 a {
     text-decoration: none !important;

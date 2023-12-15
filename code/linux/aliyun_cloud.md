@@ -18,17 +18,17 @@
 
 另外，由于是一个临时账号，我个人建议另找一个浏览器做实验，方便和自己现在用的帐户/ECS 实例区别开来。
 
-# 服务器配置
+## 硬件配置
 
 服务器硬件配置应该都是固定的吧？CPU 双核，内存 2G，硬盘 40G，带宽 1MBps。我个人觉得这个配置还是挺不错的，毕竟是白嫖，要求也不能太高了不是？
 
 操作系统方面，由于个人比较喜欢纯命令行操作，所以选择了 Ubuntu22.04 LTS，我的虚拟机也是这个版本，相对而言会比其他发行版更熟悉一些。
 
-## 服务器初始化
+# 服务器初始化
 
 在跟着创建实例的要求一步步做好之后，我们就拥有了一台属于自己的服务器了，并已经有了根用户 root。接下来，我们需要做一些初始化的工作。
 
-### 创建新用户
+## 创建新用户
 
 众所周知，**为了安全起见，我们需要一个非 root 但具有 sudo 权限的用户来进行日常操作**。这里我创建了一个名为<kbd>player</kbd>的用户并设置了密码，然后将其加入 sudo 组。
 
@@ -48,36 +48,9 @@ sudo apt install vim
 
 cd /etc
 sudo vim sudoers
-# 找到root ALL=(ALL:ALL) ALL，按o新开一行，然后写一份一样的，把root改成player
-# 按ESC，输入:wq保存退出
+# 找到root ALL=(ALL:ALL) ALL，
+# 新开一行然后写一份一样的，把root改成player，保存退出
 ```
-
-这时我们会发现一个很操蛋的事情，“为啥命令提示符之前不显示当前用户名和当前路径嘞？这岂不是每次看路径都需要<kbd>pwd</kbd>吗？烦不烦啊！”别急，问题很好修改。
-
-```bash
-cd /home/player
-vim .bashrc
-# 找到PS1=，将其修改为PS1="\u@\h:\w\$"
-# 按ESC，输入:wq保存退出
-```
-
-修改退出之后似乎一切都没有变化。我们需要重启一下服务器。
-
-```bash
-sudo reboot
-```
-
-重新连接之后，也许还是没有变化，我就是这样的。后来在处理其它问题的时候，我发现了根本原因所在：我 TM 创建用户的时候忘了加<kbd>-s</kbd>参数，导致新用户的默认 shell 是<kbd>sh</kbd>而不是<kbd>bash</kbd>。所以，我们需要修改一下新用户的默认 shell。
-
-```bash
-# 查看当前用户的默认shell
-echo $SHELL
-
-# 修改默认shell
-sudo chsh -s /bin/bash player
-```
-
-这时再重启服务器，就会发现，一切都正常了，一切是那么美好。
 
 ## 安装软件
 
@@ -111,17 +84,182 @@ sudo apt install make cmake
 # 剩下需要安装的软件，可以自行搜索
 ```
 
-## 配置 ssh
+## 简单美化一下命令行
+
+配到这里，我们会发现一个很操蛋的事情，“为啥命令提示符之前不显示当前用户名和当前路径嘞？这岂不是每次看路径都需要<kbd>pwd</kbd>吗？烦不烦啊！”别急，问题很好修改。
+
+```bash
+cd ~
+vim .bashrc
+# 找到PS1=，将其修改为PS1="\u@\h:\w\$"
+
+# 加载.bashrc
+source .bashrc
+```
+
+改好之后也许还是没有变化，我就是这样的。后来在处理其它问题的时候，我发现了根本原因所在：我 TM 创建用户的时候忘了加<kbd>-s</kbd>参数，导致新用户的默认 shell 是<kbd>sh</kbd>而不是<kbd>bash</kbd>。所以，我们需要修改一下新用户的默认 shell。
+
+```bash
+# 查看当前用户的默认shell
+echo $SHELL
+
+# 修改默认shell
+sudo chsh -s /bin/bash player
+```
+
+这时再重新加载，就会发现，一切都正常了，一切是那么美好。
+
+除此之外，我们也许想要调整命令行显示的用户名、路径之类内容的颜色，会想让命令行像 git bash 一样当我们进入 git 仓库的时候显示当前在什么分支。针对这两项需求，我修改了一下我的.bashrc 文件，现在其内容如下：
+
+```bash
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
+
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+    else
+    color_prompt=
+    fi
+fi
+
+# 简单修改一下颜色
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\[\033[00m\]'
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:'
+fi
+
+# 如果是git仓库，在命令行提示符之前用不同的颜色显示当前分支
+PS1="$PS1"'\[\033[33m\]'        # change to yellow
+PS1="$PS1"'\w'                 # pwd
+PS1="$PS1"'\[\033[36m\]'        # change color to cyan
+PS1="$PS1"'`__git_ps1`'         # git branch
+PS1="$PS1"'\[\033[0m\]'         # change color
+#PS1="$PS1"'\n'                  # new line
+PS1="$PS1"'\$ '                  # prompt: always $
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+echo This\ is\ .bashrc.
+
+alias pip='python -m pip'
+# 设置bash使用vim模式，允许使用0、dw之类常用vim快捷键，方便命令编辑
+set -o vi
+# 有时候我们需要一些魔法
+export http_proxy=http://127.0.0.1:7890
+export https_proxy=http://127.0.0.1:7890
+```
+
+# 配置 ssh
 
 用着用着，就会发现：我为啥一直在浏览器里搞命令行？要是能直接在本地的命令行里搞就好了。当然，阿里云能满足我们。
 
-### ssh 简介
+## ssh 简介
 
 什么是 ssh？ssh 是 Secure Shell 的缩写，中文名为安全外壳协议。ssh 是一种加密的网络协议，可以在不安全的网络中为网络服务提供安全的传输环境。ssh 是目前较可靠，专为远程登录会话和其他网络服务提供安全性的协议。利用 ssh 协议可以有效防止远程管理过程中的信息泄露问题。通过 ssh 可以对所有传输的数据进行加密，也能够防止 DNS 欺骗和 IP 欺骗。ssh 还支持在两个远程主机之间进行数据的传输。
 
 说了也记不住，直接开干！
 
-### 配置安全组规则
+## 配置安全组规则
 
 在阿里云控制台左上角点击，选择`云服务器ECS`，会进入云服务器实例控制界面。在左侧菜单栏寻找`安全组` ，添加安全组规则。按要求添加新的安全组规则，开放 TCP 协议对应的 22 端口。（其实可以都开了，但是毕竟不安全，建议后续按需开放。）
 
@@ -132,7 +270,7 @@ sudo apt install make cmake
 - 将上述.pem 文件移动到家目录`C:\用户\当前用户名`的<kbd>.ssh</kbd>文件夹下
 - 在<kbd>.ssh</kbd>文件夹下创建文件<kbd>config</kbd>，内容如下：
 
-```txt
+```plaintext
 # 给服务器起的别名，这里是aliyun
 Host aliyun
 # IP地址，这里以127.0.0.1代替，但真实操作需要换成服务器的公网ip，在控制台就能看到
@@ -156,254 +294,20 @@ ssh aliyun
 
 既然我们选择了在命令行里使用，编辑文件当然是比较常用 vim 了。当然 neovim 与其他命令行编辑器也很好，但我不熟悉，请参照网上其他教程进行配置。
 
-我的 vim 学习与配置[链接](https://www.qin-juan-he-zhu.top/code/linux/vim.html)中有如下一些基本配置：
+我的 vim 学习与配置[链接](https://www.qin-juan-ge-zhu.top/code/linux/vim.html)中有如下一些基本配置：
 
-- 同时开启绝对行号与相对行号，则当前行显示真实行号，其他行显示相对于当前行为上/下第几行，方便跳转。
-- 代码中常常需要的`()[]{}`自动匹配
-- 自动缩进和智能缩进，但似乎没啥鸟用
 - vim 自带的代码高亮，感觉还是相当不错的
+- 代码中常常需要的`()[]{}`自动匹配
+- 同时开启绝对行号与相对行号，则当前行显示真实行号，其他行显示相对于当前行为上/下第几行，方便跳转。
+- 代码按语法缩进，并且每次保存或退出时自动格式化
 - 当前行/当前列各给一个颜色，因为有的平台光标显示很不明显，正常插入模式一般也不好确定光标位置，这样方便知道光标在哪。
 - 自动折行，即当前行太长了会被折回来显示，但还是同一行，方便一次性看完整。
-- 一些快捷键，如<kbd>ta</kbd>到行末（替代够不到的<kbd>$</kbd>），<kbd>end</kbd>来到文件末（替代难记的<kbd>G</kbd>），还有<kbd>up/ne</kbd>上/下移动 20 行等。
-- 自动识别文件类型，并对`*.html, *.c, *.cpp, *.python`等文件在保存<kbd>:w<Enter></kbd>时自动格式化，在正常或选择模式下<kbd>Ctrl+p</kbd>一键注释（别骂了别骂了，<kbd>Ctrl+/</kbd>我属实是设置不出来）
-
-## 插件管理
+- 一些快捷键，如<kbd>L</kbd>到行末（替代够不到的<kbd>$</kbd>），还有<kbd>K/J</kbd>上/下移动 10 行等。
+- 基本的状态栏设置，包括文件名、git 分支、文件编码、文件类型、总行数等信息，方便查看。
+- 自动识别文件类型，并对`*.html, *.c, *.cpp, *.python`等文件在保存<kbd>:w<Enter></kbd>时自动格式化
+- 插件和其他重重设置
 
 这里使用了几个插件，插件管理目前用的是评价一般的`Vundle`。个人评价，下载插件啥的属实是慢，每次都报错报到怀疑人生，害得我都得手动安装然后在里边添加，但是别的目前还不会使。气死偶勒！
-
-这里需要注意的是，上文提到我喜欢把有用的东西放在`~/useful`下，但是如果直接这样写路径，其他用户如 root 等使用时候就会报错，人家的主目录第下没这个东西！所以，在写路径的位置，切记要写绝对路径！！！
-
-# 游戏
-
-> All work no play makes Jack a doll boy.
-
-经过了上边的配置，写代码的控制基本完善了，但是服务器怎么能只拿来干活呢？没有游戏怎么行？我们要快乐！
-
-目前我的服务器上装了三个游戏
-
-- 俄罗斯方块，装的是`tint`
-- 扫雷，装的是`miebash`
-- 贪吃蛇，找不到力（允悲
-
-安装方法网上都有，就不多说了。玩得愉快！
-
-# git 远程存储
-
-君不闻，《西游记》有云：
-
-> 争名夺利几时休，早起迟眠不自由。
->
-> 骑着驴骡思骏马，官居宰相望王侯。
-
-完成了代码环境的配置，我就在想，要是有一个自己的远程 git 存储库该多好？
-
-说干就干，我找到了 gitlab 安装教程，信心满满，谁知"先帝创业未半而中道崩殂"。
-
-## gitlab？
-
-我按照网上的教程，更新了清华镜像源，下载安装 gitlab。孰料一次一次在安装过程卡死，而且情况十分严重，CPU
-占用率长期维持在 50%以上，内存更是飙升到 90%，现在不仅安装进行不下去了，甚至一切操作都不认识，包括<kbd>Ctrl+C</kbd>想要杀死当前进程的请求也会石沉大海。没办法，只得强制重启。
-
-如是反复若干次，最终死心，将 gitlab 彻底从云服务器卸载，"革职为民，永不叙用"。
-
-经过上网查找，原因果然出现在配置上。**gitlab 推荐的最小内存是 4G，但是目前我们只有 2G，内存爆满也就理所当然了。**没办法，期限之内不能更改配置，就算能更改，我都穷到薅资本主义羊毛了，还能有钱升级配置？笑死。
-
-## 就这？
-
-就因为这个问题，我们就不干了？这是不行滴，小同志。
-
-不久之后，黄四郎同志发来了一篇博客：[最简单的 git 服务器](https://www.ruanyifeng.com/blog/2022/10/git-server.html)
-
-看起来似乎不错，但是失之简略。幸好，我在 git 官方教程[Pro Git](https://git-scm.com/book/zh/v2)上找到了另一部分，两个拼一拼、试一试，最终成功了。
-
-注意，本地和远程都需要安装 git，相信能看这里的读者应该已经是安装过了，这里不再赘述。
-
-### 前置
-
-在创建存储库之前，我想我们应该做些什么。
-
-对了，创建新用户吧！按照上述写的步骤创建一个新用户并为之设置密码，可以不用加入 sudo 组，因为我们不需要这个用户来操作服务器，只需要用来存储代码就行了。
-
-### 本地存储库
-
-本地我们需要一个存储库，如果已有的则可以忽略本部分。
-
-```bash
-# 创建本地存储库，这里叫test吧
-mkdir test
-cd test
-git init
-```
-
-但是本方法要求本地存储库必须已经有 commit(s)。好办，就写一个常用的`.gitignore`好了。
-
-```vim
-*.sh
-*.bat
-*.exe
-*.dll
-*.so
-*.[oa]
-*.idea
-```
-
-而后，为了方便提交操作，可以再创建一个`push.sh`脚本：
-
-```bash
-#!/bin/bash
-git add .
-git commit
-git push
-```
-
-注意，创建`push.sh`一定要在`.gitignore`之后，否则不会被忽略的。
-
-### 远程仓库
-
-就一句话：
-
-```bash
-# 创建远程仓库，这里也叫test吧
-ssh git@127.0.0.1 git init --bare test.git
-```
-
-注意，本处指明的 git 为远程用户名，127.0.0.1 代表云服务器的公网 ip，test.git 为远程仓库名。使用的时候都需要换成自己的。
-
-### 本地与远程连接
-
-本地和远程都有了，下一步就是建立联系了。
-
-```bash
-# 本地添加远程
-git remote add origin git@127.0.0.1:test.git
-
-# 此时尚不能直接推送，因为并未指定上游对应分支，需要指定
-git push --set-upstream origin master
-
-# 之后就可以直接推送了
-sh push.sh
-```
-
-### 自动化
-
-怎么样，操作看起来又臭又长吧？我也这么觉得。所以我写了两份代码，供同时自动创建本地仓库和远程对应仓库并建立所有对应关系之用。
-
-```c
-/*
- * gitadd.c
- */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <direct.h>
-
-int main()
-{
-    char local_name[100],remote_name[100],tmp[100];
-    printf("您好！\n请输入本地仓库名：");
-    gets(local_name);
-    printf("请输入远程仓库名：");
-    gets(remote_name);
-
-    //远程仓库创建
-    strcpy(tmp,"ssh aliyun-git git init --bare ");
-    strcat(remote_name,".git");
-    strcat(tmp,remote_name);
-    system(tmp);
-
-    //本地仓库创建
-    mkdir(local_name);
-    chdir(local_name);
-    system("git init");
-
-    //本地仓库初始化
-    FILE* file;
-    //编写.gitignore
-    file=fopen(".gitignore","w");
-    fprintf(file,"*.sh\n");
-    fprintf(file,"*.bat\n");
-    fprintf(file,"*.exe\n");
-    fprintf(file,"*.[oa]\n");
-    fprintf(file,"*.pyc\n");
-    fprintf(file,"__pycache__\n");
-    fprintf(file,"*.vscode\n");
-    fprintf(file,"*.swp\n");
-    fclose(file);
-    //编写push.sh
-    file=fopen("push.sh","w");
-    fprintf(file,"git add .\n");
-    fprintf(file,"git commit\n");
-    fprintf(file,"git push");
-    fclose(file);
-
-    //提交初始化commit
-    system("git add .");
-    system("git commit -m \"Initial commit\"");
-    strcpy(tmp,"git remote add origin aliyun-git:");
-    strcat(tmp,remote_name);
-    system(tmp);
-    system("git push --set-upstream origin master");
-    system("git push");
-
-    printf("完成！");
-    return 0;
-}
-```
-
-```python
-# gitadd.py
-import os
-
-if __name__ == '__main__':
-    print("你好！")
-    print("请输入本地仓库名：")
-    local_name = input()
-    print("请输入远程仓库名：")
-    remote_name = input()
-    os.system("ssh aliyun-git git init --bare "+remote_name+".git")
-
-    # 创建本地仓库
-    os.system("mkdir "+local_name)
-    os.chdir(local_name)
-    print("本地仓库已建立！")
-    print("当前路径为"+os.getcwd())
-
-    # 初始化git仓库
-    os.system("git init")
-
-    # 以utf8编码编写.gitignore文件
-    with open(".gitignore", "w", encoding="utf8") as f:
-        f.write("*.pyc\n")
-        f.write("__pycache__/\n")
-        f.write("*.exe\n")
-        f.write("*.[oa]\n")
-        f.write("*.swp\n")
-        f.write("*.sh\n")
-        f.write("*.bat\n")
-
-    # 编写push.sh文件
-    with open("push.sh", "w", encoding="utf8") as f:
-        f.write("git add .\n")
-        f.write("git commit\n")
-        f.write("git push\n")
-
-    print("本地仓库初始化完成！")
-
-    # 连接远程仓库
-    os.system("git add .")
-    os.system("git commit -m \"Initial commit\"")
-    os.system("git remote add origin aliyun-git:"+remote_name+".git")
-    os.system("git push --set-upstream origin master")
-    os.system("git push")
-
-    print("完成！")
-```
-
-**Attention please:** 本地仓库名和远程仓库名不要加后缀，程序会自动添加。另外，如果要修改，在转换本地当前工作目录的时候，**一定要使用语言自带的调整当前工作目录的函数，不要调用系统命令**，否则会出现编译器/解释器自动将程序作为多线程执行，导致一个线程进去了然后线程当场去世，后续的操作在另一个线程，工作目录根本没发生变化，也就是把原来所在的位置给 git 初始化了，出现奇奇怪怪的错误。
-
-### 其他
-
-需要明白的是，上述方法在远端创立的**只是一个裸仓库**（即只是我们本地仓库的`.git`文件夹），不包含工作目录，所以不能直接在远端进行操作，需要在本地进行操作，然后推送到远端。但是`git clone`的时候，本地得到的是一个完整的仓库，而其他使用也与普通仓库无异。
 
 # 来看看在线 VSCode 吧！
 
@@ -450,9 +354,6 @@ code-server
 ```bash
 #!/bin/sh
 code-server --host "0.0.0.0"> /home/player/useful/codeserver-out.txt 2>&1 &
-echo 启动完成！程序已在后台运行。
-echo 如需杀死进程，请以jobs查看后台程序编号并kill %num
-echo               或ps查看进程号并kill之。
 ```
 
 其中第一条指令是设置允许外界访问，并指定了由后台运行、所有输出写进`/home/player/useful/codeserver.txt`文件中。后续均为输出信息。
@@ -474,11 +375,8 @@ cert: false
 
 杀死的方法：
 
-```bash
-# 运行指令
-ps -ef | grep code-server
-
-# 输出结果如下
+```plaintext
+$ ps -ef | grep code-server
 player      2621       1  0 May29 ?        00:00:00 /usr/lib/code-server/lib/node /usr/lib/code-server --host 0.0.0.0
 player      2646    2621  0 May29 ?        00:03:31 /usr/lib/code-server/lib/node /usr/lib/code-server/out/node/entry
 player      3079    2646  0 May29 ?        00:00:57 /usr/lib/code-server/lib/node /usr/lib/code-server/lib/vscode/out/bootstrap-fork --type=ptyHost --logsPath /home/player/.local/share/code-server/logs/20230529T211752
@@ -491,10 +389,10 @@ player    465057  464494  0 13:42 ?        00:00:35 /usr/lib/code-server/lib/nod
 player    579173  574648  0 16:44 pts/1    00:00:00 grep --color=auto code-server
 
 # 只需要杀死根进程也就是第一个进程就好，下边的数据需要改成当前对应进程号
-kill -9 2621
+$ kill -9 2621
 ```
 
-重新启动之后，就可以用`<服务器公网ip>:<指定端口>`访问在线 VSCode 了，初次访问会比较慢，耐心等待吧。
+重新启动之后，就可以用`ip:post`访问在线 VSCode 了，初次访问会比较慢，耐心等待吧。
 
 ## 同步设置
 
@@ -535,16 +433,16 @@ kill -9 2621
 
 ## ICP 备案
 
-众所周知，我国是工人阶级领导的、以工农联盟为基础的、人民民主专政的社会主义国家，一切事关宣传、舆论的东西都要在党的领导下，都要经过审查备案，包括建网站和域名 https 使用。
-
-ICP 备案的原则是：用谁的服务器，在谁那里备案。即以我而言，我在腾讯云买的域名、做的 DNS 解析，但用的是阿里云的服务器，就要在阿里云做 ICP 备案。
+众所周知，我国是“工人阶级领导的、以工农联盟为基础的、人民民主专政的社会主义”国家，一切事关宣传、舆论的东西都要在党的领导下，都要经过审查备案，包括建网站和域名 https 使用。ICP 备案的原则是：**用谁的服务器，在谁那里备案**。以我为例，我在腾讯云买的域名、做的 DNS 解析，但用的是阿里云的服务器，就要在阿里云做 ICP 备案。
 
 备案流程按按着走就行，只是有几点需要特别注意：
 
 - 备案的省份需要与户籍所在省一致
 - 备案网站名称不要太普通，容易和别人重复，会被客服小姐姐电话要求订正
 - 网站名称不要出现“阁、楼、店”等一些容易误会为企业商业主体网站的名称，否则也会被退回。
-- 网站用途描述要详细，尽量 30 字以上，绝对不要出现“博客”等词，审查非常非常严格，而且极大可能直接被 ban。即使你真要博客，不能暗度陈仓吗？
+- 网站用途描述要详细，尽量 30 字以上
+  - 用途描述绝对不要出现“博客”等词，审查非常非常严格，而且极大可能直接被 ban。即使你真要博客，不能暗度陈仓吗？
+  - 就算你要开评论区也不要说提及。**朋友，你也不想你的博客隔三差五被警察同志拿着放大镜看吧？**
 
 提交备案之后。如有问题客服会打电话通知，并退回修改；阿里云初审需要大概不到 1 天，工信部短信确认需要 1 天，然后发送到备案省（即户籍所在省）的管局，时长最多 20 天，建议提前搞。我用了 6 天。
 
@@ -554,16 +452,18 @@ ICP 备案的原则是：用谁的服务器，在谁那里备案。即以我而�
 
 没错，我们需要一个代理，根据访问的网址来对应到指定端口。
 
-### 安装
+### 安装、运行与常用操作
 
 ```bash
 sudo apt install nginx
-```
+# 安装完成后如果服务器重启，nginx会自动启动，手动启动命令如下
+sudo nginx
 
-### 运行
+# 停止服务
+sudo nginx -s stop
 
-```bash
-nginx
+# 重新加载配置文件（适用于修改了配置文件但不需要重启的场景）
+sudo nginx -s reload
 ```
 
 ### SSL 证书
@@ -576,30 +476,21 @@ nginx
 sudo apt install certbot
 ```
 
-在申请证书之前，需要停止 nginx 的工作，如果正在运行，按照上边说的方法杀死即可：
-
-```bash
-ps -ef | grep nginx
-
-# 杀死显示的第一个进程
-kill -9 <进程号>
-
-# 重启nginx
-nginx
-```
-
-而后就可以申请证书辣！
+在申请证书之前，需要停止 nginx 的工作，如果正在运行，按照上边说的方法杀死，而后就可以申请证书辣！
 
 ```bash
 # 申请证书
 sudo certbot certonly --standalone --email example@qq.com -d code.player.com
+
+# 除了使用参数方式外，也可以使用交互的方式
+sudo certbot certonly
 ```
 
 申请完成后会展示证书的存储路径，记下来，后边会用到。比如：
 
-SSL 证书 /etc/letsencrypt/live/code.play.com/fullchain.pem;
+SSL 证书 /etc/letsencrypt/live/code.player.com/fullchain.pem;
 
-SSL 证书秘钥 /etc/letsencrypt/live/code.play.com/privkey.pem;
+SSL 证书秘钥 /etc/letsencrypt/live/code.player.com/privkey.pem;
 
 ### 修改、添加配置
 
@@ -610,6 +501,7 @@ Nginx 默认下载目录在`/etc/nginx`，该目录下有个`.conf`文件，但�
 ```conf
 server
 {
+    # 这段是一个常用的http重定向到https的方法，用了都说好
     listen 80;
     server_name code.player.com;
     return 301 https://$host$request_uri;
@@ -619,28 +511,128 @@ server
     server_name code.player.com;
     listen 443 ssl;
 
+    # 证书路径
     ssl_certificate /etc/letsencrypt/live/code.player.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/code.player.com/privkey.pem;
 
+    # 这是对于code-server做出的设置
     location / {
-        proxy_pass http://127.0.0.1:8080;# 这里的端口号要和code-server指定的端口号一致，我是8080
+        proxy_pass http://127.0.0.1:8080; # 这里的端口号要和code-server指定的端口号一致，我是8080
         proxy_set_header Host $host;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection upgrade;
         proxy_set_header Accept-Encoding gzip;
     }
+
+    # 如果文件对应的是webroot服务（也就是一个文件夹下存放着指定网址的网页）
+    # 需要将上边的配置修改为
+    # location / {
+    #     root /var/myweb/; # 这里是文件夹路径
+    #     index index.html; # 这里是每个文件夹下默认打开的文件
+    # }
 }
 ```
-
-亲测有效。
 
 编写完文件之后，需要重新加载配置文件（不必重启 Nginx）：
 
 ```bash
-nginx -s reload
+sudo nginx -s reload
 ```
 
-但在使用过程中，一定记得把域名换成自己的域名、证书路径换成自己的证书路径、端口换成自己在 code-server 中指定的端口！
+再次提醒：一定记得把域名换成自己的域名、证书路径换成自己的证书路径、端口换成自己在提供服务的应用（如 code-server）中指定的端口！
+
+# 服务器上的文件浏览
+
+我们已经学会了设置 nginx 的 webroot，但也有很多情况我们需要能在各种设备上直接地看到服务器上有哪些文件，既能方便文件传输，也能覆盖对大多数只需要看不需要改的场景。
+
+python3 为我们提供了一个简单的 http 文件浏览服务，默认安装目录为`/usr/lib/python3.x/http/server.py`，一般情况下我们可以直接运行它：
+
+```bash
+python3 -m http.server
+```
+
+但是 python 提供的这份文件存在一些问题：
+
+- 响应头没有规定文件编码，让浏览器自己看着办，容易出现乱码
+- 里边选择性忽略了一些文件、文件夹
+
+于是我在给定的基础上做了一些小修改，修改版的文件在[这里](https://www.qin-juan-ge-zhu.top/code/linux/httpmyserver.html)。
+
+# git 远程存储
+
+君不闻《西游记》有云：
+
+> 争名夺利几时休，早起迟眠不自由。
+>
+> 骑着驴骡思骏马，官居宰相望王侯。
+
+完成了代码环境的配置，我就在想，要是有一个自己的远程 git 托管环境该多好？那就干！
+
+我的详细配置方法写在[这里](https://www.qin-juan-ge-zhu.top/code/linux/gitserver.html)里了。
+
+# 游戏
+
+> All work no play makes Jack a doll boy.
+
+经过了上边的配置，写代码的控制基本完善了，但是服务器怎么能只拿来干活呢？没有游戏怎么行？我们要快乐！
+
+目前我装了三个游戏：
+
+- 俄罗斯方块，装的是`tint`
+- 扫雷，装的是`minebash`
+- 贪吃蛇，找不到力（允悲
+
+安装方法网上都有，就不多说了。玩得愉快！
+
+# 开机运行脚本
+
+经过了以上的设置，我的服务器已经有了许多服务，特别是每个计算机人电脑里必然需要养的一只宠物——小蓝猫 clash。但是每次重启系统之后，这许多服务都需要自己手动拉起的话未免太过麻烦了，所以我们需要一个在系统加载完成后就能自动以 root 身份执行的脚本。经过查询，我找到了处理办法。
+
+在 Linux 系统下，开机启动一般使用的是`/etc/rc.local`文件（但也有很多发行版不再使用这种操作方式）。ubuntu20.04 系统已经默认安装了 rc-local.service 服务，但是不知什么原因系统把这个服务给“隐蔽”了，所以如果不做一番操作是无法使用的。
+
+```bash
+# 以下所有命令需要root身份执行
+
+cp /usr/lib/systemd/system/rc-local.service /etc/systemd/system/
+# 修改rc-local.service文件，在文件末尾添加以下内容（注意删去前边的注释符）：
+# [Install]
+# WantedBy=multi-user.target
+
+# 创建rc.local文件，带上shebang行
+echo '#!/bin/bash' > /etc/rc.local
+# 修改rc.local文件权限
+chmod +x /etc/rc.local
+
+# 上述步骤完成后，注意不要急于写rc.local脚本，我们需要先启动rc-local.service服务
+systemctl start rc-local.service
+systemctl enable rc-local.service
+# 上述两条命令运行正常时，系统需要重启
+reboot
+
+# 重启完成后，检查rc-local.service服务是否正常运行
+systemctl status rc-local.service
+
+# 一切正常，就可以编写rc.local脚本的内容了
+# 需要注意的是，该脚本以root身份运行，所以不需要sudo
+# 如果部分命令需要以其他用户身份运行，可以使用su命令，如：
+# su -l <username> -c <要运行的命令>
+# 如果要运行的是脚本（不建议，没必要），注意对应参数
+# 文件的最后，可以用exec &> /var/log/rc-local.log将脚本的输出重定向到日志文件中
+```
+
+除此之外，我们可能还需要为所有用户默认开启魔法。这个功能在开机脚本和`/etc/profile`中都无法实现，应当放在`/etc/environment`中。在其中添加以下内容：
+
+```plaintext
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+http_proxy=http://127.0.0.1:7890
+https_proxy=http://127.0.0.1:7890
+no_proxy=127.0.0.1,localhost
+HTTP_PROXY=http://127.0.0.1:7890
+HTTPS_PROXY=http://127.0.0.1:7890
+NO_PROXY=127.0.0.1,localhost
+```
+
+该文件中的所有设置对于所有用户均有效，着实省去了每次开机、切换用户都要手动挂代理的麻烦。
 
 # 碎碎念
 
@@ -652,4 +644,4 @@ nginx -s reload
 
 这篇文档是对一个月以来搞云服务器的配置的一个小小总结，本来以为没多少东西，结果写了整整一下午到现在，一个 Markdown 文档，手写居然达到了 900 多行、将近 40KB，令我也大吃一惊。
 
-也许我之后还会继续鼓捣我的服务器，那时候就继续写下去吧。现在也许该考虑考虑期末考试了（笑。
+也许我之后还会继续鼓捣我的服务器，那时候就继续写下去吧。现在该考虑考虑期末考试了（笑。
