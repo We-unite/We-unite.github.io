@@ -6,7 +6,7 @@ document.writeln("    <meta charset=\'UTF-8\'>");
 document.writeln("    <meta name=\'viewport\' content=\'width=device-width initial-scale=1\'>");
 document.writeln("    <link rel=\"stylesheet\" href=\"https://www.qin-juan-ge-zhu.top/common/CSS/MySet.css\">");
 document.writeln("    <link rel=\"icon\" type=\"image/x-icon\" href=\"https://www.qin-juan-ge-zhu.top/common/icon.png\" />");
-document.writeln("    <script src=\"https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js\"></script>");
+document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/jQuery.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/vim.js\"></script>");
 document.writeln("    <!-- <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/click4code.js\"></script> -->");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/pandoc-menu.js\"></script>");

@@ -175,7 +175,8 @@ h3 {
     width: 100vw;
     bottom: 0;
     display: flex;
-    justify-content: center
+    justify-content: center;
+    color: rgba(255, 255, 255, .8);
 }
 
 .copyright {

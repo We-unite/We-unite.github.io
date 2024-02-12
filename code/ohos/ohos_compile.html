@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>OpenHarmony 3.2 编译</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
+</head>
+
+<body>
+    <div class="pandoc">
+        <div class="main">
+            <header id="title-block-header">
+                <p class="title">OpenHarmony 3.2 编译</h1>
+            </header>
+            <!-- 鸿蒙开发环境搭建 -->
+            <blockquote>
+                <p>本次编译环境搭建参考了以下博客：</p>
+                <ul>
+                    <li><a
+                            href="https://gitee.com/hihope_iot/docs/blob/master/HiHope_DAYU200/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E7%BC%96%E8%AF%91%E6%8C%87%E5%8D%97.md">HiHope_DAYU200/开发环境搭建编译指南</a>
+                    </li>
+                    <li><a href="https://juejin.cn/post/7257553293889634363">基于 Ubuntu 20.04 配置 OpenHarmony 开发环境</a>
+                    </li>
+                    <li><a
+                            href="https://blog.csdn.net/jwq1220/article/details/127303546?csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22127303546%22%2C%22source%22%3A%222401_82617925%22%7D&amp;fromshare=blogdetail">OpenHarmony
+                            源码编译步骤(基于 3.2 beta3)</a></li>
+                    <li><a
+                            href="https://unix.stackexchange.com/questions/616392/failed-load-btf-from-vmlinux-unknown-error-2make-makefile1162-vmlinu">FAILED:
+                            load BTF from vmlinux: Unknown error -2</a></li>
+                </ul>
+            </blockquote>
+            <h1 id="环境与依赖">环境与依赖</h1>
+            <h2 id="硬件环境">硬件环境</h2>
+            <p>编译过程使用的是
+                <code>Ubuntu</code>，经测试，<code>Ubuntu 22.04 LTS</code>/<code>Ubuntu 20.04 LTS</code>/<code>Ubuntu 18.04 LTS</code>
+                均可用。
+            </p>
+            <p>网上的大多数博客里没有对编译的硬件限制作出说明，现根据我们的情况，给出一个大概的范围：</p>
+            <ul>
+                <li><strong>内存必须在 10G 以上</strong>，我使用的是 13G，编译成功（8G 时编译失败了，下文会说明）</li>
+                <li><strong>磁盘 160G 或以上</strong>
+                    <ul>
+                        <li>源码大小就 36G 左右了</li>
+                        <li>大量的依赖会占据数十 G 的空间</li>
+                        <li>我用的是 160G 磁盘，编译成功，但基本不剩什么空间了</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>这里我用的是 VMWare+Ubuntu22.04 虚拟机。</p>
+            <h2 id="软件包依赖">软件包依赖</h2>
+            <p>安装依赖在博客中都有讲，但<strong>少了一部分依赖项</strong>，我因而将所有必要的依赖项整理到一个脚本里了：</p>
+            <pre><code>#!/bin/bash
+
+##########################################################################
+# File Name    : harmony.sh
+# Encoding     : utf-8
+# Author       : We-unite
+# Email        : weunite1848@gmail.com
+# Created Time : 2024-02-07 12:32:50
+##########################################################################
+
+set -e # 一旦出错立刻停止执行，不会执行后续指令
+
+# 更新软件源
+sudo apt update
+sudo apt upgrade
+
+# 官方博客说明的依赖项
+sudo apt install binutils git git-lfs gnupg flex \
+    bison gperf build-essential zip curl zlib1g-dev gcc-multilib g++-multilib \
+    libc6-dev-i386 lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z1-dev ccache \
+    libgl1-mesa-dev libxml2-utils xsltproc unzip m4 bc gnutls-bin \
+    python3-pip ruby libtinfo-dev libtinfo5 \
+
+# 官方博客未说明，但安装过程中报缺失的依赖项
+sudo apt install openjdk-8-jdk libssl-dev libelf-dev default-jdk \
+    genext2fs u-boot-tools mtd-utils scons gcc-arm-none-eabi \
+    liblz4-tool
+
+# 别的博客说明的依赖项
+sudo apt install device-tree-compiler lib32stdc++6 lib32z1 libncurses5-dev lib32ncurses6
+
+# 检查是否存在python3，如不存在则为之安装
+if ! [ -x &quot;$(command -v python3)&quot; ]; then
+    sudo apt install python3
+fi
+# 是否有python，如没有则建立软连接到python3的位置
+if ! [ -x &quot;$(command -v python)&quot; ]; then
+    sudo ln -s $(which python3) /usr/bin/python
+fi</code></pre>
+            <p>这里需要注意的是，<strong>如果安装过程中出现报错，在修改之后，必须重新执行整个脚本</strong>，因为在 apt 发现找不到某个软件包之后，后续的包与命令都不会执行。</p>
+            <h1 id="配置-git">配置 git</h1>
+            <h2 id="git-基础设置">git 基础设置</h2>
+            <p>在上边我们已经下载了本次所需要的<code>git</code>与<code>git-lfs</code>，接下来我们需要对<code>git</code>进行基础设置。</p>
+            <pre><code># 设置用户名与密码，新用户必做
+# 这里的用户名与密码只是一个写在git提交记录中的标识，可以与gitee/github账号无关
+git config --global user.name &quot;yourname&quot;
+git config --global user.email &quot;your-email-address&quot;
+# git凭证缓存，必做
+git config --global credential.helper store
+# git默认的文本编辑器是nano，我一般喜欢改为vim，选做
+git config --global core.editor vim</code></pre>
+            <h2 id="gitee-帐户">gitee 帐户</h2>
+            <p>由于 OpenHarmony 的源码托管在 gitee 上，所以我们需要在 gitee 上注册一个帐户。注册的方法在此不复赘述。</p>
+            <p>本次编译过程中，我们并不需要提交代码，因而可以仅通过 http 方式从 gitee 下载源码——如果是这样的话，<strong>就不需要进行 git 与 gitee
+                    关联</strong>；如果想要提交代码，那么需要将本地的 git 与 gitee 账号关联起来，具体操作如下：</p>
+            <pre><code># 在本地执行
+ssh-keygen -t rsa -C &quot;your-email-address&quot;</code></pre>
+            <p>命令执行后，每次需要输入都直接回车，<strong>连续有三个回车</strong>，执行就会结束，ssh
+                密钥对的公钥和私钥分别保存在<code>~/.ssh/id_rsa.pub</code>和<code>~/.ssh/id_rsa</code>中。</p>
+            <p>在 gitee 用户的设置界面，将公钥<code>id_rsa.pub</code>的内容复制到 gitee 的 SSH 公钥中，保存即可。</p>
+            <p>此时，我们就可以通过 ssh 的方式与 gitee 进行交互、也可以免密提交代码了。</p>
+            <h1 id="配置-repo-工具">配置 repo 工具</h1>
+            <pre><code>sudo curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; /usr/local/bin/repo
+sudo chmod a+x /usr/local/bin/repo
+pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests</code></pre>
+            <h1 id="系统源码编译">系统源码编译</h1>
+            <h2 id="获取源码">获取源码</h2>
+            <p>通过 repo + https/ssh 下载：</p>
+            <pre><code># 通过http下载
+repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
+# 或者也可以通过ssh下载
+# repo init -u git@gitee.com:openharmony/manifest.git -b master --no-repo-verify
+repo sync -c
+repo forall -c &#39;git lfs pull&#39;</code></pre>
+            <h2 id="prebuilts-与编译">prebuilts 与编译</h2>
+            <pre><code># 先在源码根目录下执行脚本，安装编译器及二进制工具
+bash build/prebuilts_download.sh
+# 再执行如下命令进行版本编译
+sudo ./build.sh --product-name rk3568 --ccache</code></pre>
+            <h2 id="编译完成">编译完成</h2>
+            <p>编译所生成的文件都归档在 out 目录下，结果镜像输出在源码根目录下的 out/rk3568/packages/phone/images 目录下。</p>
+            <p>自此源码编译成功，即可进行镜像烧录。</p>
+            <h1 id="编译报错解决记录">编译报错解决记录</h1>
+            <p>以下记录编译过程中出现的一些出现过的报错、坑点和注意事项，以为后来者鉴。</p>
+            <h2 id="ssh-下载源码报错">ssh 下载源码报错</h2>
+            <p>在使用 ssh
+                下载时，第一步<code>repo init -u git@gitee.com:openharmony/manifest.git -b master --no-repo-verify</code>，报错：
+            </p>
+            <pre><code>Warning: Permanently added &#39;gitee.com,180.76.198.77&#39; (ECDSA) to the list of known hosts.</code></pre>
+            <p>经检查，发现 gitee 邮箱设置与公钥中邮箱存在差异，修改 gitee 邮箱设置后成功。</p>
+            <h2 id="设备磁盘空间不足">设备磁盘空间不足</h2>
+            <p>编译过程中异常终止，并显示“设备上没有空间”。</p>
+            <p><strong>解决方法：</strong></p>
+            <ul>
+                <li>在<code>VMWare</code>中扩大磁盘空间
+                    <ul>
+                        <li><strong>关闭虚拟机</strong></li>
+                        <li>在<code>VMWare</code>上方菜单栏中依次选择<code>虚拟机-&gt;设置-&gt;硬件-&gt;硬盘-&gt;扩展</code>，然后输入新的磁盘大小</li>
+                        <li>点击确定后会提示，说需要在虚拟机中扩展分区，才能使用新的磁盘空间</li>
+                    </ul>
+                </li>
+                <li>打开虚拟机，并扩展分区
+                    <ul>
+                        <li>在命令行中输入<code>sudo apt install gparted</code>，安装<code>gparted</code>分区工具</li>
+                        <li>打开该工具，选择需要扩展的分区（一般为挂载到根目录<code>/</code>的那个分区），点击<code>Resize/Move</code>，然后拖动分区大小，点击<code>Resize/Move</code>，再点击<code>Apply</code>，等待分区扩展完成
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <p>如果在虚拟机里用 gparted 进行分区扩展时，弹窗说“分区被挂载为只读，无法调整大小”。此时我们需要：</p>
+            <ul>
+                <li>右键该分区，查看挂载到什么位置了。一般是挂载到<code>/</code>与<code>/var/snap/firefox/common/host-hunspell</code></li>
+                <li>执行以下命令：</li>
+            </ul>
+            <pre><code># 对于这个设备挂载到的每一个分区，都执行以下命令，以此类推
+sudo mount -o remount -rw /
+sudo mount -o remount -rw /var/snap/firefox/common/host-hunspell</code></pre>
+            <p>而后在 gparted 中点击<code>gparted-&gt;刷新设备</code>，即可进行分区扩展。</p>
+            <h2 id="一个奇怪的报错gn-failed">一个奇怪的报错——<code>GN Failed</code></h2>
+            <p>这是一个很奇怪的报错，我们尚未找到真正的原因所在，只知道如何暂时地绕过去。</p>
+            <h3 id="问题描述与复现">问题描述与复现</h3>
+            <p>问题复现方法为在编译过程中，执行以下命令：</p>
+            <pre><code>./build.sh --product-name rk3568 --ccache</code></pre>
+            <p>该命令是指导书中写的编译命令，但执行时候会出错；<strong>与上文所述的经确认无误的编译命令不同在于没加<code>sudo</code></strong>。</p>
+            <p>如果按照指导书的命令来，不出意外编译将会报错： <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_1.png" />
+                <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_2.png" />
+            </p>
+            <p><strong>以下是该问题的具体描述：</strong></p>
+            <p><code>build.log</code>如下：</p>
+            <pre><code>Set cache size limit to 100.0 GB
+[OHOS INFO] loader args:[&#39;platforms_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/platforms.build&quot;&#39;, &#39;subsystem_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/subsystem_config.json&quot;&#39;, &#39;example_subsystem_file=&quot;&quot;&#39;, &#39;exclusion_modules_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/exclusion_modules.json&quot;&#39;, &#39;source_root_dir=&quot;/home/axiomer/桌面/&quot;&#39;, &#39;gn_root_out_dir=&quot;out/sdk&quot;&#39;, &#39;build_platform_name=phone&#39;, &#39;build_xts=False&#39;, &#39;load_test_config=False&#39;, &#39;target_os=ohos&#39;, &#39;target_cpu=arm64&#39;, &#39;os_level=standard&#39;, &quot;ignore_api_check=[&#39;xts&#39;, &#39;common&#39;, &#39;testfwk&#39;]&quot;, &#39;scalable_build=False&#39;, &#39;skip_partlist_check=False&#39;]
+[OHOS INFO] Excuting gn command: /home/axiomer/桌面/prebuilts/build-tools/linux-x86/bin/gn gen --args=&quot;product_name=\&quot;ohos-sdk\&quot; product_path=\&quot;/home/axiomer/桌面/productdefine/common/products\&quot; product_config_path=\&quot;/home/axiomer/桌面/productdefine/common/products\&quot; device_name=\&quot;sdk\&quot; device_path=\&quot;/home/axiomer/桌面/device/board/ohos/sdk\&quot; device_company=\&quot;ohos\&quot; device_config_path=\&quot;/home/axiomer/桌面/device/board/ohos/sdk\&quot; target_cpu=\&quot;arm64\&quot; is_standard_system=true ohos_build_compiler_specified=\&quot;\&quot; ohos_build_time=1707374188101 ohos_build_datetime=\&quot;2024-02-08 22:36:28\&quot; build_ohos_sdk=true build_ohos_ndk=true ohos_build_enable_ccache=true ohos_build_type=\&quot;debug\&quot; device_type=\&quot;default\&quot; build_variant=\&quot;root\&quot; use_thin_lto=false ndk_platform=\&quot;linux\&quot; sdk_for_hap_build=true skip_generate_module_list_file=true enable_lto_O0=true archive_ndk=false enable_ndk_doxygen=false use_cfi=false sdk_check_flag=false sdk_platform=\&quot;linux\&quot; root_perf_main=\&quot;main\&quot; runtime_mode=\&quot;release\&quot;&quot; --args=product_name=&quot;ohos-sdk&quot; product_path=&quot;/home/axiomer/桌面/productdefine/common/products&quot; product_config_path=&quot;/home/axiomer/桌面/productdefine/common/products&quot; device_name=&quot;sdk&quot; device_path=&quot;/home/axiomer/桌面/device/board/ohos/sdk&quot; device_company=&quot;ohos&quot; device_config_path=&quot;/home/axiomer/桌面/device/board/ohos/sdk&quot; target_cpu=&quot;arm64&quot; is_standard_system=true ohos_build_compiler_specified=&quot;&quot; ohos_build_time=1707374188101 ohos_build_datetime=&quot;2024-02-08 22:36:28&quot; build_ohos_sdk=true build_ohos_ndk=true ohos_build_enable_ccache=true ohos_build_type=&quot;debug&quot; device_type=&quot;default&quot; build_variant=&quot;root&quot; use_thin_lto=false ndk_platform=&quot;linux&quot; sdk_for_hap_build=true skip_generate_module_list_file=true enable_lto_O0=true archive_ndk=false enable_ndk_doxygen=false use_cfi=false sdk_check_flag=false sdk_platform=&quot;linux&quot; root_perf_main=&quot;main&quot; runtime_mode=&quot;release&quot; /home/axiomer/桌面/out/sdk
+ERROR at //build/config/BUILDCONFIG.gn:92:15: Could not read file.
+    read_file(&quot;${preloader_output_dir}/build_config.json&quot;, &quot;json&quot;)
+              ^------------------------------------------
+I resolved this to &quot;/home/axiomer/桌面/out/preloader/build_config.json&quot;.
+root_out_dir=//out/sdk
+root_build_dir=//out/sdk
+root_gen_dir=//out/sdk/gen
+current_toolchain=
+[91m[OHOS ERROR][0m Traceback (most recent call last):
+[91m[OHOS ERROR][0m   File &quot;/home/axiomer/桌面/build/hb/containers/status.py&quot;, line 47, in wrapper
+[91m[OHOS ERROR][0m     return func(*args, **kwargs)
+[91m[OHOS ERROR][0m   File &quot;/home/axiomer/桌面/build/hb/services/gn.py&quot;, line 197, in _execute_gn_gen_cmd
+[91m[OHOS ERROR][0m     SystemUtil.exec_command(gn_gen_cmd, self.config.log_path)
+[91m[OHOS ERROR][0m   File &quot;/home/axiomer/桌面/build/hb/util/system_util.py&quot;, line 64, in exec_command
+[91m[OHOS ERROR][0m     LogUtil.get_failed_log(log_path)
+[91m[OHOS ERROR][0m   File &quot;/home/axiomer/桌面/build/hb/util/log_util.py&quot;, line 191, in get_failed_log
+[91m[OHOS ERROR][0m     LogUtil.get_gn_failed_log(log_path)
+[91m[OHOS ERROR][0m   File &quot;/home/axiomer/桌面/build/hb/util/log_util.py&quot;, line 137, in get_gn_failed_log
+[91m[OHOS ERROR][0m     raise OHOSException(
+[91m[OHOS ERROR][0m exceptions.ohos_exception.OHOSException: GN Failed! Please check error in /home/axiomer/桌面/out/sdk/error.log, and for more build information in /home/axiomer/桌面/out/sdk/build.log
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Code:        3000
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Reason:      GN Failed! Please check error in /home/axiomer/桌面/out/sdk/error.log, and for more build information in /home/axiomer/桌面/out/sdk/build.log
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Error Type:  UNKNOWN
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Description: An unknown error occurred while executing &#39;gn gen&#39;.
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Solution:    There is no solution available. You can check the &#39;gn_error.log&#39; in the output directory for more information
+[91m[OHOS ERROR][0m</code></pre>
+            <p>报错信息中提到<code>ERROR at //build/config/BUILDCONFIG.gn:92:15: Could not read file.</code>，但是经过检查文件，<strong>存在名为<code>BUILDCONFIG.gn</code>的文件，且开放可读权限</strong>；但报错信息中显示无法读该文件。
+            </p>
+            <h3 id="失败尝试">失败尝试</h3>
+            <p>在此，我进行了许多尝试，但都无一例外失败了；以下是我的尝试点，或许会有帮助：</p>
+            <ul>
+                <li>根据<a href="">一个相似提问</a>，对相关依赖进行安装，失败了： <img
+                        src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_dependencies.png" /></li>
+                <li>根据报错信息，在编译命令中添加<code>--no-prebuilt-sdk</code>选项对 ohos-sdk 的构建进行跳过，依然失败</li>
+            </ul>
+            <p>尝试未果 T^T</p>
+            <h3 id="最终方案">最终方案</h3>
+            <p>报错信息如下所示：</p>
+            <p>在上述报错信息中提到<code>Permission denied</code>，即权限不够；于是尝试添加<code>sudo</code>，居然跑通了！！！！</p>
+            <p>在指导书的编译指令<code>./build.sh --product-name rk3568 --ccache</code>前添加权限设置<code>sudo</code>，即指令更改为：</p>
+            <pre><code>sudo ./build.sh --product-name rk3568 --ccache</code></pre>
+            <p>不知道为什么，编译过程中始终没有向我提出权限要求，但是不加<code>sudo</code>开权限就是跑不通，很奇怪 @ _ <span class="citation"
+                    data-cites="也许是">@也许是</span> OHOS 内敛不好意思申请权限呢……</p>
+            <h2 id="另一个奇怪的报错failed-load-btf-from-vmlinux-unknown-error--22">
+                另一个奇怪的报错——<code>FAILED: load BTF from vmlinux: Unknown error -22</code></h2>
+            <p>关于这个报错，当时的错误日志、运行日志、聊天截图均已丢失，但时日不久，记忆还算清楚，加上这个报错困扰了我好些天，因而必须记录。</p>
+            <h3 id="问题简要描述">问题简要描述</h3>
+            <p>正常按照<code>sudo ./build.sh --product-name rk3568 --ccache</code>编译时，报错，主要报错信息如下：</p>
+            <pre><code>die__process_unit: DW_TAG_label (0xa) @ &lt;0x3adc&gt; not handled!
+die__process_unit: DW_TAG_label (0xa) @ &lt;0x3bdc&gt; not handled!
+die__process_unit: DW_TAG_label (0xa) @ &lt;0x3bef&gt; not handled!
+die__process_unit: DW_TAG_label (0xa) @ &lt;0x3ce5&gt; not handled!
+die__process_unit: DW_TAG_label (0xa) @ &lt;0x3cff&gt; not handled!
+die__process_unit: DW_TAG_label (0xa) @ &lt;0x3d19&gt; not handled!
+Killed
+  LD      .tmp_vmlinux.kallsyms1
+  KSYMS   .tmp_vmlinux.kallsyms1.S
+  AS      .tmp_vmlinux.kallsyms1.S
+  LD      .tmp_vmlinux.kallsyms2
+  KSYMS   .tmp_vmlinux.kallsyms2.S
+  AS      .tmp_vmlinux.kallsyms2.S
+  LD      ymlinux
+  BTEIDS  vmlinux
+FAILED: load BTF from vmlinux: Unknown error -22make[2]: *** [/home/player/harmony/out/kernel/src_tmp/linux-5.19/
+Makefile:1225: vmlinux]错误 255
+make[1]: *** [arch/arm64/Makefile:208: rk3568-toybrick-x0-linux.img]错误2
+make[1]: 离开目录&quot;/home/player/harmony/out/kernel/OBJ/linux-5.10&quot;
+make: *** [Makefile:192:__sub-make]错误 2</code></pre>
+            <p>可以看到，报错的关键点在于<code>FAILED: load BTF from vmlinux: Unknown error -22</code>这里。查看 Makefile 对应报错位置：</p>
+            <pre><code>vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
+    +$(call if_changed,link-vmlinux)
+
+targets := vmlinux</code></pre>
+            <h3 id="解释">解释</h3>
+            <ul>
+                <li>这段 makefile 的实际功能是链接一个虚拟 linux
+                    <ul>
+                        <li>通过目录位置，我们可以合理猜测，这里是在进行<strong>linux 内核编译，但失败了</strong></li>
+                    </ul>
+                </li>
+                <li>报错中说的<code>BTF</code>则是数据格式
+                    <ul>
+                        <li>一般出现<code>load BTF from xxx</code>错误时，是由于系统不一致导致的（也就是不同系统 BTF 格式不一样，出现了识别错误）</li>
+                    </ul>
+                </li>
+                <li>最重要的是，<strong>Unknown error -22 这个报错码，搜不到任何信息！</strong></li>
+            </ul>
+            <p>因而，我尝试了重装系统，将我的 Ubuntu22.04 重装为 20.04，但最后<strong>仍然会出现这个错误</strong>，足以证明不是系统差异导致的。</p>
+            <h3 id="解决">解决</h3>
+            <p>最终，我在<a
+                    href="https://unix.stackexchange.com/questions/616392/failed-load-btf-from-vmlinux-unknown-error-2make-makefile1162-vmlinu">第二篇参考博客</a>里找到了答案：编译较新的
+                Linux 内核时，至少需要 10G+内存，而我一贯把虚拟机内存只设置为 8G。</p>
+            <p>令人好奇的是，为什么需要这么大内存？按理来说在虚拟内存空间里，物理内存不够的时候，不应该是由 OS 出面进行内存与磁盘的页面调度吗？我认为，可能是在编译过程中，其他进程占据一部分内存，而这里在链接一个虚拟
+                linux 文件，可能文件体积过大而尚未创建完成，所有页面一直驻留在内存中，导致内存崩溃。</p>
+            <p>总而言之，言而总之，在<code>VMware-&gt;虚拟机-&gt;设置-&gt;硬件-&gt;内存</code>中，把内存扩大，就可以完美解决该问题。经我的测试，内存 13.2G(主机总内存 16G
+                时候推荐的最大虚拟机内存)是能编译完成的，编译时长 6h。最终解决。</p>
+            <h1 id="完结撒花">完结撒花 ❀</h1>
+            <p>本次鸿蒙开发环境的搭建过程可谓一波三折，总结几个最大的坑点，或许可以作为编译的经验罢：</p>
+            <ul>
+                <li><strong>有报错，试试添加权限！</strong></li>
+                <li>贫贱程序猿百事哀，编译 OpenHarmony 系统需要<strong>足够的硬件配置</strong>
+                    <ul>
+                        <li>内存 10G+</li>
+                        <li>磁盘 160G+</li>
+                    </ul>
+                </li>
+            </ul>
+            <p>不说了，抓紧攒点钱开学升级电脑配置要紧……磁盘快炸了……</p>
+            <p class="time">2024.2.12<br>甲辰年正月初三</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

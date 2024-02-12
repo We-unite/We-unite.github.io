@@ -560,6 +560,7 @@ nav {
     /* order: 1; */
     float: left;
     box-sizing: border-box;
+    max-width: 15%;
 }
 
 body {
