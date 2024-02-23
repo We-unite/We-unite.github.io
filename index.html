@@ -13,7 +13,6 @@
 <body class="typora-export os-windows" style="display:flex;">
     <div class="background" style="font-size: medium;">
         <div class="box">
-
             <!-- 欢迎来到 -->
             <svg width="56.824" height="61.208" viewBox="0 0 56.824 63.208" xmlns="http://www.w3.org/2000/svg"
                 data-copyright="https://github.com/oubenruing/svg-text-animate" style="vertical-align: text-top; ">
@@ -166,10 +165,43 @@
                         </path>
                     </g>
                 </svg>
-
             </div>
         </div>
     </div>
 </body>
+
+<script>
+    // 在文档加载完成后，修改标签为footer的元素的内容，为多行html
+    document.addEventListener('DOMContentLoaded', function () {
+        var footer = document.querySelector('footer');
+        footer.innerHTML = `
+        <span id="brand">勤倦阁&copy;2023&nbsp;&nbsp;</span>
+        <a id="link" href="https://beian.miit.gov.cn/">豫ICP备2023011563号-1</a>
+    `;
+
+        var brand = document.getElementById('brand');
+        var brandStyle = window.getComputedStyle(brand);
+        var link = document.getElementById('link');
+
+        link.style.color = brandStyle.color;
+        link.style.fontFamily = brandStyle.fontFamily;
+        link.style.fontSize = brandStyle.fontSize;
+        link.style.fontWeight = brandStyle.fontWeight;
+        // 如果需要，你还可以设置更多的样式，如文本装饰、行高等等
+
+        // 添加鼠标移入移出事件监听器
+        link.addEventListener('mouseenter', function () {
+            link.style.backgroundImage = 'linear-gradient(to right, violet, indigo, blue, green, yellow, orange, red)'; // 鼠标移入时设置彩虹色背景
+            link.style.webkitBackgroundClip = 'text'; // 用于兼容webkit内核浏览器
+            link.style.color = 'transparent'; // 使得文字透明，显示渐变色
+        });
+
+        link.addEventListener('mouseleave', function () {
+            link.style.backgroundImage = 'none'; // 鼠标移出时取消背景
+            link.style.color = brandStyle.color; // 鼠标移出时恢复原始字体颜色
+        });
+    });
+
+</script>
 
 </html>

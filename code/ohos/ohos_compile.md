@@ -109,11 +109,18 @@ ssh-keygen -t rsa -C "your-email-address"
 
 # 配置 repo 工具
 
+**注意：前两条命令需要以 root 身份执行！！！**
+
 ```bash
-sudo curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > /usr/local/bin/repo
-sudo chmod a+x /usr/local/bin/repo
+# 以下两条命令需要以root身份执行
+curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > /usr/local/bin/repo
+chmod a+x /usr/local/bin/repo
+
+# 这条普通身份也可以
 pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests
 ```
+
+之所以前两条命令需要以 root 身份而不能是 sudo，是因为`/usr/local/bin`是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root 身份执行，但**重定向时候 sudo 用的也是当前用户身份**，权限不足，自然报错。（**如果是管道，那么 sudo 也是只对当前命令有效，而不是对后续的整个管道有效。**）
 
 # 系统源码编译
 

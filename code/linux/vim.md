@@ -76,7 +76,6 @@ sudo apt autoremove python2*
 sudo apt install -y git \
                  libatk1.0-dev \
                  libcairo2-dev \
-                 #libgtk2.0-dev \
                  liblua5.1-0-dev \
                  libncurses5-dev \
                  libperl-dev \
@@ -85,7 +84,8 @@ sudo apt install -y git \
                  libxt-dev \
                  lua5.1 \
                  python3-dev \
-                 ruby-dev
+                 ruby-dev \
+                 # libgtk2.0-dev
 ```
 
 由于我的编译在服务器上运行，主要运行环境为命令行，不需要 gtk2 等图形界面的支持，因而将安装 gtk 的那一行注释掉了。在编译带有 gtk2.0 的 vim 时似乎会遇到问题：vim 源码截至目前版本（v9.0.1854）采用的 gtk 代码中的`struct _GTimeVal`已经被弃用，gcc 要求改用`struct _GDateTime`，因此编译时会报错，而且陷入死循环，编译不会终止，只能<kbd>Ctrl+c</kbd>杀死进程。我尚不知道如何解决。这也是我放弃支持 gtk 的原因之一。

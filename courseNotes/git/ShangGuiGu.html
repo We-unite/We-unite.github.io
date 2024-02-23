@@ -2,38 +2,1203 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>尚硅谷git笔记</title>
-    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/github.css">
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/github.css" />
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.3/dist/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.3/dist/style.css" />
 </head>
 
-<body class='typora-export os-windows'>
-    <div class='typora-export-content'>
-        <div id='write'>
+<body class="typora-export os-windows">
+    <div class="typora-export-content">
+        <div id="write">
             <p class="title">尚硅谷git笔记</p>
-            <p class="time"><a
+            <p class="time">
+                <a
                     href="https://www.bilibili.com/video/BV1vy4y1s7k6/?vd_source=0e7576154715d4dea629f3e001cde0ae">课程网址</a>
             </p>
-            <p class="time">本思维导图使用<a href="https://markmap.js.org/">Markmap</a>制作</p>
-            <p class="time" style="text-align: left;">说明：</p>
-            <p class="time" style="text-align: left;">课程使用大量篇幅讲解GitHub基本操作，选择性记录；</p>
-            <p class="time" style="text-align: left;">讲解Idea对Git/GitHub/Gitee的集成，没用过，不记录；</p>
-            <p class="time" style="text-align: left;">讲解局域网代码托管平台GitLab服务器的搭建，暂时用不着，不记录。
+            <p class="time">
+                本思维导图使用<a href="https://markmap.js.org/">Markmap</a>制作
             </p>
+            <p class="time" style="text-align: left">说明：</p>
+            <p class="time" style="text-align: left">
+                课程使用大量篇幅讲解GitHub基本操作，选择性记录；
+            </p>
+            <p class="time" style="text-align: left">
+                讲解Idea对Git/GitHub/Gitee的集成，没用过，不记录；
+            </p>
+            <p class="time" style="text-align: left">
+                讲解局域网代码托管平台GitLab服务器的搭建，暂时用不着，不记录。
+            </p>
+            <svg id="mindmap"></svg>
+            <script src="https://cdn.jsdelivr.net/npm/d3@6.7.0"></script>
+            <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.14.3"></script>
+            <script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.3/dist/index.umd.min.js"></script>
+            <script>
+                ((getMarkmap, getOptions, root, jsonOptions) => {
+                    const markmap = getMarkmap();
+                    window.mm = markmap.Markmap.create(
+                        "svg#mindmap",
+                        (getOptions || markmap.deriveOptions)(jsonOptions),
+                        root
+                    );
+                })(
+                    () => window.markmap,
+                    null,
+                    {
+                        type: "heading",
+                        depth: 0,
+                        payload: { lines: [0, 1] },
+                        content: "Git",
+                        children: [
+                            {
+                                type: "bullet_list",
+                                depth: 1,
+                                payload: { lines: [1, 2] },
+                                content: "",
+                                children: [
+                                    {
+                                        type: "list_item",
+                                        depth: 2,
+                                        payload: { lines: [1, 2] },
+                                        content: "课程目标：5h熟练掌握以下内容",
+                                    },
+                                ],
+                            },
+                            {
+                                type: "heading",
+                                depth: 1,
+                                payload: { lines: [2, 3] },
+                                content: "Git介绍",
+                                children: [
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [3, 4] },
+                                        content: "免费的开源分布式VCS",
+                                        children: [
+                                            {
+                                                type: "heading",
+                                                depth: 3,
+                                                payload: { lines: [4, 5] },
+                                                content: "版本控制",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [5, 6] },
+                                                        content: "记录文件内容变化",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [6, 7] },
+                                                        content: "查阅特定历史版本",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [7, 8] },
+                                                        content:
+                                                            "记录文件修改的历史记录、查看历史版本、作版本切换",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [8, 9] },
+                                                        content: "个人开发过渡到团队协作的需求",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "heading",
+                                                depth: 3,
+                                                payload: { lines: [9, 10] },
+                                                content: "分布式VCS VS 集中式VCS",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [10, 11] },
+                                                        content: "集中的版本控制工具",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [11, 12] },
+                                                                content: "CVS/SVN",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [12, 13] },
+                                                                content: "中央服务器",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [13, 14] },
+                                                                content: "保证各人修改的是同一套代码",
+                                                                children: [
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [14, 15] },
+                                                                        content: "每个人可以看到别人在做什么",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [15, 16] },
+                                                                        content: "管理员可以对用户权限进行管理",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [16, 17] },
+                                                                        content:
+                                                                            "中央服务器的单点故障，造成极严重的危害",
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [17, 18] },
+                                                        content: "分布式",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [18, 19] },
+                                                                content:
+                                                                    "没中央服务器，各自为中心，各自进行版本控制",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [19, 20] },
+                                                                content: "统一性由代码托管中心（远程库）储存",
+                                                                children: [
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [20, 21] },
+                                                                        content: "先克隆到本地再做版本控制",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [21, 22] },
+                                                                        content:
+                                                                            "写完push，保证远程库代码永远最新",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [22, 23] },
+                                                                        content:
+                                                                            "即使远程库挂掉，本地也可以继续工作，只不过无法上传",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [23, 24] },
+                                                                        content: "解决的问题",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [24, 25] },
+                                                                        content: "断网开发",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [25, 26] },
+                                                                        content:
+                                                                            "每个客户端都是整个完整项目（包含历史记录），更安全",
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [26, 27] },
+                                                        content: "Git历史（Linux开源，作版本控制）",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [27, 28] },
+                                                                content: "Linus手动合并代码（1991起）",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [28, 29] },
+                                                                content:
+                                                                    "2002，BitMover授权Linux社区免费试用BitKeeper",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [29, 30] },
+                                                                content: "2005,Andrew违反协议破解了BitKeeper",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [30, 31] },
+                                                                content:
+                                                                    "Linux两周开发了Git，一个月后Linux系统代码由Git管理",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [31, 32] },
+                                                                content: "2008，GitHub上线，远程代码托管中心",
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [32, 33] },
+                                        content: "优点",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [33, 34] },
+                                                content: "快速高效处理从小到大各种项目",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [34, 35] },
+                                                content: "占地面积小",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [35, 36] },
+                                                content: "性能极快",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [36, 37] },
+                                                content: "廉价本地库",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [37, 38] },
+                                                content: "方便的暂存区",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [38, 39] },
+                                                content: "多个工作流分支，优于其他版本控制工具",
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [39, 40] },
+                                        content: '<a href="Git-scm.com">Git官网</a>介绍',
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [40, 41] },
+                                                content: "Ererything is local",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [41, 42] },
+                                                content: "使用的公司",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [42, 43] },
+                                                        content: "谷歌",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [43, 44] },
+                                                        content: "脸书",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [44, 45] },
+                                                        content: "微软",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [45, 46] },
+                                                        content: "推特",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [46, 47] },
+                                                        content: "安卓",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [47, 48] },
+                                                        content: "linux",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [48, 49] },
+                                                content: "Git for windows 2.31.2",
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [49, 50] },
+                                        content: "Git工作机制",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [50, 51] },
+                                                content: "工作区",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [51, 52] },
+                                                        content: "写代码",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [52, 53] },
+                                                        content: "代码存放的磁盘的目录位置",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [53, 54] },
+                                                content: "暂存区",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [54, 55] },
+                                                        content: "临时存储",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [55, 56] },
+                                                        content: "添加暂存区<code>git add</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [56, 57] },
+                                                        content: "工作区删代码没有历史记录，暂存区也可以",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [57, 58] },
+                                                content: "本地库",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [58, 59] },
+                                                        content: "生成历史版本",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [59, 60] },
+                                                        content: "提交本地库<code>git commit</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [60, 61] },
+                                                        content:
+                                                            "git的版本是基于上一版本的，不能单独删除历史版本",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [61, 62] },
+                                                content: "代码托管中心",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [62, 63] },
+                                                        content: "基于网络服务的远程代码仓库（即远程库）",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [63, 64] },
+                                                        content: "推送<code>git push</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [64, 65] },
+                                                        content: "GitLab/GitHub/Gitee（局域网）",
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [65, 66] },
+                                        content: "Git命令（基于开发案例）",
+                                        children: [
+                                            {
+                                                type: "heading",
+                                                depth: 3,
+                                                payload: { lines: [66, 67] },
+                                                content: "设置用户签名",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [67, 68] },
+                                                        content:
+                                                            "<code>git config --global user.name 用户名</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [68, 69] },
+                                                        content:
+                                                            "<code>git config --global user.email 邮箱</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [69, 70] },
+                                                        content:
+                                                            "打开<code>C:\\用户\\当前用户\\.gitconfig</code>查看是否已配置",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [70, 71] },
+                                                        content: "签名的作用:",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [71, 72] },
+                                                                content: "区分不同操作者身份",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [72, 73] },
+                                                                content:
+                                                                    "此处设置的用户签名与GitHub/其他代码托管中心账号无任何关系",
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "heading",
+                                                depth: 3,
+                                                payload: { lines: [73, 74] },
+                                                content: "本地库",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [74, 75] },
+                                                        content: "初始化本地库",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [75, 76] },
+                                                                content:
+                                                                    "打开需要跟踪作为本地库的文件夹，<code>git init</code>",
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [76, 77] },
+                                                        content: "查看本地库状态",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [77, 78] },
+                                                                content: "<code>git status</code>，输出三行",
+                                                                children: [
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [78, 79] },
+                                                                        content: "当前所在分支",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [79, 80] },
+                                                                        content: "有无提交过",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [80, 81] },
+                                                                        content: "有无可提交文件",
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [81, 82] },
+                                                        content: "添加暂存区",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [82, 83] },
+                                                                content:
+                                                                    "<code>git add &lt;文件名&gt;</code>",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [83, 84] },
+                                                                content:
+                                                                    "<code>git rm --cached &lt;文件名&gt;</code>将文件从暂存区删除（工作区仍有）",
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [84, 85] },
+                                                        content: "提交本地库",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [85, 86] },
+                                                                content:
+                                                                    "<code>git commit -m &quot;日志信息&quot;</code>",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [86, 87] },
+                                                                content:
+                                                                    "<code>-m</code>为参数，跟日志信息，即使不加，也会要求写",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [87, 88] },
+                                                                content:
+                                                                    "<code>git reflog</code>查看引用日志信息",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [88, 89] },
+                                                                content:
+                                                                    "<code>git log</code>查看详细日志，除版本外，可以看到提交用户（原用户签名）、完整版本号",
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [89, 90] },
+                                                        content: "修改文件（略）",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [90, 91] },
+                                                        content: "历史版本+版本穿梭",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [91, 92] },
+                                                                content:
+                                                                    "<code>-m</code>为参数，跟日志信息，即使不加，也会要求写",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [92, 93] },
+                                                                content:
+                                                                    "<code>git reflog</code>查看引用日志信息,可见精简的版本号、当前指针指向的分支",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [93, 94] },
+                                                                content:
+                                                                    "<code>git log</code>查看详细日志，除版本外，可以看到提交用户（原用户签名）、完整版本号",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [94, 95] },
+                                                                content: "版本穿梭",
+                                                                children: [
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [95, 96] },
+                                                                        content: "查看到版本号并赋值",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [96, 97] },
+                                                                        content:
+                                                                            "<code>git reset --hard &lt;版本号&gt;</code>",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [97, 98] },
+                                                                        content:
+                                                                            "版本穿梭后可看到版本历史信息有标号（说不清，自己试）",
+                                                                    },
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [98, 99] },
+                                                                        content:
+                                                                            "穿梭历史版本不会删除更新版本，仍然在工作树上",
+                                                                    },
+                                                                ],
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [99, 100] },
+                                        content: "Git分支",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [100, 101] },
+                                                content: "简介",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [101, 102] },
+                                                        content:
+                                                            "在版本控制过程中，同时推进多个任务，可各表一枝",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [102, 103] },
+                                                        content:
+                                                            "程序猿可以将自己的任务从开发主线分离出来，开发时不影响主线运行",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [103, 104] },
+                                                        content: "分支的底层也是指针的引用",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [104, 105] },
+                                                content: "优点",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [105, 106] },
+                                                        content: "同时并发推进多个功能开发，提高效率",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [106, 107] },
+                                                        content:
+                                                            "一个分支失败不会对其他分支有任何影响，单独重开即可",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [107, 108] },
+                                                content: "一般操作",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [108, 109] },
+                                                        content:
+                                                            "创建分支<code>git branch &lt;创建的分支名&gt;</code>，本质为多创建一个指针",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [109, 110] },
+                                                        content: "查看分支<code>git branch -v</code>",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [110, 111] },
+                                                        content:
+                                                            "切换分支<code>git checkout &lt;目标分支名&gt;</code>，本质为HEAD指针所存顶部对象地址改动",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [111, 112] },
+                                                content: "分支合并",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [112, 113] },
+                                                        content:
+                                                            "将指定分支合并到当前分支<code>git merge &lt;指定分支名&gt;</code>，为正常合并",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [113, 114] },
+                                                        content: "代码冲突",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [114, 115] },
+                                                                content:
+                                                                    "两个分支对同一文件同一位置有两套完全不同的修改，需要手动决定",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [115, 116] },
+                                                                content:
+                                                                    "先<code>git merge &lt;指定分支名&gt;</code>，报警，此时命令行标注的当前分支名显示正在合并但未完成，需要手动合并",
+                                                                children: [
+                                                                    {
+                                                                        type: "list_item",
+                                                                        depth: 6,
+                                                                        payload: { lines: [116, 117] },
+                                                                        content:
+                                                                            "e.g.<code>player@Ubuntu &gt; $ (master | MERGING)</code>",
+                                                                    },
+                                                                ],
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [117, 118] },
+                                                                content:
+                                                                    "此时再手动操作冲突的文件，将要保留的内容留下，其他冲突内容删除、特殊分割符号删除",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [118, 119] },
+                                                                content:
+                                                                    "将此修改后的冲突文件重新添加暂存。提交本地库",
+                                                            },
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [119, 120] },
+                                                                content:
+                                                                    "此时合并成功，命令行显示的当前分支名恢复正常",
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [120, 121] },
+                                        content: "团队协作机制",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [121, 122] },
+                                                content:
+                                                    '注意参考<a href="https://www.bilibili.com/video/BV1vy4y1s7k6?p=19&amp;spm_id_from=pageDriver&amp;vd_source=0e7576154715d4dea629f3e001cde0ae">原视频</a>',
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [122, 123] },
+                                                content: "代码托管中心（托A/B/C言之）",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [123, 124] },
+                                                content: "团队内协作",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [124, 125] },
+                                                        content:
+                                                            "A本地库push到a远程库，B则clone下来作为本地库修改",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [125, 126] },
+                                                        content: "B修改后再push，A则pull下来查看最新的a",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [126, 127] },
+                                                content: "跨团队协作",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [127, 128] },
+                                                        content:
+                                                            "a远程库fork出b远程库，C经由本地库处理这个b远程库",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [128, 129] },
+                                                        content:
+                                                            "C提交拉取请求Pull Request，经对应人员审核后，与a远程库进行合并merge",
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                            {
+                                type: "heading",
+                                depth: 1,
+                                payload: { lines: [129, 130] },
+                                content: "GitHub",
+                                children: [
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [130, 131] },
+                                        content: "普通事项不多说，强调以下两点",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [131, 132] },
+                                                content: "仓库的Public/Private",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [132, 133] },
+                                                        content: "Public的仓库，读权限完全放开",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [133, 134] },
+                                                        content:
+                                                            "Private的读权限只在团队内部，但不超过5人，否则收费（GitLab不香吗）",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [134, 135] },
+                                                content: "创建别名",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [135, 136] },
+                                                        content:
+                                                            "<code>git push &lt;远程库链接&gt; &lt;分支名&gt;</code>，链接太长，在本地选择起别名",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [136, 137] },
+                                                                content:
+                                                                    "新手直接<code>git push</code>/<code>git push origin main</code>/<code>git push origin</code>即可，省心省力，代码哪来的回哪去",
+                                                            },
+                                                        ],
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [137, 138] },
+                                                        content:
+                                                            "<code>git remote add &lt;别名&gt; &lt;远程地址&gt;</code>为指定地址创建别名",
+                                                    },
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [138, 139] },
+                                                        content:
+                                                            "<code>git remote -v</code>查看1当前所有远程地址别名",
+                                                        children: [
+                                                            {
+                                                                type: "list_item",
+                                                                depth: 5,
+                                                                payload: { lines: [139, 140] },
+                                                                content:
+                                                                    "一个别名既可以拉取（fetch）又可以push，所以查看时一个别名显示两条",
+                                                            },
+                                                        ],
+                                                    },
+                                                ],
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [140, 141] },
+                                        content: "GitHub团队协作",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [141, 142] },
+                                                content: "机智如上，略，具体操作用到再说",
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [142, 143] },
+                                        content: "SSH免密登录GitHub",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [143, 144] },
+                                                content:
+                                                    "在远程仓库中点击<code>Code</code>（绿色），可见除了https链接还有一个ssh链接。",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [144, 145] },
+                                                        content: "使用时需要本地git已经通过ssh连接github",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [145, 146] },
+                                                content:
+                                                    "在<code>git clone &lt;链接&gt;</code>或<code>git push &lt;链接&gt;</code>时，除https链接即网址外，也可使用仓库ssh，其他操作一切正常",
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                            {
+                                type: "heading",
+                                depth: 1,
+                                payload: { lines: [146, 147] },
+                                content: "Gitee码云",
+                                children: [
+                                    {
+                                        type: "bullet_list",
+                                        depth: 2,
+                                        payload: { lines: [147, 149] },
+                                        content: "",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [147, 148] },
+                                                content: "国内代码托管网站，开源中国推出，中文网站",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [148, 149] },
+                                                content: "完全仿照GitHub开发，日常使用基本一致，不赘",
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [149, 150] },
+                                        content: "连接GitHub进行代码复制/迁移",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [150, 151] },
+                                                content:
+                                                    "新建仓库，不输入仓库名，在下方选择“导入已有仓库”，输入GitHub项目的链接（必须为https协议）",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [151, 152] },
+                                                content: "若输入后弹出绿框，极为正常，点击创建",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [152, 153] },
+                                                content:
+                                                    "仓库更新，进入gitee仓库后，点击仓库名后更新按钮，即可自动更新",
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                            {
+                                type: "heading",
+                                depth: 1,
+                                payload: { lines: [153, 154] },
+                                content: "GitLab",
+                                children: [
+                                    {
+                                        type: "bullet_list",
+                                        depth: 2,
+                                        payload: { lines: [154, 156] },
+                                        content: "",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [154, 155] },
+                                                content:
+                                                    "开源的自建代码托管平台，局域网代码托管中心（在一定范围内共享，外部禁止）",
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [155, 156] },
+                                                content:
+                                                    '<a href="https://about.gitlab.com">官网地址</a>、<a href="https://about.gitlab.com/installation">安装说明</a>',
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        type: "heading",
+                                        depth: 2,
+                                        payload: { lines: [156, 157] },
+                                        content: "服务器的搭建与部署",
+                                        children: [
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [157, 158] },
+                                                content: "服务器准备",
+                                                children: [
+                                                    {
+                                                        type: "list_item",
+                                                        depth: 4,
+                                                        payload: { lines: [158, 159] },
+                                                        content:
+                                                            "下载时查看各系统服务器要求，安装过程省略",
+                                                    },
+                                                ],
+                                            },
+                                            {
+                                                type: "list_item",
+                                                depth: 3,
+                                                payload: { lines: [159, 160] },
+                                                content: "其余安装和使用过程省略，用到再说",
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                    {}
+                );
+            </script>
+            <p class="time">2023.2</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment4works.js"></script>
         </div>
     </div>
-    <svg id="mindmap"></svg>
-    <script src="https://cdn.jsdelivr.net/npm/d3@6.7.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markmap-view@0.14.3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markmap-toolbar@0.14.3/dist/index.umd.min.js"></script>
-    <script>((getMarkmap, getOptions, root, jsonOptions) => {
-            const markmap = getMarkmap();
-            window.mm = markmap.Markmap.create('svg#mindmap', (getOptions || markmap.deriveOptions)(jsonOptions), root);
-        })(() => window.markmap, null, { "type": "heading", "depth": 0, "payload": { "lines": [0, 1] }, "content": "Git", "children": [{ "type": "bullet_list", "depth": 1, "payload": { "lines": [1, 2] }, "content": "", "children": [{ "type": "list_item", "depth": 2, "payload": { "lines": [1, 2] }, "content": "课程目标：5h熟练掌握以下内容" }] }, { "type": "heading", "depth": 1, "payload": { "lines": [2, 3] }, "content": "Git介绍", "children": [{ "type": "heading", "depth": 2, "payload": { "lines": [3, 4] }, "content": "免费的开源分布式VCS", "children": [{ "type": "heading", "depth": 3, "payload": { "lines": [4, 5] }, "content": "版本控制", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [5, 6] }, "content": "记录文件内容变化" }, { "type": "list_item", "depth": 4, "payload": { "lines": [6, 7] }, "content": "查阅特定历史版本" }, { "type": "list_item", "depth": 4, "payload": { "lines": [7, 8] }, "content": "记录文件修改的历史记录、查看历史版本、作版本切换" }, { "type": "list_item", "depth": 4, "payload": { "lines": [8, 9] }, "content": "个人开发过渡到团队协作的需求" }] }, { "type": "heading", "depth": 3, "payload": { "lines": [9, 10] }, "content": "分布式VCS VS 集中式VCS", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [10, 11] }, "content": "集中的版本控制工具", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [11, 12] }, "content": "CVS/SVN" }, { "type": "list_item", "depth": 5, "payload": { "lines": [12, 13] }, "content": "中央服务器" }, { "type": "list_item", "depth": 5, "payload": { "lines": [13, 14] }, "content": "保证各人修改的是同一套代码", "children": [{ "type": "list_item", "depth": 6, "payload": { "lines": [14, 15] }, "content": "每个人可以看到别人在做什么" }, { "type": "list_item", "depth": 6, "payload": { "lines": [15, 16] }, "content": "管理员可以对用户权限进行管理" }, { "type": "list_item", "depth": 6, "payload": { "lines": [16, 17] }, "content": "中央服务器的单点故障，造成极严重的危害" }] }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [17, 18] }, "content": "分布式", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [18, 19] }, "content": "没中央服务器，各自为中心，各自进行版本控制" }, { "type": "list_item", "depth": 5, "payload": { "lines": [19, 20] }, "content": "统一性由代码托管中心（远程库）储存", "children": [{ "type": "list_item", "depth": 6, "payload": { "lines": [20, 21] }, "content": "先克隆到本地再做版本控制" }, { "type": "list_item", "depth": 6, "payload": { "lines": [21, 22] }, "content": "写完push，保证远程库代码永远最新" }, { "type": "list_item", "depth": 6, "payload": { "lines": [22, 23] }, "content": "即使远程库挂掉，本地也可以继续工作，只不过无法上传" }, { "type": "list_item", "depth": 6, "payload": { "lines": [23, 24] }, "content": "解决的问题" }, { "type": "list_item", "depth": 6, "payload": { "lines": [24, 25] }, "content": "断网开发" }, { "type": "list_item", "depth": 6, "payload": { "lines": [25, 26] }, "content": "每个客户端都是整个完整项目（包含历史记录），更安全" }] }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [26, 27] }, "content": "Git历史（Linux开源，作版本控制）", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [27, 28] }, "content": "Linus手动合并代码（1991起）" }, { "type": "list_item", "depth": 5, "payload": { "lines": [28, 29] }, "content": "2002，BitMover授权Linux社区免费试用BitKeeper" }, { "type": "list_item", "depth": 5, "payload": { "lines": [29, 30] }, "content": "2005,Andrew违反协议破解了BitKeeper" }, { "type": "list_item", "depth": 5, "payload": { "lines": [30, 31] }, "content": "Linux两周开发了Git，一个月后Linux系统代码由Git管理" }, { "type": "list_item", "depth": 5, "payload": { "lines": [31, 32] }, "content": "2008，GitHub上线，远程代码托管中心" }] }] }] }, { "type": "heading", "depth": 2, "payload": { "lines": [32, 33] }, "content": "优点", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [33, 34] }, "content": "快速高效处理从小到大各种项目" }, { "type": "list_item", "depth": 3, "payload": { "lines": [34, 35] }, "content": "占地面积小" }, { "type": "list_item", "depth": 3, "payload": { "lines": [35, 36] }, "content": "性能极快" }, { "type": "list_item", "depth": 3, "payload": { "lines": [36, 37] }, "content": "廉价本地库" }, { "type": "list_item", "depth": 3, "payload": { "lines": [37, 38] }, "content": "方便的暂存区" }, { "type": "list_item", "depth": 3, "payload": { "lines": [38, 39] }, "content": "多个工作流分支，优于其他版本控制工具" }] }, { "type": "heading", "depth": 2, "payload": { "lines": [39, 40] }, "content": "<a href=\"Git-scm.com\">Git官网</a>介绍", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [40, 41] }, "content": "Ererything is local" }, { "type": "list_item", "depth": 3, "payload": { "lines": [41, 42] }, "content": "使用的公司", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [42, 43] }, "content": "谷歌" }, { "type": "list_item", "depth": 4, "payload": { "lines": [43, 44] }, "content": "脸书" }, { "type": "list_item", "depth": 4, "payload": { "lines": [44, 45] }, "content": "微软" }, { "type": "list_item", "depth": 4, "payload": { "lines": [45, 46] }, "content": "推特" }, { "type": "list_item", "depth": 4, "payload": { "lines": [46, 47] }, "content": "安卓" }, { "type": "list_item", "depth": 4, "payload": { "lines": [47, 48] }, "content": "linux" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [48, 49] }, "content": "Git for windows 2.31.2" }] }, { "type": "heading", "depth": 2, "payload": { "lines": [49, 50] }, "content": "Git工作机制", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [50, 51] }, "content": "工作区", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [51, 52] }, "content": "写代码" }, { "type": "list_item", "depth": 4, "payload": { "lines": [52, 53] }, "content": "代码存放的磁盘的目录位置" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [53, 54] }, "content": "暂存区", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [54, 55] }, "content": "临时存储" }, { "type": "list_item", "depth": 4, "payload": { "lines": [55, 56] }, "content": "添加暂存区<code>git add</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [56, 57] }, "content": "工作区删代码没有历史记录，暂存区也可以" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [57, 58] }, "content": "本地库", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [58, 59] }, "content": "生成历史版本" }, { "type": "list_item", "depth": 4, "payload": { "lines": [59, 60] }, "content": "提交本地库<code>git commit</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [60, 61] }, "content": "git的版本是基于上一版本的，不能单独删除历史版本" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [61, 62] }, "content": "代码托管中心", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [62, 63] }, "content": "基于网络服务的远程代码仓库（即远程库）" }, { "type": "list_item", "depth": 4, "payload": { "lines": [63, 64] }, "content": "推送<code>git push</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [64, 65] }, "content": "GitLab/GitHub/Gitee（局域网）" }] }] }, { "type": "heading", "depth": 2, "payload": { "lines": [65, 66] }, "content": "Git命令（基于开发案例）", "children": [{ "type": "heading", "depth": 3, "payload": { "lines": [66, 67] }, "content": "设置用户签名", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [67, 68] }, "content": "<code>git config --global user.name 用户名</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [68, 69] }, "content": "<code>git config --global user.email 邮箱</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [69, 70] }, "content": "打开<code>C:\\用户\\当前用户\\.gitconfig</code>查看是否已配置" }, { "type": "list_item", "depth": 4, "payload": { "lines": [70, 71] }, "content": "签名的作用:", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [71, 72] }, "content": "区分不同操作者身份" }, { "type": "list_item", "depth": 5, "payload": { "lines": [72, 73] }, "content": "此处设置的用户签名与GitHub/其他代码托管中心账号无任何关系" }] }] }, { "type": "heading", "depth": 3, "payload": { "lines": [73, 74] }, "content": "本地库", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [74, 75] }, "content": "初始化本地库", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [75, 76] }, "content": "打开需要跟踪作为本地库的文件夹，<code>git init</code>" }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [76, 77] }, "content": "查看本地库状态", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [77, 78] }, "content": "<code>git status</code>，输出三行", "children": [{ "type": "list_item", "depth": 6, "payload": { "lines": [78, 79] }, "content": "当前所在分支" }, { "type": "list_item", "depth": 6, "payload": { "lines": [79, 80] }, "content": "有无提交过" }, { "type": "list_item", "depth": 6, "payload": { "lines": [80, 81] }, "content": "有无可提交文件" }] }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [81, 82] }, "content": "添加暂存区", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [82, 83] }, "content": "<code>git add &lt;文件名&gt;</code>" }, { "type": "list_item", "depth": 5, "payload": { "lines": [83, 84] }, "content": "<code>git rm --cached &lt;文件名&gt;</code>将文件从暂存区删除（工作区仍有）" }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [84, 85] }, "content": "提交本地库", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [85, 86] }, "content": "<code>git commit -m &quot;日志信息&quot;</code>" }, { "type": "list_item", "depth": 5, "payload": { "lines": [86, 87] }, "content": "<code>-m</code>为参数，跟日志信息，即使不加，也会要求写" }, { "type": "list_item", "depth": 5, "payload": { "lines": [87, 88] }, "content": "<code>git reflog</code>查看引用日志信息" }, { "type": "list_item", "depth": 5, "payload": { "lines": [88, 89] }, "content": "<code>git log</code>查看详细日志，除版本外，可以看到提交用户（原用户签名）、完整版本号" }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [89, 90] }, "content": "修改文件（略）" }, { "type": "list_item", "depth": 4, "payload": { "lines": [90, 91] }, "content": "历史版本+版本穿梭", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [91, 92] }, "content": "<code>-m</code>为参数，跟日志信息，即使不加，也会要求写" }, { "type": "list_item", "depth": 5, "payload": { "lines": [92, 93] }, "content": "<code>git reflog</code>查看引用日志信息,可见精简的版本号、当前指针指向的分支" }, { "type": "list_item", "depth": 5, "payload": { "lines": [93, 94] }, "content": "<code>git log</code>查看详细日志，除版本外，可以看到提交用户（原用户签名）、完整版本号" }, { "type": "list_item", "depth": 5, "payload": { "lines": [94, 95] }, "content": "版本穿梭", "children": [{ "type": "list_item", "depth": 6, "payload": { "lines": [95, 96] }, "content": "查看到版本号并赋值" }, { "type": "list_item", "depth": 6, "payload": { "lines": [96, 97] }, "content": "<code>git reset --hard &lt;版本号&gt;</code>" }, { "type": "list_item", "depth": 6, "payload": { "lines": [97, 98] }, "content": "版本穿梭后可看到版本历史信息有标号（说不清，自己试）" }, { "type": "list_item", "depth": 6, "payload": { "lines": [98, 99] }, "content": "穿梭历史版本不会删除更新版本，仍然在工作树上" }] }] }] }] }, { "type": "heading", "depth": 2, "payload": { "lines": [99, 100] }, "content": "Git分支", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [100, 101] }, "content": "简介", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [101, 102] }, "content": "在版本控制过程中，同时推进多个任务，可各表一枝" }, { "type": "list_item", "depth": 4, "payload": { "lines": [102, 103] }, "content": "程序猿可以将自己的任务从开发主线分离出来，开发时不影响主线运行" }, { "type": "list_item", "depth": 4, "payload": { "lines": [103, 104] }, "content": "分支的底层也是指针的引用" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [104, 105] }, "content": "优点", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [105, 106] }, "content": "同时并发推进多个功能开发，提高效率" }, { "type": "list_item", "depth": 4, "payload": { "lines": [106, 107] }, "content": "一个分支失败不会对其他分支有任何影响，单独重开即可" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [107, 108] }, "content": "一般操作", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [108, 109] }, "content": "创建分支<code>git branch &lt;创建的分支名&gt;</code>，本质为多创建一个指针" }, { "type": "list_item", "depth": 4, "payload": { "lines": [109, 110] }, "content": "查看分支<code>git branch -v</code>" }, { "type": "list_item", "depth": 4, "payload": { "lines": [110, 111] }, "content": "切换分支<code>git checkout &lt;目标分支名&gt;</code>，本质为HEAD指针所存顶部对象地址改动" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [111, 112] }, "content": "分支合并", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [112, 113] }, "content": "将指定分支合并到当前分支<code>git merge &lt;指定分支名&gt;</code>，为正常合并" }, { "type": "list_item", "depth": 4, "payload": { "lines": [113, 114] }, "content": "代码冲突", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [114, 115] }, "content": "两个分支对同一文件同一位置有两套完全不同的修改，需要手动决定" }, { "type": "list_item", "depth": 5, "payload": { "lines": [115, 116] }, "content": "先<code>git merge &lt;指定分支名&gt;</code>，报警，此时命令行标注的当前分支名显示正在合并但未完成，需要手动合并", "children": [{ "type": "list_item", "depth": 6, "payload": { "lines": [116, 117] }, "content": "e.g.<code>player@Ubuntu &gt; $ (master | MERGING)</code>" }] }, { "type": "list_item", "depth": 5, "payload": { "lines": [117, 118] }, "content": "此时再手动操作冲突的文件，将要保留的内容留下，其他冲突内容删除、特殊分割符号删除" }, { "type": "list_item", "depth": 5, "payload": { "lines": [118, 119] }, "content": "将此修改后的冲突文件重新添加暂存。提交本地库" }, { "type": "list_item", "depth": 5, "payload": { "lines": [119, 120] }, "content": "此时合并成功，命令行显示的当前分支名恢复正常" }] }] }] }, { "type": "heading", "depth": 2, "payload": { "lines": [120, 121] }, "content": "团队协作机制", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [121, 122] }, "content": "注意参考<a href=\"https://www.bilibili.com/video/BV1vy4y1s7k6?p=19&amp;spm_id_from=pageDriver&amp;vd_source=0e7576154715d4dea629f3e001cde0ae\">原视频</a>" }, { "type": "list_item", "depth": 3, "payload": { "lines": [122, 123] }, "content": "代码托管中心（托A/B/C言之）" }, { "type": "list_item", "depth": 3, "payload": { "lines": [123, 124] }, "content": "团队内协作", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [124, 125] }, "content": "A本地库push到a远程库，B则clone下来作为本地库修改" }, { "type": "list_item", "depth": 4, "payload": { "lines": [125, 126] }, "content": "B修改后再push，A则pull下来查看最新的a" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [126, 127] }, "content": "跨团队协作", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [127, 128] }, "content": "a远程库fork出b远程库，C经由本地库处理这个b远程库" }, { "type": "list_item", "depth": 4, "payload": { "lines": [128, 129] }, "content": "C提交拉取请求Pull Request，经对应人员审核后，与a远程库进行合并merge" }] }] }] }, { "type": "heading", "depth": 1, "payload": { "lines": [129, 130] }, "content": "GitHub", "children": [{ "type": "heading", "depth": 2, "payload": { "lines": [130, 131] }, "content": "普通事项不多说，强调以下两点", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [131, 132] }, "content": "仓库的Public/Private", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [132, 133] }, "content": "Public的仓库，读权限完全放开" }, { "type": "list_item", "depth": 4, "payload": { "lines": [133, 134] }, "content": "Private的读权限只在团队内部，但不超过5人，否则收费（GitLab不香吗）" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [134, 135] }, "content": "创建别名", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [135, 136] }, "content": "<code>git push &lt;远程库链接&gt; &lt;分支名&gt;</code>，链接太长，在本地选择起别名", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [136, 137] }, "content": "新手直接<code>git push</code>/<code>git push origin main</code>/<code>git push origin</code>即可，省心省力，代码哪来的回哪去" }] }, { "type": "list_item", "depth": 4, "payload": { "lines": [137, 138] }, "content": "<code>git remote add &lt;别名&gt; &lt;远程地址&gt;</code>为指定地址创建别名" }, { "type": "list_item", "depth": 4, "payload": { "lines": [138, 139] }, "content": "<code>git remote -v</code>查看1当前所有远程地址别名", "children": [{ "type": "list_item", "depth": 5, "payload": { "lines": [139, 140] }, "content": "一个别名既可以拉取（fetch）又可以push，所以查看时一个别名显示两条" }] }] }] }, { "type": "heading", "depth": 2, "payload": { "lines": [140, 141] }, "content": "GitHub团队协作", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [141, 142] }, "content": "机智如上，略，具体操作用到再说" }] }, { "type": "heading", "depth": 2, "payload": { "lines": [142, 143] }, "content": "SSH免密登录GitHub", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [143, 144] }, "content": "在远程仓库中点击<code>Code</code>（绿色），可见除了https链接还有一个ssh链接。", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [144, 145] }, "content": "使用时需要本地git已经通过ssh连接github" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [145, 146] }, "content": "在<code>git clone &lt;链接&gt;</code>或<code>git push &lt;链接&gt;</code>时，除https链接即网址外，也可使用仓库ssh，其他操作一切正常" }] }] }, { "type": "heading", "depth": 1, "payload": { "lines": [146, 147] }, "content": "Gitee码云", "children": [{ "type": "bullet_list", "depth": 2, "payload": { "lines": [147, 149] }, "content": "", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [147, 148] }, "content": "国内代码托管网站，开源中国推出，中文网站" }, { "type": "list_item", "depth": 3, "payload": { "lines": [148, 149] }, "content": "完全仿照GitHub开发，日常使用基本一致，不赘" }] }, { "type": "heading", "depth": 2, "payload": { "lines": [149, 150] }, "content": "连接GitHub进行代码复制/迁移", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [150, 151] }, "content": "新建仓库，不输入仓库名，在下方选择“导入已有仓库”，输入GitHub项目的链接（必须为https协议）" }, { "type": "list_item", "depth": 3, "payload": { "lines": [151, 152] }, "content": "若输入后弹出绿框，极为正常，点击创建" }, { "type": "list_item", "depth": 3, "payload": { "lines": [152, 153] }, "content": "仓库更新，进入gitee仓库后，点击仓库名后更新按钮，即可自动更新" }] }] }, { "type": "heading", "depth": 1, "payload": { "lines": [153, 154] }, "content": "GitLab", "children": [{ "type": "bullet_list", "depth": 2, "payload": { "lines": [154, 156] }, "content": "", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [154, 155] }, "content": "开源的自建代码托管平台，局域网代码托管中心（在一定范围内共享，外部禁止）" }, { "type": "list_item", "depth": 3, "payload": { "lines": [155, 156] }, "content": "<a href=\"https://about.gitlab.com\">官网地址</a>、<a href=\"https://about.gitlab.com/installation\">安装说明</a>" }] }, { "type": "heading", "depth": 2, "payload": { "lines": [156, 157] }, "content": "服务器的搭建与部署", "children": [{ "type": "list_item", "depth": 3, "payload": { "lines": [157, 158] }, "content": "服务器准备", "children": [{ "type": "list_item", "depth": 4, "payload": { "lines": [158, 159] }, "content": "下载时查看各系统服务器要求，安装过程省略" }] }, { "type": "list_item", "depth": 3, "payload": { "lines": [159, 160] }, "content": "其余安装和使用过程省略，用到再说" }] }] }] }, {})</script>
 </body>
 
 </html>

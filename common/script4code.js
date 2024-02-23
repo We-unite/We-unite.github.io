@@ -9,13 +9,12 @@ document.writeln("    <link rel=\"icon\" type=\"image/x-icon\" href=\"https://ww
 document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/jQuery.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/vim.js\"></script>");
 document.writeln("    <!-- <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/click4code.js\"></script> -->");
+document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4notes.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/pandoc-menu.js\"></script>");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js\"></script>");
 document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\'typora-export os-windows\'>");
 document.writeln("    <!-- <div class=\"yanhua\"></div> -->");
-document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4notes.js\"></script>");
 document.writeln("    <script type=\"text/javascript\">");
 document.writeln("        //生成随机颜色");
 document.writeln("        function randomColor() {");

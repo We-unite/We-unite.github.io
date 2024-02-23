@@ -144,9 +144,6 @@ table {
     /* 改的 */
     display: inline;
     text-align: left;
-    /* 表格本身居中显示 */
-    margin-left: auto;
-    margin-right: auto;
 }
 
 table caption {

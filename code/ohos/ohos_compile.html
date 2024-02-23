@@ -5,8 +5,9 @@
     <meta charset="utf-8" />
     <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <title>OpenHarmony 3.2 编译</title>
+    <title>Open Harmony 编译</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
@@ -14,7 +15,7 @@
     <div class="pandoc">
         <div class="main">
             <header id="title-block-header">
-                <p class="title">OpenHarmony 3.2 编译</h1>
+                <p class="title">Open Harmony 编译</p>
             </header>
             <!-- 鸿蒙开发环境搭建 -->
             <blockquote>
@@ -115,9 +116,16 @@ ssh-keygen -t rsa -C &quot;your-email-address&quot;</code></pre>
             <p>在 gitee 用户的设置界面，将公钥<code>id_rsa.pub</code>的内容复制到 gitee 的 SSH 公钥中，保存即可。</p>
             <p>此时，我们就可以通过 ssh 的方式与 gitee 进行交互、也可以免密提交代码了。</p>
             <h1 id="配置-repo-工具">配置 repo 工具</h1>
-            <pre><code>sudo curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; /usr/local/bin/repo
-sudo chmod a+x /usr/local/bin/repo
+            <p><strong>注意：前两条命令需要以 root 身份执行！！！</strong></p>
+            <pre><code># 以下两条命令需要以root身份执行
+curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; /usr/local/bin/repo
+chmod a+x /usr/local/bin/repo
+
+# 这条普通身份也可以
 pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests</code></pre>
+            <p>之所以前两条命令需要以 root 身份而不能是 sudo，是因为<code>/usr/local/bin</code>是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root
+                身份执行，但<strong>重定向时候 sudo 用的也是当前用户身份</strong>，权限不足，自然报错。（<strong>如果是管道，那么 sudo
+                    也是只对当前命令有效，而不是对后续的整个管道有效。</strong>）</p>
             <h1 id="系统源码编译">系统源码编译</h1>
             <h2 id="获取源码">获取源码</h2>
             <p>通过 repo + https/ssh 下载：</p>

@@ -105,3 +105,17 @@ a {
     margin-top: 50px;
     margin-bottom: 40px;
 }
+
+/* 为class为"markmap mindmap"的元素设计圆角矩形边框 */
+.markmap.mindmap {
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 50px;
+}
+
+/* .markmap.mindmap {
+    border: 1px solid #000;
+    padding: 10px;
+    margin: 10px;
+} */

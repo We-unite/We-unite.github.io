@@ -10,7 +10,7 @@ body {
 }
 
 .sidenav {
-    height: 91.5%;
+    height: 95%;
     width: 0;
     position: fixed;
     z-index: 1;
@@ -19,7 +19,7 @@ body {
     background-color: #111;
     overflow-x: hidden;
     transition: .5s;
-    padding-top: 60px
+    padding-top: 40px
 }
 
 .sidenav a {
@@ -81,7 +81,8 @@ h3 {
 }
 
 .icon {
-    padding: 1rem 0 0 0
+    /* padding: 1rem 0 0 0; */
+    padding: 0 0 10px 0;
 }
 
 .icon svg {
