@@ -30,7 +30,7 @@
 
 当然，创建单独用户的理由不止这么简单，它在我们使用 http 来托管仓库的时候有专门的作用，下文会讨论到。
 
-我为其创建了一个名为`git`的用户，家目录`/home/git`，但不授予 sudo 权限。
+我为其创建了一个名为`git`的用户，家目录`/home/git`，但**不授予 sudo 权限**。
 
 # ssh 服务
 
@@ -70,8 +70,8 @@ bash push.sh
 read -p "Local repo name: " local_name
 read -p "Remote repo name: " remote_name
 
-# 远程仓库创建
-tmp="ssh aliyun-git git init --bare $remote_name.git"
+# 远程仓库创建，用的时候记得改服务器地址
+tmp="ssh your-server git init --bare $remote_name.git"
 eval "$tmp"
 
 # 本地仓库创建
@@ -121,7 +121,7 @@ echo "Success!"
 
 于是，我发现了一篇[教程](https://www.aneasystone.com/archives/2018/12/build-your-own-git-server.html)，照葫芦画瓢起来。
 
-需要注意的是，**上面的 ssh 服务不一定需要专门创建用户，但 http(s)服务这里我推荐新建用户**。
+需要注意的是，**仍然建议为 git 仓库专门建用户**。
 
 ## 配套软件安装
 
@@ -224,16 +224,16 @@ admin [27/Nov/2018:22:19:33] "POST /test.git/git-receive-pack HTTP/1.1" 200 63 "
 server
 {
     listen 80;
-    server_name git.qin-juan-ge-zhu.top;
+    server_name git.player.com;
     return 301 https://$host$request_uri;
 }
 server
 {
-    server_name git.qin-juan-ge-zhu.top;
+    server_name git.player.com;
     listen 443 ssl;
 
-    ssl_certificate /etc/letsencrypt/live/git.qin-juan-ge-zhu.top/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/git.qin-juan-ge-zhu.top/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/git.player.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/git.player.com/privkey.pem;
 
     location @auth {
         auth_basic "Git Server";
@@ -354,15 +354,470 @@ usermod -aG git www-data
 
 此时再进行测试，应该就可以正常使用了。
 
-## 其他存在的问题
+# cgit 拥抱图形化
+
+到了 http(s)服务这里，我们在命令行里进行 git 操作的需求已经基本得到了满足。但是，生命不息，折腾不止，我们发现有一个能图形化显示仓库的界面、并且要仍然能在命令行里进行仓库操作，最是舒坦。
+
+- GitList 的界面看起来不错，而且能展示源码、clone 链接之类的，整体非常像 github 的界面，可惜使用的是我不会的 php 语言，而且没有找到详细一些的安装使用教程
+- cgit 是一个用纯 C 语言开发的一个 git 裸库展示，虽然界面看起来比较古早，但功能简单、强大，能展示源码、自由切换分支、方便地查看提交历史（diss 一下 github，github 查看提交历史看起来真的很不方便很不直观）。诸如[Linux 内核](https://git.kernel.org)等项目都在使用。
+
+选择了 cgit，我找到了又一位大佬的[博客](https://blog.dejavu.moe/posts/hosting-minimal-git-server-with-cgit)，非常详细。需要注意的是，**我们仍然需要一个专门的用户。**
+
+## 依赖
+
+`nginx`/`git`/`vim`等工具不必赘述，还有一些依赖项需要安装：
+
+```bash
+# apache2-utils是用其htpasswd命令创建认证文件的
+# fcgiwrap是用于将 FastCGI 转换为 HTTP 协议的工具
+# 这两个工具上文均已提到和使用，不再赘述
+sudo apt update
+sudo apt install -y apache2-utils fcgiwrap
+
+# 编译过程中需要openssl的头文件
+sudo apt install -y libssl-dev
+
+# 建议为cgit提供lua支持，用来进行个性化的设置
+# 本文以 lua5.1 为例
+sudo apt install liblua5.1-0 liblua5.1-0-dbg liblua5.1-dev lua5.1
+```
+
+## cgit 安装
+
+cgit 最近的正式发行版已经好几年了，但是它的开发仍然很活跃，所以建议从它的 git 仓库中获取最新的代码，而非直接安装：
+
+```bash
+git clone https://git.zx2c4.com/cgit
+cd cgit
+git submodule init
+git submodule update
+```
+
+在仓库目录下创建`cgit.conf`文件，用来存放 cgit 构建时可以覆盖的配置：
+
+```bash
+sed -n '3,31p' Makefile > cgit.conf
+```
+
+我们可以按需编辑之：
+
+```plaintext
+CGIT_VERSION = v1.2.3
+CGIT_SCRIPT_NAME = cgit.cgi
+CGIT_SCRIPT_PATH = /var/www/cgit  # 本文只改了这里
+CGIT_DATA_PATH = $(CGIT_SCRIPT_PATH)
+CGIT_CONFIG = /etc/cgitrc  # 默认配置文件路径
+CACHE_ROOT = /var/cache/cgit
+prefix = /usr/local
+libdir = $(prefix)/lib
+filterdir = $(libdir)/cgit/filters
+docdir = $(prefix)/share/doc/cgit
+htmldir = $(docdir)
+pdfdir = $(docdir)
+mandir = $(prefix)/share/man
+SHA1_HEADER = <openssl/sha.h>
+GIT_VER = 2.39.0
+GIT_URL = https://www.kernel.org/pub/software/scm/git/git-$(GIT_VER).tar.xz
+INSTALL = install
+COPYTREE = cp -r
+MAN5_TXT = $(wildcard *.5.txt)
+MAN_TXT  = $(MAN5_TXT)
+DOC_MAN5 = $(patsubst %.txt,%,$(MAN5_TXT))
+DOC_HTML = $(patsubst %.txt,%.html,$(MAN_TXT))
+DOC_PDF  = $(patsubst %.txt,%.pdf,$(MAN_TXT))
+
+ASCIIDOC = asciidoc
+ASCIIDOC_EXTRA =
+ASCIIDOC_HTML = xhtml11
+ASCIIDOC_COMMON = $(ASCIIDOC) $(ASCIIDOC_EXTRA)
+TXT_TO_HTML = $(ASCIIDOC_COMMON) -b $(ASCIIDOC_HTML)
+```
+
+编译 && 安装：
+
+```bash
+# 如果不需要lua支持
+make NO_LUA=1
+# 有lua支持的话
+make LUA_PKGCONFIG=lua5.1
+
+# 安装，注意一下安装路径
+# 不妨将输出写到日志里，以便查看
+sudo make install | tee install.log
+```
+
+## nginx 配置
+
+首先，参照[这里](认证文件)生成一个自己的认证文件，再继续往下看。
+
+在`/etc/nginx/git-http-backend.conf`中写入以下内容，注意把域名、ssl 路径、htpasswd 认证文件换成自己的：
+
+```conf
+# /etc/nginx/git-http-backend.conf
+fastcgi_pass unix:/var/run/fcgiwrap.socket;
+include fastcgi_params;
+fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
+fastcgi_param GIT_HTTP_EXPORT_ALL "";
+fastcgi_param GIT_PROJECT_ROOT /home/git;
+fastcgi_param PATH_INFO $1;
+fastcgi_param REMOTE_USER $remote_user;
+```
+
+而后，在`/etc/nginx/conf.d/cgit.conf`中写：
+
+```conf
+# /etc/nginx/conf.d/cgit.conf
+server {
+    listen 80;
+    server_name git.player.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    server_name git.player.com;
+    listen 443 ssl http2;
+
+    ssl_certificate /etc/letsencrypt/live/git.player.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/git.player.com/privkey.pem;
+
+    # SSL Security
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256;
+
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+
+    # Site Log path
+    access_log /var/log/nginx/cgit-access.log;
+    error_log /var/log/nginx/cgit-error.log;
+
+    root /var/www/cgit;
+    try_files $uri @cgit;
+    client_max_body_size 10m;
+
+    location @cgit {
+        include fastcgi_params;
+        # cgit's CGI script path
+        fastcgi_param SCRIPT_FILENAME /var/www/cgit/cgit.cgi;
+        fastcgi_param DOCUMENT_ROOT /usr/lib/git-core;
+        fastcgi_pass unix:/var/run/fcgiwrap.socket;
+        fastcgi_param PATH_INFO $uri;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param HTTP_HOST $server_name;
+        fastcgi_param GIT_HTTP_EXPORT_ALL "";
+        fastcgi_param GIT_PROJECT_ROOT /home/git;
+
+        if ($arg_service = git-receive-pack) {
+            rewrite (/.*) /git_write/$1 last;
+        }
+
+        if ($uri ~ ^/.*/git-receive-pack$) {
+            rewrite (/.*) /git_write/$1 last;
+        }
+
+        if ($arg_service = git-upload-pack) {
+            rewrite (/.*) /git_read/$1 last;
+        }
+
+        if ($uri ~ ^/.*/git-upload-pack$) {
+            rewrite (/.*) /git_read/$1 last;
+        }
+    }
+
+    location ~ /git_read/(.*) {
+        include git-http-backend.conf;
+    }
+
+    location ~ /git_write/(.*) {
+        # HTTP Basic Authentication
+        auth_basic "Authentication Required To Push";
+        auth_basic_user_file /etc/nginx/conf.d/git.htpasswd;
+        include git-http-backend.conf;
+    }
+}
+```
+
+最后，重启 nginx 服务：
+
+```bash
+sudo nginx -s reload
+```
+
+_看吧，一个个仓库，向我们列队走来！_
+
+## cgit 高级配置
+
+可以安装一些包，用于 cgit 的代码高亮、Markdown 渲染、Gravatar 头像渲染等：
+
+```bash
+sudo apt install -y python3-docutils python3-markdown highlight python3-pygments
+
+# 编译安装 LuaoSSL
+# https://25thandclement.com/~william/projects/luaossl.html
+git clone https://github.com/wahern/luaossl.git && cd luaossl
+make LUAPKG=lua5.1
+sudo make install LUAPKG=lua5.1
+
+sudo mkdir -p /usr/local/share/cgit
+sudo ln -s /usr/local/lib/cgit/filters /usr/local/share/cgit/filters
+sudo chown -R www-data:www-data /usr/local/share/cgit/
+
+# 给下面使用 filter api 的脚本赋予可执行权限，比如
+sudo chmod +x /usr/local/share/cgit/filters/email-gravatar.lua
+```
+
+然后编辑上边我们已经指定的配置文件`/etc/cgitrc`，更多配置项参见[cgitrc.5.txt](https://git.zx2c4.com/cgit/tree/cgitrc.5.txt)。
+
+```plaintext
+# /etc/cgitrc
+# 包含 cgit 的所有运行时设置
+# 格式 NAME=VALUE
+# 以 "#" 开头的行是注释
+
+# 全局配置
+css=/cgit.css
+logo=/cgit.png
+favicon=/favicon.ico
+#footer=
+virtual-root=/
+# 禁用哑克隆
+enable-http-clone=0
+
+# Smart HTTP
+# 记得改成自己的链接
+clone-url=https://git.player.com/$CGIT_REPO_URL
+# 首页标题显示的内容，改成你想要的
+root-title=GIT.PLAYER.COM
+root-desc=YOUR.WORDS
+# 在首页展示的介绍信息，可用md/man/html等
+# 详参/usr/local/share/cgit/filters/about-formatting.sh
+root-readme=/var/www/cgit/README.md
+
+# 建议配置
+enable-index-owner=1
+enable-index-links=1
+enable-blame=1
+enable-log-filecount=1
+enable-log-linecount=1
+enable-commit-graph=1
+
+# 禁止搜素引擎索引
+robots=noindex, nofollow
+
+branch-sort=age
+commit-sort=date
+max-stats=quarter
+snapshots=tar.gz zip
+
+# 使用 RAM 的缓存大小 单位 MB
+cache-size=1024
+
+# 代码高亮
+source-filter=/usr/local/share/cgit/filters/syntax-highlighting.py
+
+# 格式化贡献者，显示Gravatar头像
+email-filter=lua:/usr/local/share/cgit/filters/email-gravatar.lua
+
+# 格式化 about 页面
+about-filter=/usr/local/share/cgit/filters/about-formatting.sh
+readme=:README.md
+readme=:readme.md
+readme=:README.txt
+readme=:readme.txt
+readme=:README
+readme=:readme
+
+# MIME 类型
+mimetype.html=text/html
+mimetype.gif=image/gif
+mimetype.jpg=image/jpeg
+mimetype.jpeg=image/jpeg
+mimetype.png=image/png
+mimetype.webp=image/webp
+mimetype.pdf=application/pdf
+mimetype.svg=image/svg+xml
+
+# 移除 .git 后缀，很有必要
+remove-suffix=1
+
+# 扫描路径
+scan-path=/home/git
+
+# 每个存储库配置
+#repo.url=reponame
+#repo.path=/home/git/reponame.git
+#repo.desc=Some description here
+#repo.owner=Owner Name
+#repo.logo=/repo-logo.png
+```
+
+### 高亮风格
+
+在上面的配置文件里，我们使用了[Pygments](https://pygments.org/styles/)的代码高亮。其默认使用的高亮是 pastie，我们可以根据自己的喜好修改高亮风格。
+
+首先，看看有哪些可用的高亮风格。
+
+```bash
+# 查看可用的高亮风格
+pygmentize -L styles
+
+# 编辑我们使用的代码高亮脚本
+sudo vim /usr/local/share/cgit/filters/syntax-highlighting.py
+```
+
+### Gravatar 头像
+
+在上述配置中，我们使用了 Gravatar 头像。[Gravatar](https://cn.gravatar.com/) 是一个全球通用的头像服务，根据你使用的邮箱（而非用户身份）来为你提供头像。换言之，只要你的邮箱注册了 Gravatar，那么你在任何一个支持 Gravatar 的网站上都可以使用你的 Gravatar 头像。这对于我们这种不想做登录、又想展示用户的网站来说，是一个很好的选择。
+
+- [中文官网](https://cn.gravatar.com/)
+- [英文官网](https://gravatar.com/)
+
+由于 Gravatar 中文官网访问比较慢（不知道为什么，英文官网我挂了梯子还上不去），我们可以使用国内的镜像服务。这里有一篇常用镜像服务的[博客](https://luoxx.top/archives/gravatar-mirror-2022)。我使用的是[Cravatar](https://cravatar.cn/)。
+
+使用流程都是基本一致的，在这个网站上注册账号，上传头像，然后根据网站提供的 API 来获取。一般方式为`https://域名.com/avatar/邮箱的md5值`。在我们使用的脚本`/usr/local/share/cgit/filters/email-gravatar.lua`中，将原有的域名替换为我们使用的域名即可。
+
+cgit 的[官网](https://git.zx2c4.com/cgit/)上不仅能实现 Gravatar 头像，还能在鼠标移动到头像上的时候以大图显示。这不是原生功能，而是需要动 lua 脚本自己实现。原博客大佬在 cgit 的[邮件列表](https://lists.zx2c4.com/pipermail/cgit/2014-March/002036.html)找到了实现方式。
+
+```bash
+sudo vim /usr/local/share/cgit/filters/email-libravatar-korg.lua
+```
+
+在脚本中写入以下内容：
+
+```lua
+-- This script may be used with the email-filter or repo.email-filter settings in cgitrc.
+-- It adds gravatar icons to author names. It is designed to be used with the lua:
+-- prefix in filters. It is much faster than the corresponding python script.
+--
+-- Requirements:
+--      luaossl
+--      <http://25thandclement.com/~william/projects/luaossl.html>
+--
+
+local digest = require("openssl.digest")
+
+function md5_hex(input)
+        local b = digest.new("md5"):final(input)
+        local x = ""
+        for i = 1, #b do
+                x = x .. string.format("%.2x", string.byte(b, i))
+        end
+        return x
+end
+
+function filter_open(email, page)
+        buffer = ""
+        md5 = md5_hex(email:sub(2, -2):lower())
+end
+
+function filter_close()
+   html("<span class='libravatar'>" ..
+   "<img class='inline' src='//www.gravatar.com/avatar/" .. md5 .. "?s=13&d=retro' />" ..
+   "<img class='onhover' src='//www.gravatar.com/avatar/" .. md5 .. "?s=128&d=retro' />" ..
+   "</span>" .. buffer)
+   return 0
+end
+
+function filter_write(str)
+        buffer = buffer .. str
+end
+```
+
+只有 lua 还不够，我们需要将以下内容添加到`/var/www/cgit/cgit.css`中：
+
+```css
+/* libgravatar */
+div#cgit span.libravatar img.onhover {
+  display: none;
+  border: 1px solid gray;
+  padding: 0px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  width: 128px;
+  height: 128px;
+}
+
+div#cgit span.libravatar img.inline {
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  width: 13px;
+  height: 13px;
+  margin-right: 0.4em;
+  opacity: 0.9;
+}
+
+div#cgit span.libravatar:hover > img.onhover {
+  display: block;
+  position: absolute;
+  margin-left: 1.5em;
+  background-color: #eeeeee;
+  box-shadow: 5px 5px 3px #bbb;
+}
+```
+
+而后，修改`/etc/cgitrc`中的`email-filter`的值为我们新建的脚本`lua:/usr/local/share/cgit/filters/email-libravatar-korg.lua`，就好了。
+
+### 添加 README
+
+在`/etc/cgitrc`中，我们指定了`root-readme`，这是用来在网站主页展示 README 的。我们可以编写一个 README 文件，然后在`/etc/cgitrc`中指明它的路径。README 可以使用`markdown`/`man`/`rst`/html`/`txt`等格式。
+
+我使用的是`markdown`格式，在`/var/www/cgit/`中创建了一个`README.md`文件，然后在`/etc/cgitrc`中指明了路径。
+
+### 样式修改
+
+对于 cgit 显示出来的界面，你可能并不太满意（比如我就嫌界面的字太小、颜色不舒适啥的）。修改办法也很简单，找到`/var/www/cgit/cgit.css`文件，然后修改之。
+
+而对于我们的 Markdown 或者别的什么语言写的 README，如果觉得渲染效果不好，都是可以自己去修改的。
+
+找到`/usr/local/share/cgit/filters/about-formatting.sh`文件，我们会看到以下内容：
+
+```bash
+#!/bin/sh
+
+# This may be used with the about-filter or repo.about-filter setting in cgitrc.
+# It passes formatting of about pages to differing programs, depending on the usage.
+
+# Markdown support requires python and markdown-python.
+# RestructuredText support requires python and docutils.
+# Man page support requires groff.
+
+# The following environment variables can be used to retrieve the configuration
+# of the repository for which this script is called:
+# CGIT_REPO_URL        ( = repo.url       setting )
+# CGIT_REPO_NAME       ( = repo.name      setting )
+# CGIT_REPO_PATH       ( = repo.path      setting )
+# CGIT_REPO_OWNER      ( = repo.owner     setting )
+# CGIT_REPO_DEFBRANCH  ( = repo.defbranch setting )
+# CGIT_REPO_SECTION    ( = section        setting )
+# CGIT_REPO_CLONE_URL  ( = repo.clone-url setting )
+
+cd "$(dirname $0)/html-converters/"
+case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+    *.markdown|*.mdown|*.md|*.mkd) exec ./md2html; ;;
+    *.rst) exec ./rst2html; ;;
+    *.[1-9]) exec ./man2html; ;;
+    *.htm|*.html) exec cat; ;;
+    *.txt|*) exec ./txt2html; ;;
+esac
+```
+
+从这里可以看到，负责渲染的是`/usr/local/share/cgit/filters/html-converters`文件夹中的对于脚本。我们可以自己修改这些脚本，或者自己添加新的脚本，来实现自己想要的渲染效果。
+
+当然，除了网站主页的 README，我们还可以在每个仓库的主页上添加 README。只需要在仓库的根目录下添加 README 文件即可。然后网页上仓库的标签页就会有“About”标签页，显示 README.md 的内容。
+
+到这里，cgit 的配置就基本完成了。重启 nginx 服务，然后访问你的域名，就可以看到一个很漂亮的界面了；命令行里，也可以 clone、push、fetch、pull 我们托管的仓库。大功告成！
+
+# 其他存在的问题
 
 除了上述问题已经解决之外，还有一些问题依然存在：
 
-- 不管是 nginx 还是 git，在使用 http 上传的时候都会有一定的缓冲区限制，如果上传文件过大或累计多个 commit 才上传，很可能被拒收导致上传失败。这个问题在 github 上也存在，但是 github 的缓冲区限制比较大，一般不会出现这个问题。但是我们的服务器配置比较低，所以这个问题就比较严重了。解决办法是在 nginx 的配置文件中添加`client_max_body_size 100m;`，这样就可以将缓冲区限制扩大到 100M，一般来说足够了。
+- 不管是 nginx 还是 git，在使用 http 上传的时候都会有一定的**缓冲区限制，如果上传文件过大或累计多个 commit 才上传，很可能被拒收导致上传失败**。这个问题在 github 上也存在，但是 github 的缓冲区限制比较大，一般不会出现这个问题；我们的服务器配置比较低，所以这个问题就比较严重了。解决办法是在 nginx 的配置文件中添加`client_max_body_size 100m;`，这样就可以将缓冲区限制扩大到 100M，一般来说足够了。
 - 即使解决了缓冲区大小，偶尔也会被拒收，原因尚未查清
-- 尚未能通过访问特定链接来实现 git 仓库的创建。据说是用 nginx 调用脚本，但暂时没弄出来
-- 没有一个比较好用且功能较为完备的图形化界面（就像 github 那样）。
-  - GitList 的界面看起来不错，而且能展示源码、clone 链接之类的，整体非常像 github 的界面，可惜使用的是我不会的 php 语言，而且没有找到详细一些的安装使用教程
-  - cgit 是一个用纯 C 语言开发的一个 git 裸库展示，虽然界面看起来比较古早，但功能也很不错，能展示源码、自由切换分支、方便地查看提交历史（diss 一下 github，github 查看提交历史看起来真的很不方便很不直观）。美中不足的是**无法在界面上提供 clone 和源码下载功能**。不过毕竟是个开源软件，而且是我比较熟悉的 C，等有时间有能力了看看自己能不能实现这个功能吧。
+- **尚未能通过访问特定链接来实现 git 仓库的创建。**据说是用 nginx 调用脚本，但暂时没弄出来
 
-这篇博客前前后后有二十多天了，该结束了。闲言少叙，看电视去也~
+这篇博客前前后后有二十多天了，有空再折腾吧。看电视去也~
+
+<!-- 2024.1.3 -->
