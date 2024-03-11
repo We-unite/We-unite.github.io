@@ -1,6 +1,6 @@
 /* 以下部分为自行开发 */
-.wall{
-    width:100%;
+.wall {
+    width: 100%;
 }
 
 a {
@@ -112,10 +112,10 @@ a {
     padding: 10px;
     margin: 10px;
     border-radius: 50px;
+    font-family: "PT Serif", 'Times New Roman', Times, serif;
 }
 
-/* .markmap.mindmap {
-    border: 1px solid #000;
-    padding: 10px;
-    margin: 10px;
-} */
+/* class=katex-html的元素禁止展示 */
+.katex-html {
+    display: none;
+}
