@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-void html2js(char file_name[])
-{
+void html2js(char file_name[]) {
     FILE *html, *js;
     char buf[1024];
     size_t i, len;
@@ -11,27 +10,22 @@ void html2js(char file_name[])
     strcpy(tmp, file_name);
     html = fopen(strcat(tmp, ".html"), "r");
     js = fopen(strcat(file_name, ".js"), "w");
-    if (html == NULL || js == NULL)
-    {
+    if (html == NULL || js == NULL) {
         printf("ERROR:Fail to open file!\n");
         exit(1);
     }
-    while (!feof(html))
-    {
+    while (!feof(html)) {
         memset(buf, '\0', 1024);
         fgets(buf, 1024, html);
         len = strlen(buf);
         fprintf(js, "document.writeln(\"");
-        for (i = 0; i < len - 1; i++)
-        {
-            if (buf[i] == '\"' || buf[i] == '\'')
-            {
+        for (i = 0; i < len - 1; i++) {
+            if (buf[i] == '\"' || buf[i] == '\'') {
                 fprintf(js, "\\");
             }
             fprintf(js, "%c", buf[i]);
         }
-        if (buf[i] != '\n')
-        {
+        if (buf[i] != '\n') {
             fprintf(js, "%c", buf[i]);
         }
         fprintf(js, "\");\n");
@@ -40,12 +34,11 @@ void html2js(char file_name[])
     fclose(js);
     printf("Success!\n");
 }
-int main()
-{
+int main() {
     char file_name[30];
-    strcpy(file_name, "script4code");
+    strcpy(file_name, "common/script4code");
     html2js(file_name);
-    strcpy(file_name, "script4works");
+    strcpy(file_name, "common/script4works");
     html2js(file_name);
     return 0;
 }

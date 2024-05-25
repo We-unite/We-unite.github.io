@@ -100,9 +100,9 @@
                             d="M923.2 289.6c0 354.4-232.8 609.6-575.2 620.8-144.8 11.2-244-32.8-332.8-99.2 99.2 11.2 232.8-21.6 298.4-88.8-99.2 0-155.2-56-188-132h88.8C125.6 556.8 58.4 490.4 58.4 380c21.6 11.2 44 21.6 88.8 21.6-77.6-44-121.6-188-66.4-276.8 99.2 110.4 220.8 210.4 421.6 220.8-56-220.8 232.8-332.8 354.4-188 56-11.2 88.8-32.8 132-56-11.2 56-44 88.8-88.8 110.4 44 0 77.6-11.2 110.4-32.8-10.4 44-54.4 88.8-87.2 110.4z"
                             fill="" p-id="3318"></path>
                     </svg></a>
-                <a target="_blank" href="mailto:3205135446@qq.com" data-tooltip="勤倦阁主"><svg t="1603709790743" class="icon"
-                        viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5171" width="128"
-                        height="128">
+                <a target="_blank" href="mailto:3205135446@qq.com" data-tooltip="勤倦阁主"><svg t="1603709790743"
+                        class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                        p-id="5171" width="128" height="128">
                         <path
                             d="M853.333 187.733H170.667A111.019 111.019 0 0 0 59.733 298.667v426.666c0 61.184 49.792 110.934 110.934 110.934h682.666c61.184 0 110.934-49.792 110.934-110.934V298.667c0-61.184-49.75-110.934-110.934-110.934z m59.734 537.6c0 32.939-26.838 59.734-59.734 59.734H170.667c-32.939 0-59.734-26.795-59.734-59.734V298.667c0-32.939 26.795-59.734 59.734-59.734h682.666c32.896 0 59.734 26.795 59.734 59.734v426.666z m-81.622-368.298a25.6 25.6 0 0 1-5.888 35.712L552.62 588.757a68.267 68.267 0 0 1-79.446 0.171l-274.73-196.139a25.6 25.6 0 0 1 29.738-41.685L502.87 547.2a17.067 17.067 0 0 0 19.883-0.043l272.981-196.01a25.6 25.6 0 0 1 35.712 5.888z"
                             fill="" p-id="5172"></path>
@@ -117,7 +117,7 @@
         同时，每一代的子代应放在统一的div内，不得分别存放。
         div内不同个体均以a标签包裹，如还有子代则点击时不可跳转，要求不写href属性
         每个有祖先的div都需要写style="display:none"，否则会出现bug
-        有子代的，子代的dic紧随其后，不得乱放 -->
+        有子代的，子代的div紧随其后，不得乱放 -->
 
 
         <div class="main-menu" id="main1" onclick="clickit('child1')">-个人作品</div>
@@ -149,15 +149,21 @@
             </div>
             <a onclick="clickit('grandson22')">-一些小玩意儿</a>
             <div class="grandson" id="grandson22" style="display: none;">
-                <a href="https://www.qin-juan-ge-zhu.top/code/ohos/ohos_compile.html">OpenHarmony编译</a>
                 <a href="https://www.qin-juan-ge-zhu.top/code/highlight.html">代码高亮与复制</a>
                 <a href="https://www.qin-juan-ge-zhu.top/code/index.html">C的小零件</a>
                 <a href="https://www.qin-juan-ge-zhu.top/code/cpppp.html">C++ Primer Plus基础</a>
                 <a href="https://www.qin-juan-ge-zhu.top/code/experiment.html">大物实验MATLAB</a>
                 <a href="https://www.qin-juan-ge-zhu.top/code/zeal.html">Zeal文档下载</a>
             </div>
-            <a onclick="clickit('grandson23')">-功能网页</a>
-            <div class="grandson" id="grandson23" style="display:none">
+
+            <a onclick="clickit('grandson23')">-OHOS 文档</a>
+            <div class="grandson" id="grandson23" style="display: none;">
+                <a href="https://www.qin-juan-ge-zhu.top/code/ohos/ohos_compile.html">OpenHarmony编译</a>
+                <a href="https://www.qin-juan-ge-zhu.top/code/ohos/lcm_compile.html">LCM交叉编译/a>
+            </div>
+
+            <a onclick="clickit('grandson24')">-功能网页</a>
+            <div class="grandson" id="grandson24" style="display:none">
                 <a href="https://code.qin-juan-ge-zhu.top">VSCode Online</a>
                 <a href="https://git.qin-juan-ge-zhu.top">Git托管存储室</a>
                 <a href="https://file.qin-juan-ge-zhu.top">服务器文件浏览</a>

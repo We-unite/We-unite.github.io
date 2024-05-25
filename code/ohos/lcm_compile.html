@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+    <title>LCM 交叉编译</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
+</head>
+
+<body>
+    <div class="pandoc">
+        <div class="main">
+            <p class="title">LCM 交叉编译</p>
+            <!-- 编译集成lcm模块 -->
+            <h1 id="lcm-简介">LCM 简介</h1>
+            <p>LCM(Lightweight Communications and
+                Marshalling)是一种轻量级的通信和编组库，是一种针对高带宽、低延迟、实时性要求高的场景下的通讯工具，用于在多个进程之间传递消息。LCM 的设计目标是提供一种简单的方法来传递结构化数据，而不需要复杂的
+                API 或协议定义。LCM 的消息传递是基于发布/订阅模型的，发布者和订阅者之间通过一个中心化的消息传递系统进行通信。</p>
+            <p>在机器人和自动驾驶系统中，LCM 可作为 ROS 的替代品，借以完成进程间、设备间的通讯。</p>
+            <p>为了方便地在不同进程、不同设备间传递数据，我们在 OHOS 系统中集成了 LCM 模块。</p>
+            <p>参考文档：</p>
+            <ul>
+                <li><a href="https://lcm-proj.github.io/">LCM 官方文档</a></li>
+                <li><a href="https://zhuanlan.zhihu.com/p/621943685">一篇博客</a></li>
+            </ul>
+            <h1 id="依赖项安装">依赖项安装</h1>
+            <pre><code>sudo apt update
+sudo apt upgrade
+sudo apt install build-essential cmake libglib2.0-dev
+sudo apt install openjdk-8-jdk # lcm仅支持jdk8</code></pre>
+            <h1 id="x86-的-lcm">x86 的 lcm</h1>
+            <p>如果我们仅仅需要 x86 架构的 lcm，执行下列命令即可：</p>
+            <pre><code>git clone https://github.com/lcm-proj/lcm
+cd lcm
+mkdir build &amp;&amp; cd build
+cmake ..
+make
+sudo make install</code></pre>
+            <p>编译完成后，注意观察<kbd>build</kbd>目录下是否有<kbd>lcm-java</kbd>文件夹，如果没有，证明没有安装 java 或者 java 版本不对。</p>
+            <h2 id="lcm-python">lcm-python</h2>
+            <p>若想使用<kbd>lcm-python</kbd>，在<kbd>lcm/lcm-python</kbd>下执行<code>sudo python3 setup.py install</code>即可，使用时<code>import python</code>。
+            </p>
+            <h2 id="lcm-spy-的使用">lcm-spy 的使用</h2>
+            <p>lcm-spy 是 LCM 配套的数据可视化工具。 可以通过 lcm-spy 监视 lcm 数据发送频率、数据量、数据结构，甚至实时画图。 如果安装了 JAVA，则 lcm-spy 会连同 LCM 一同被安装。
+            </p>
+            <p>启动 lcm-spy：</p>
+            <pre><code>export CLASSPATH=${your lcm-type class path}
+lcm-spy</code></pre>
+            <h1 id="交叉编译">交叉编译</h1>
+            <p>既然 lcm 用的是 cmake，何不交叉编译到 OHOS 里用呢？</p>
+            <p>首先，我们可以设置一下 Native Development Kit（NDK）的路径：</p>
+            <pre><code># 设置成自己的NDK工具目录
+export OHOS_ROOT=~/app/native</code></pre>
+            <pre><code>$OHOS_ROOT/build-tools/cmake/bin/cmake \
+      -DOHOS_STL=c++_shared \
+      -DOHOS_ARCH=armv8-a \
+      -DOHOS_PLATFORM=OHOS \
+      -DCMAKE_TOOLCHAIN_FILE=$(find $OHOS_ROOT -name &quot;ohos.toolchain.cmake&quot;)</code></pre>
+            <p>不出意外的话，就要出意外了。果不其然，报错<kbd>Could NOT fid Glib2</kbd>。思考之后，我们认为，问题出现在 lcm 所依赖的 glib 库上：在 x86
+                架构上，我们直接向系统安装了<code>libglib2.0-dev</code>，而 lcm 编译时直接从系统里找到了这个库；但当交叉编译时，由于 OHOS 交叉编译工具未提供
+                libglib2.0-dev，lcm 找遍了系统也没找到 arm 架构下的这个库，因而直接报错。</p>
+            <p>解决方案自然是自己手动交叉编译<code>libglib2.0-dev</code>。</p>
+            <h2 id="glib2.0-交叉编译">Glib2.0 交叉编译</h2>
+            <p>从<a href="https://download.gnome.org/sources/glib/">官网</a>下载 glib-2.79.2 源码，解压后进入源码目录。</p>
+            <pre><code>mkdir glib &amp;&amp; cd glib
+wget https://download.gnome.org/sources/glib/2.79/glib-2.79.2.tar.xz
+tar -xvf glib-2.79.2.tar.xz
+mkdir build</code></pre>
+            <p>这里需要注意的是：</p>
+            <ul>
+                <li>虽然 glib 编译需要<code>meson</code>，但它并不能直接交叉编译，OHOS 也并未提供用于交叉编译的<code>meson</code>。</li>
+                <li><code>meson</code>要求保证源码目录与构建目录不能相同，以保证构建过程的干净，因此我们在源码目录外新建了一个<code>build</code>目录。</li>
+            </ul>
+            <p>接着，参考博客<a
+                    href="https://t.csdnimg.cn/YfSJC">这篇博客</a>，撰写如下<kbd>meson_ohos.txt</kbd>（友情提醒，使用该文件时把<kbd>native</kbd>也就是
+                NDK 的路径修改为自己的路径、源平台与目标平台按需修改）：</p>
+            <pre><code>[binaries]
+c = &#39;$OHOS_ROOT/llvm/bin/aarch64-unknown-linux-ohos-clang&#39;
+cpp = &#39;$OHOS_ROOT/llvm/bin/aarch64-unknown-linux-ohos-clang++&#39;
+ar = &#39;$OHOS_ROOT/llvm/bin/llvm-ar&#39;
+strip = &#39;$OHOS_ROOT/llvm/bin/llvm-strip&#39;
+ld = &#39;$OHOS_ROOT/llvm/bin/llvm-link&#39;
+
+[properties]
+skip_sanity_check = true
+sys_root = &#39;$OHOS_ROOT/sysroot&#39;
+c_args = [&#39;-L$OHOS_ROOT/sysroot/usr/lib/aarch64-linux-ohos&#39;]
+
+[host_machine]
+system = &#39;linux&#39;
+cpu_family = &#39;aarch64&#39;
+cpu = &#39;aarch64&#39;
+endian = &#39;little&#39;
+
+[target_machine]
+system = &#39;ohos&#39;
+cpu_family = &#39;aarch64&#39;
+cpu = &#39;armv8a&#39;
+endian = &#39;little&#39;</code></pre>
+            <p>将该文件放置在<kbd>glib-2.79.2</kbd>源码目录下，而后在<kbd>build</kbd>目录下执行以下命令：</p>
+            <pre><code>meson --cross-file=../glib-2.79.2/meson_ohos.txt ..
+ninja</code></pre>
+            <p>编译完成，正确地安装 glib2 到交叉编译工具链中（？？？），之后我们回到 lcm 的源码目录，重新执行 cmake 命令：</p>
+            <pre><code>$OHOS_ROOT/build-tools/cmake/bin/cmake \
+      -DOHOS_STL=c++_shared \
+      -DOHOS_ARCH=armv8-a \
+      -DOHOS_PLATFORM=OHOS \
+      -DCMAKE_TOOLCHAIN_FILE=$(find $OHOS_ROOT -name &quot;ohos.toolchain.cmake&quot;)</code></pre>
+            <p>这次，编译成功了。万岁！</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+        </div>
+    </div>
+</body>
+
+</html>

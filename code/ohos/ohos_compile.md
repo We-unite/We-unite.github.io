@@ -22,6 +22,7 @@
   - 源码大小就 36G 左右了
   - 大量的依赖会占据数十 G 的空间
   - 我用的是 160G 磁盘，编译成功，但基本不剩什么空间了
+- 注意所需要的**ohos 的版本、cpu 版本、位数等信息**
 
 这里我用的是 VMWare+Ubuntu22.04 虚拟机。
 
@@ -31,15 +32,6 @@
 
 ```bash
 #!/bin/bash
-
-##########################################################################
-# File Name    : harmony.sh
-# Encoding     : utf-8
-# Author       : We-unite
-# Email        : weunite1848@gmail.com
-# Created Time : 2024-02-07 12:32:50
-##########################################################################
-
 set -e # 一旦出错立刻停止执行，不会执行后续指令
 
 # 更新软件源
@@ -107,14 +99,18 @@ ssh-keygen -t rsa -C "your-email-address"
 
 此时，我们就可以通过 ssh 的方式与 gitee 进行交互、也可以免密提交代码了。
 
-# 配置 repo 工具
+# 系统源码编译
+
+## 配置 repo 工具
 
 **注意：前两条命令需要以 root 身份执行！！！**
 
 ```bash
 # 以下两条命令需要以root身份执行
+sudo -s
 curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > /usr/local/bin/repo
 chmod a+x /usr/local/bin/repo
+exit
 
 # 这条普通身份也可以
 pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests
@@ -122,17 +118,20 @@ pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests
 
 之所以前两条命令需要以 root 身份而不能是 sudo，是因为`/usr/local/bin`是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root 身份执行，但**重定向时候 sudo 用的也是当前用户身份**，权限不足，自然报错。（**如果是管道，那么 sudo 也是只对当前命令有效，而不是对后续的整个管道有效。**）
 
-# 系统源码编译
-
 ## 获取源码
 
 通过 repo + https/ssh 下载：
 
 ```bash
-# 通过http下载
+# 通过http下载，这里需要注意你需要的ohos的版本
 repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
-# 或者也可以通过ssh下载
+# 如果需要的是特定分支，-b后边改成对应分支名
+# 如果是tag，-b后的参数比较复杂，要在网页上提前确定好需要的tag名字，
+# 如下载的是tag为OpenHarmony-v3.2-Release的版本，命令如下：
+# repo init -u https://gitee.com/openharmony/manifest -b refs/tags/OpenHarmony-v3.2-Release --no-repo-verify
+# 除使用https外，也可以通过ssh下载
 # repo init -u git@gitee.com:openharmony/manifest.git -b master --no-repo-verify
+
 repo sync -c
 repo forall -c 'git lfs pull'
 ```
@@ -143,12 +142,15 @@ repo forall -c 'git lfs pull'
 # 先在源码根目录下执行脚本，安装编译器及二进制工具
 bash build/prebuilts_download.sh
 # 再执行如下命令进行版本编译
+# 注意：默认编译的时候，目标cpu是32位，即使为64位cpu也无法使用64位功能
 sudo ./build.sh --product-name rk3568 --ccache
+# 如果是64位cpu，需要加上--target-cpu=arm64
+sudo ./build.sh --product-name rk3568 --ccache --target-cpu=arm64
 ```
 
 ## 编译完成
 
-编译所生成的文件都归档在 out 目录下，结果镜像输出在源码根目录下的 out/rk3568/packages/phone/images 目录下。
+编译所生成的文件都归档在 out 目录下，结果镜像输出在源码根目录下的`out/rk3568/packages/phone/images`目录下。
 
 自此源码编译成功，即可进行镜像烧录。
 
@@ -336,7 +338,77 @@ targets := vmlinux
 
 总而言之，言而总之，在`VMware->虚拟机->设置->硬件->内存`中，把内存扩大，就可以完美解决该问题。经我的测试，内存 13.2G(主机总内存 16G 时候推荐的最大虚拟机内存)是能编译完成的，编译时长 6h。最终解决。
 
-# 完结撒花 ❀
+# ohos 的 NDK
+
+NDK 编译方式比较简单，在源码根目录下执行如下命令：
+
+```bash
+# 安装依赖
+./build/build_scripts/env_setup.sh
+
+# 执行完上述命令后记得执行source ~/.bashrc或者重启终端
+source ~/.bashrc
+
+# 安装编译SDK需要的依赖包（编译镜像的时候是不依赖这些包的）
+sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev
+
+./build.sh --product-name ohos-sdk --ccache --build-target ohos_ndk
+```
+
+编译出来的 NDK 在`out/sdk/packages/ohos-sdk/linux/native`下。当然同时也有 windows 版本的 NDK，你猜在哪里？
+
+将编译出来的 NDK 的 zip 解压到你想要的目录下，然后将该目录添加到环境变量中，即可使用。
+
+注意，NDK 包提供的交叉编译工具是 cmake 和 ninja，编译器是 clang 和 clang++，并没有我们熟悉的 gcc/g++和 make。除此之外，NDK 还未我们提供编译所需的全套服务，如编译工具链配置文件`ohos.toolchain.cmake`、头文件、库文件等。快说，谢谢 ohos~
+
+为了更方便地使用NDK，鄙人不才，写了两个脚本，分别用于cmake编译和单文件编译：
+
+```bash
+#!/bin/bash
+
+##########################################################################
+# File Name    : compile.sh
+# Encoding     : utf-8
+# Author       : We-unite
+# Email        : weunite1848@gmail.com
+# Created Time : 2024-02-29 15:19:15
+##########################################################################
+
+set -e
+
+if [ $UID -eq 0 ]; then
+	echo "Please do not run this script as root"
+	exit 1
+fi
+
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 <static|shared> <v7|v8>"
+	exit 1
+fi
+
+if [ $2 == "v8" ]; then
+	arch=arm64-v8a
+elif [ $2 == "v7" ]; then
+	arch=armeabi-v7a
+else
+	echo "Invalid architecture: $2"
+	exit 1
+fi
+
+link=$1 # static or shared
+native_path=~/app/native
+
+export PATH=$native_path/build-tools/cmake/bin:$PATH
+
+# 使用cmake编译，编译生成的文件运行在rk3568上
+cmake -B build -D OHOS_STL=c++_$link -D OHOS_ARCH=$arch -D OHOS_PLATFORM=OHOS -D CMAKE_TOOLCHAIN_FILE=$(find $native_path -name ohos.toolchain.cmake)
+cmake --build build
+```
+
+```bash
+```
+
+# 完结撒花
 
 本次鸿蒙开发环境的搭建过程可谓一波三折，总结几个最大的坑点，或许可以作为编译的经验罢：
 

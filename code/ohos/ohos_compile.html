@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <title>Open Harmony 编译</title>
+    <title>OpenHarmony 3.2 编译</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
@@ -15,9 +15,10 @@
     <div class="pandoc">
         <div class="main">
             <header id="title-block-header">
-                <p class="title">Open Harmony 编译</p>
+                <p class="title">OpenHarmony 3.2 编译</p>
             </header>
             <!-- 鸿蒙开发环境搭建 -->
+            <p>[toc]</p>
             <blockquote>
                 <p>本次编译环境搭建参考了以下博客：</p>
                 <ul>
@@ -38,8 +39,7 @@
             <h2 id="硬件环境">硬件环境</h2>
             <p>编译过程使用的是
                 <code>Ubuntu</code>，经测试，<code>Ubuntu 22.04 LTS</code>/<code>Ubuntu 20.04 LTS</code>/<code>Ubuntu 18.04 LTS</code>
-                均可用。
-            </p>
+                均可用。</p>
             <p>网上的大多数博客里没有对编译的硬件限制作出说明，现根据我们的情况，给出一个大概的范围：</p>
             <ul>
                 <li><strong>内存必须在 10G 以上</strong>，我使用的是 13G，编译成功（8G 时编译失败了，下文会说明）</li>
@@ -50,20 +50,12 @@
                         <li>我用的是 160G 磁盘，编译成功，但基本不剩什么空间了</li>
                     </ul>
                 </li>
+                <li>注意所需要的<strong>ohos 的版本、cpu 版本、位数等信息</strong></li>
             </ul>
             <p>这里我用的是 VMWare+Ubuntu22.04 虚拟机。</p>
             <h2 id="软件包依赖">软件包依赖</h2>
             <p>安装依赖在博客中都有讲，但<strong>少了一部分依赖项</strong>，我因而将所有必要的依赖项整理到一个脚本里了：</p>
             <pre><code>#!/bin/bash
-
-##########################################################################
-# File Name    : harmony.sh
-# Encoding     : utf-8
-# Author       : We-unite
-# Email        : weunite1848@gmail.com
-# Created Time : 2024-02-07 12:32:50
-##########################################################################
-
 set -e # 一旦出错立刻停止执行，不会执行后续指令
 
 # 更新软件源
@@ -115,33 +107,43 @@ ssh-keygen -t rsa -C &quot;your-email-address&quot;</code></pre>
                 密钥对的公钥和私钥分别保存在<code>~/.ssh/id_rsa.pub</code>和<code>~/.ssh/id_rsa</code>中。</p>
             <p>在 gitee 用户的设置界面，将公钥<code>id_rsa.pub</code>的内容复制到 gitee 的 SSH 公钥中，保存即可。</p>
             <p>此时，我们就可以通过 ssh 的方式与 gitee 进行交互、也可以免密提交代码了。</p>
-            <h1 id="配置-repo-工具">配置 repo 工具</h1>
+            <h1 id="系统源码编译">系统源码编译</h1>
+            <h2 id="配置-repo-工具">配置 repo 工具</h2>
             <p><strong>注意：前两条命令需要以 root 身份执行！！！</strong></p>
             <pre><code># 以下两条命令需要以root身份执行
+sudo -s
 curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; /usr/local/bin/repo
 chmod a+x /usr/local/bin/repo
+exit
 
 # 这条普通身份也可以
 pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests</code></pre>
             <p>之所以前两条命令需要以 root 身份而不能是 sudo，是因为<code>/usr/local/bin</code>是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root
                 身份执行，但<strong>重定向时候 sudo 用的也是当前用户身份</strong>，权限不足，自然报错。（<strong>如果是管道，那么 sudo
                     也是只对当前命令有效，而不是对后续的整个管道有效。</strong>）</p>
-            <h1 id="系统源码编译">系统源码编译</h1>
             <h2 id="获取源码">获取源码</h2>
             <p>通过 repo + https/ssh 下载：</p>
-            <pre><code># 通过http下载
+            <pre><code># 通过http下载，这里需要注意你需要的ohos的版本
 repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
-# 或者也可以通过ssh下载
+# 如果需要的是特定分支，-b后边改成对应分支名
+# 如果是tag，-b后的参数比较复杂，要在网页上提前确定好需要的tag名字，
+# 如下载的是tag为OpenHarmony-v3.2-Release的版本，命令如下：
+# repo init -u https://gitee.com/openharmony/manifest -b refs/tags/OpenHarmony-v3.2-Release --no-repo-verify
+# 除使用https外，也可以通过ssh下载
 # repo init -u git@gitee.com:openharmony/manifest.git -b master --no-repo-verify
+
 repo sync -c
 repo forall -c &#39;git lfs pull&#39;</code></pre>
             <h2 id="prebuilts-与编译">prebuilts 与编译</h2>
             <pre><code># 先在源码根目录下执行脚本，安装编译器及二进制工具
 bash build/prebuilts_download.sh
 # 再执行如下命令进行版本编译
-sudo ./build.sh --product-name rk3568 --ccache</code></pre>
+# 注意：默认编译的时候，目标cpu是32位，即使为64位cpu也无法使用64位功能
+sudo ./build.sh --product-name rk3568 --ccache
+# 如果是64位cpu，需要加上--target-cpu=arm64
+sudo ./build.sh --product-name rk3568 --ccache --target-cpu=arm64</code></pre>
             <h2 id="编译完成">编译完成</h2>
-            <p>编译所生成的文件都归档在 out 目录下，结果镜像输出在源码根目录下的 out/rk3568/packages/phone/images 目录下。</p>
+            <p>编译所生成的文件都归档在 out 目录下，结果镜像输出在源码根目录下的<code>out/rk3568/packages/phone/images</code>目录下。</p>
             <p>自此源码编译成功，即可进行镜像烧录。</p>
             <h1 id="编译报错解决记录">编译报错解决记录</h1>
             <p>以下记录编译过程中出现的一些出现过的报错、坑点和注意事项，以为后来者鉴。</p>
@@ -186,8 +188,7 @@ sudo mount -o remount -rw /var/snap/firefox/common/host-hunspell</code></pre>
             <pre><code>./build.sh --product-name rk3568 --ccache</code></pre>
             <p>该命令是指导书中写的编译命令，但执行时候会出错；<strong>与上文所述的经确认无误的编译命令不同在于没加<code>sudo</code></strong>。</p>
             <p>如果按照指导书的命令来，不出意外编译将会报错： <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_1.png" />
-                <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_2.png" />
-            </p>
+                <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_2.png" /></p>
             <p><strong>以下是该问题的具体描述：</strong></p>
             <p><code>build.log</code>如下：</p>
             <pre><code>Set cache size limit to 100.0 GB
@@ -294,7 +295,23 @@ targets := vmlinux</code></pre>
                 linux 文件，可能文件体积过大而尚未创建完成，所有页面一直驻留在内存中，导致内存崩溃。</p>
             <p>总而言之，言而总之，在<code>VMware-&gt;虚拟机-&gt;设置-&gt;硬件-&gt;内存</code>中，把内存扩大，就可以完美解决该问题。经我的测试，内存 13.2G(主机总内存 16G
                 时候推荐的最大虚拟机内存)是能编译完成的，编译时长 6h。最终解决。</p>
-            <h1 id="完结撒花">完结撒花 ❀</h1>
+            <h1 id="ohos-的-ndk">ohos 的 NDK</h1>
+            <p>NDK 编译方式比较简单，在源码根目录下执行如下命令：</p>
+            <pre><code># 安装依赖
+./build/build_scripts/env_setup.sh
+
+# 执行完上述命令后记得执行source ~/.bashrc或者重启终端
+source ~/.bashrc
+
+# 安装编译SDK需要的依赖包（编译镜像的时候是不依赖这些包的）
+sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev
+
+./build.sh --product-name ohos-sdk --ccache --build-target ohos_ndk</code></pre>
+            <p>编译出来的 NDK 在<code>out/sdk/packages/ohos-sdk/linux/native</code>下。当然同时也有 windows 版本的 NDK，你猜在哪里？</p>
+            <p>将编译出来的 NDK 的 zip 解压到你想要的目录下，然后将该目录添加到环境变量中，即可使用。</p>
+            <p>注意，NDK 包提供的交叉编译工具是 cmake 和 ninja，编译器是 clang 和 clang++，并没有我们熟悉的 gcc/g++和 make。除此之外，NDK
+                还未我们提供编译所需的全套服务，如编译工具链配置文件<code>ohos.toolchain.cmake</code>、头文件、库文件等。快说，谢谢 ohos~</p>
+            <h1 id="完结撒花">完结撒花</h1>
             <p>本次鸿蒙开发环境的搭建过程可谓一波三折，总结几个最大的坑点，或许可以作为编译的经验罢：</p>
             <ul>
                 <li><strong>有报错，试试添加权限！</strong></li>
@@ -306,7 +323,7 @@ targets := vmlinux</code></pre>
                 </li>
             </ul>
             <p>不说了，抓紧攒点钱开学升级电脑配置要紧……磁盘快炸了……</p>
-            <p class="time">2024.2.12<br>甲辰年正月初三</p>
+            <p class="time">2024.2.12，甲辰年正月初三<br>2024.4.24改</p>
             <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>
