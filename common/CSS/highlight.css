@@ -73,7 +73,11 @@ pre .btn-tip {
     border-radius: 4px;
 }
 
-/* 代码复制时全选但不能被看到 */
-code ::selection {
+/* 代码复制时全选但不能被看到
+ * 该功能是不道德的，用户想要怎么复制是人家的权利
+ * 即使是自己用起来也经常只需要复制一段
+ * 所以还是让用户自由复制吧
+ */
+/* code ::selection {
     background-color: rgba(0, 0, 0, 0);
-}
+} */

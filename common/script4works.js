@@ -157,10 +157,11 @@ document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/zeal.html\">Zeal文档下载</a>");
 document.writeln("            </div>");
 document.writeln("");
-document.writeln("            <a onclick=\"clickit(\'grandson23\')\">-OHOS 文档</a>");
+document.writeln("            <a onclick=\"clickit(\'grandson23\')\">-项目文档</a>");
 document.writeln("            <div class=\"grandson\" id=\"grandson23\" style=\"display: none;\">");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/ohos/ohos_compile.html\">OpenHarmony编译</a>");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/ohos/lcm_compile.html\">LCM交叉编译/a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/ohos_compile.html\">OpenHarmony编译</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/lcm_compile.html\">LCM交叉编译</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/godo.html\">godo知识总结</a>");
 document.writeln("            </div>");
 document.writeln("");
 document.writeln("            <a onclick=\"clickit(\'grandson24\')\">-功能网页</a>");
