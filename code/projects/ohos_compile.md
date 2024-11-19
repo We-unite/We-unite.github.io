@@ -1,7 +1,5 @@
 <!-- 鸿蒙开发环境搭建 -->
 
-[toc]
-
 > 本次编译环境搭建参考了以下博客：
 >
 > - [HiHope_DAYU200/开发环境搭建编译指南](https://gitee.com/hihope_iot/docs/blob/master/HiHope_DAYU200/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E7%BC%96%E8%AF%91%E6%8C%87%E5%8D%97.md)
@@ -103,49 +101,58 @@ ssh-keygen -t rsa -C "your-email-address"
 
 ## 配置 repo 工具
 
-**注意：前两条命令需要以 root 身份执行！！！**
-
 ```bash
-# 以下两条命令需要以root身份执行
-sudo -s
-curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > /usr/local/bin/repo
-chmod a+x /usr/local/bin/repo
-exit
+curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 > ~/repo
+chmod a+x ~/repo
+sudo mv ~/repo /usr/local/bin/repo
+sudo chown root:root /usr/local/bin/repo
 
-# 这条普通身份也可以
 pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests
 ```
 
-之所以前两条命令需要以 root 身份而不能是 sudo，是因为`/usr/local/bin`是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root 身份执行，但**重定向时候 sudo 用的也是当前用户身份**，权限不足，自然报错。（**如果是管道，那么 sudo 也是只对当前命令有效，而不是对后续的整个管道有效。**）
+需要注意的是，不能直接使用 sudo 搭配管道，这是因为`/usr/local/bin`是一个只有 root 用户才有写权限的目录，而 sudo 命令虽然是以 root 身份执行，但**重定向时候 sudo 用的也是当前用户身份**，权限不足，自然报错。（**如果是管道，那么 sudo 也是只对当前命令有效，而不是对后续的整个管道有效。**）
 
 ## 获取源码
+
+这里需要注意的是，一般情况下最好使用带有 v 和 Release 的版本。不带 Release 不是发布版，会随时更新代码，容易编译出错；带 Release 的也有两种 tag，是带 v 和不带 v 的区别，如`OpenHarmony-v4.0-Release`和`OpenHarmony-4.0-Release`。二者的区别主要在于，不带 v 的是官方维护的稳定版，也会更新代码，厂商的补丁一般只针对带 v 的使用。
 
 通过 repo + https/ssh 下载：
 
 ```bash
-# 通过http下载，这里需要注意你需要的ohos的版本
-repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
 # 如果需要的是特定分支，-b后边改成对应分支名
+# repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
 # 如果是tag，-b后的参数比较复杂，要在网页上提前确定好需要的tag名字，
 # 如下载的是tag为OpenHarmony-v3.2-Release的版本，命令如下：
 # repo init -u https://gitee.com/openharmony/manifest -b refs/tags/OpenHarmony-v3.2-Release --no-repo-verify
 # 除使用https外，也可以通过ssh下载
 # repo init -u git@gitee.com:openharmony/manifest.git -b master --no-repo-verify
-
+repo init -u https://gitee.com/openharmony/manifest -b refs/tags/OpenHarmony-v4.0-Release --no-repo-verify
 repo sync -c
 repo forall -c 'git lfs pull'
 ```
 
-## prebuilts 与编译
+## 补丁与编译
+
+首先，打上厂商的补丁。下载对应版本补丁后，将补丁文件放到源码根目录下，执行：
+
+```bash
+unzip purple_pi_oh_patch.zip
+cd purple_pi_oh_patch
+./ido_patch.sh
+```
+
+看到`patch complete`字样，说明补丁成功。接下来进行 prebuilts 和编译：
 
 ```bash
 # 先在源码根目录下执行脚本，安装编译器及二进制工具
 bash build/prebuilts_download.sh
-# 再执行如下命令进行版本编译
+
+# 编译
 # 注意：默认编译的时候，目标cpu是32位，即使为64位cpu也无法使用64位功能
-sudo ./build.sh --product-name rk3568 --ccache
 # 如果是64位cpu，需要加上--target-cpu=arm64
-sudo ./build.sh --product-name rk3568 --ccache --target-cpu=arm64
+# 编译rk3568时
+# sudo ./build.sh --product-name rk3568 --ccache --target-cpu=arm64
+sudo ./build.sh --product-name purple_pi_oh --ccache --no-prebuilt-sdk --target-cpu=arm64
 ```
 
 ## 编译完成
@@ -194,6 +201,82 @@ sudo mount -o remount -rw /var/snap/firefox/common/host-hunspell
 ```
 
 而后在 gparted 中点击`gparted->刷新设备`，即可进行分区扩展。
+
+## Ninja 编译报错 `Code 4000`
+
+编译 rk3568 过程中可能会出现以下报错：
+
+```plaintext
+[OHOS ERROR] Code: 4000
+[OHOS ERROR] Reason: ninja phase failed
+```
+
+详细的报错信息已经丢失，将就着看吧。反正别的办法都不好使的时候试试这个。
+
+此时执行以下内容即可：
+
+```bash
+rm -rf out
+sed -i 's/CONFIG_DEBUG_INFO_BTF=y/# CONFIG_DEBUG_INFO_BTF=y/g' kernel/linux/config/linux-5.10/rk3568/arch/arm64_defconfig
+```
+
+而后重新编译。
+
+## 另一个`Code 4000`
+
+编译时报错如下：
+
+```plaintext
+ninja: build stopped: subcommand failed.
+[91m[OHOS ERROR][0m Traceback (most recent call last):
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/services/ninja.py", line 49, in _execute_ninja_cmd
+[91m[OHOS ERROR][0m     SystemUtil.exec_command(
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/util/system_util.py", line 63, in exec_command
+[91m[OHOS ERROR][0m     raise OHOSException(
+[91m[OHOS ERROR][0m exceptions.ohos_exception.OHOSException: Please check build log in /home/player/Desktop/ohos/src/out/purple_pi_oh/build.log
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m During handling of the above exception, another exception occurred:
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Traceback (most recent call last):
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/containers/status.py", line 47, in wrapper
+[91m[OHOS ERROR][0m     return func(*args, **kwargs)
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/modules/ohos_build_module.py", line 67, in run
+[91m[OHOS ERROR][0m     raise exception
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/modules/ohos_build_module.py", line 65, in run
+[91m[OHOS ERROR][0m     super().run()
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/modules/interface/build_module_interface.py", line 72, in run
+[91m[OHOS ERROR][0m     raise exception
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/modules/interface/build_module_interface.py", line 70, in run
+[91m[OHOS ERROR][0m     self._target_compilation()
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/modules/ohos_build_module.py", line 103, in _target_compilation
+[91m[OHOS ERROR][0m     self.target_compiler.run()
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/services/ninja.py", line 38, in run
+[91m[OHOS ERROR][0m     self._execute_ninja_cmd()
+[91m[OHOS ERROR][0m   File "/home/player/Desktop/ohos/src/build/hb/services/ninja.py", line 52, in _execute_ninja_cmd
+[91m[OHOS ERROR][0m     raise OHOSException('ninja phase failed', '4000')
+[91m[OHOS ERROR][0m exceptions.ohos_exception.OHOSException: ninja phase failed
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Code:      4000
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Reason:    ninja phase failed
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m Solution:  Please check the compile log at out/{compiling product}/build.log, If you could analyze build logs.
+[91m[OHOS ERROR][0m 		Or you can try the following steps to solve this problem:
+[91m[OHOS ERROR][0m 		  1. cd to OHOS root path
+[91m[OHOS ERROR][0m 		  2. run 'hb clean --all' or 'rm -rf out build/resources/args/*.json'.
+[91m[OHOS ERROR][0m 		  3. repo sync
+[91m[OHOS ERROR][0m 		  4. repo forall -c 'git lfs pull'
+[91m[OHOS ERROR][0m 		  5. bash build/prebuilts_download.sh
+[91m[OHOS ERROR][0m 		  6. rebuild your product or component
+[91m[OHOS ERROR][0m
+[91m[OHOS ERROR][0m 		If you still cannot solve this problem, you could post this problem on:
+[91m[OHOS ERROR][0m 		  https://gitee.com/openharmony/build/issues
+[91m[OHOS ERROR][0m
+```
+
+在报错信息之上，还有很多很多行，大致意思是正在对某些文件或仓库拉补丁，输出了补丁的 commit 信息。报错中最后提示的解决办法其实是无效的，我全量删除源码、甚至重装虚拟机，都还会遇到这个问题。
+
+仔细分析报错信息，发现报错的根本原因是在 python 中**处理一个 Exception 时，又抛出了另一个 Exception，导致程序异常终止**。上网搜索可知，这种问题的一般原因是 python 同时拉取或爬取大量网页内容，但都失败了，导致同时出现两个异常，程序崩溃。具体到我们这里，问题就是拉补丁失败了，我检查了一下我的网络环境，发现我挂着梯子，梯子质量不是那么好。尝试将梯子关掉后，再次编译，问题解决。
 
 ## 一个奇怪的报错——`GN Failed`
 
@@ -361,18 +444,18 @@ sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev
 
 注意，NDK 包提供的交叉编译工具是 cmake 和 ninja，编译器是 clang 和 clang++，并没有我们熟悉的 gcc/g++和 make。除此之外，NDK 还未我们提供编译所需的全套服务，如编译工具链配置文件`ohos.toolchain.cmake`、头文件、库文件等。快说，谢谢 ohos~
 
-为了更方便地使用NDK，鄙人不才，写了两个脚本，分别用于cmake编译和单文件编译：
+为了更方便地使用 NDK，鄙人不才，写了两个脚本，分别用于 cmake 编译和单文件编译：
 
 ```bash
 #!/bin/bash
 
-##########################################################################
+#######################################################################
 # File Name    : compile.sh
 # Encoding     : utf-8
 # Author       : We-unite
 # Email        : weunite1848@gmail.com
-# Created Time : 2024-02-29 15:19:15
-##########################################################################
+# Created Time : 2024-11-18 15:19:15
+#######################################################################
 
 set -e
 
@@ -401,11 +484,74 @@ native_path=~/app/native
 export PATH=$native_path/build-tools/cmake/bin:$PATH
 
 # 使用cmake编译，编译生成的文件运行在rk3568上
-cmake -B build -D OHOS_STL=c++_$link -D OHOS_ARCH=$arch -D OHOS_PLATFORM=OHOS -D CMAKE_TOOLCHAIN_FILE=$(find $native_path -name ohos.toolchain.cmake)
+cmake -B build -D OHOS_STL=c++_$link -D OHOS_ARCH=$arch \ 
+    -D OHOS_PLATFORM=OHOS \ 
+    -D CMAKE_TOOLCHAIN_FILE=$(find $native_path -name ohos.toolchain.cmake)
 cmake --build build
 ```
 
 ```bash
+#!/bin/bash
+
+#######################################################################
+# File Name    : compile-tiny.sh
+# Encoding     : utf-8
+# Author       : We-unite
+# Email        : weunite1848@gmail.com
+# Created Time : 2024-11-16 13:06:58
+#######################################################################
+
+set -e
+# 如果是root，报错
+if [ $(id -u) -eq 0 ]; then
+	echo "Do not run as root"
+	exit 1
+fi
+
+if [ $# -ne 2 ]; then
+	echo "Usage: $0 <src file> [armv8-a|armv7-a]"
+	exit 1
+fi
+
+native=~/app/native
+file=$1
+targetFile=${file%.*}
+arch=$2
+
+case $arch in
+	armv8-a)
+		compiler=$native/llvm/bin/aarch64-unknown-linux-ohos
+		targetPlatform=aarch64-linux-ohos
+		;;
+	armv7-a)
+		compiler=$native/llvm/bin/armv7-unknown-linux-ohos
+		targetPlatform=arm-linux-ohos
+		;;
+	*)
+		echo "Unsupported arch"
+		exit 1
+		;;
+esac
+
+case ${file##*.} in
+	c)
+		compiler=$compiler-clang
+		;;
+	cpp)
+		compiler=$compiler-clang++
+		;;
+	*)
+		echo "Unsupported file type"
+		exit 1
+		;;
+esac
+
+export CPATH=
+
+$compiler -o $targetFile $file -Wall \
+	--target=$targetPlatform \
+	--sysroot=$native/sysroot \
+	-march=$arch -mfloat-abi=softfp
 ```
 
 # 完结撒花

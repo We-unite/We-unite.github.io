@@ -159,7 +159,7 @@ document.writeln("            </div>");
 document.writeln("");
 document.writeln("            <a onclick=\"clickit(\'grandson23\')\">-项目文档</a>");
 document.writeln("            <div class=\"grandson\" id=\"grandson23\" style=\"display: none;\">");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/ohos_compile.html\">OpenHarmony编译</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/ohos_compile.html\">OpenHarmony 编译</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/lcm_compile.html\">LCM交叉编译</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/projects/godo.html\">godo知识总结</a>");
 document.writeln("            </div>");
