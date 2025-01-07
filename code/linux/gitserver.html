@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>自己的 git 托管</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">自己的 git 托管</p>
+            <header id="title-block-header">
+                <p class="title">自己的 git 托管</p>
+            </header>
             <!-- git 远程存储 -->
             <blockquote>
                 <p>争名夺利几时休，早起迟眠不自由。</p>
@@ -49,13 +50,13 @@
             <p>首先，本方法要求有一个本地 git 存储库，并且已经有 commit。如果是本地新建的仓库，需要先有一个 commit，然后继续操作。这个 commit
                 可以用编写<code>.gitignore</code>或者<code>push.sh</code>等不甚重要的文件来凑数。</p>
             <h2 id="远程仓库">远程仓库</h2>
-            <pre><code># 创建远程仓库，这里也叫test吧
+            <pre><code class="language-bash"># 创建远程仓库，这里也叫test吧
 ssh git@127.0.0.1 git init --bare test.git</code></pre>
             <p>注意，本处指明的 git 为远程用户名，127.0.0.1 代表云服务器的公网 ip，test.git
                 为远程仓库名。使用的时候都需要换成自己的。如果仓库不想直接存储在用户目录下，需要指出其存储路径，如<code>code/fuck/test.git</code></p>
             <h2 id="本地与远程连接">本地与远程连接</h2>
             <p>本地和远程都有了，下一步就是建立联系了。</p>
-            <pre><code># 本地添加远程库信息
+            <pre><code class="language-bash"># 本地添加远程库信息
 git remote add origin git@127.0.0.1:test.git
 
 # 此时尚不能直接推送，因为并未指定上游对应分支，需要指定
@@ -65,7 +66,7 @@ git push --set-upstream origin master
 bash push.sh</code></pre>
             <h2 id="自动化">自动化</h2>
             <p>整体操作过程可以说比较简单了。既然如此，<strong>脚本，启动！</strong></p>
-            <pre><code>#!/bin/bash
+            <pre><code class="language-bash">#!/bin/bash
 
 read -p &quot;Local repo name: &quot; local_name
 read -p &quot;Remote repo name: &quot; remote_name
@@ -136,7 +137,7 @@ echo &quot;Success!&quot;</code></pre>
             </ul>
             <h2 id="nginx-配置与说明">nginx 配置与说明</h2>
             <p>最初的设置是这样的：</p>
-            <pre><code>server
+            <pre><code class="language-nginx">server
 {
     # 这里用于将 http 请求重定向到 https，是一种常用的方式
     listen 80;
@@ -167,7 +168,7 @@ server
     }
 }</code></pre>
             <p>nginx 重新加载配置之后，我们就可以正常<code>git clone https://git.player.com/test.git</code>了。但当我们 push 时，会出现 403 错误：</p>
-            <pre><code>$ git push
+            <pre><code class="language-bash">$ git push
 fatal: unable to access &#39;https://git.player.com/test.git/&#39;: The requested URL returned error: 403</code></pre>
             <p>为了解决这个错误，我们可以在 <code>git-http-backend</code> 的官网文档 上找到这样的一段描述：</p>
             <blockquote>
@@ -181,7 +182,7 @@ fatal: unable to access &#39;https://git.player.com/test.git/&#39;: The requeste
             <p>我们可以在仓库中执行 <code>git config http.receivepack true</code> 来开启 push 权限，但是这样的话，所有人都可以 push
                 代码了，这显然不是我们想要的。我们可以通过 <code>git config http.receivepack false</code> 来关闭 push 权限，这样的话，所有人都不能 push
                 代码了，这也不是我们想要的。那么，我们应该怎么做呢？更好的做法是这样的：</p>
-            <pre><code>$HTTP[&quot;querystring&quot;] =~ &quot;service=git-receive-pack&quot; {
+            <pre><code class="language-nginx">$HTTP[&quot;querystring&quot;] =~ &quot;service=git-receive-pack&quot; {
     include &quot;git-auth.conf&quot;
 }
 $HTTP[&quot;url&quot;] =~ &quot;^/git/.*/git-receive-pack$&quot; {
@@ -189,16 +190,15 @@ $HTTP[&quot;url&quot;] =~ &quot;^/git/.*/git-receive-pack$&quot; {
 }</code></pre>
             <p>看上去挺简单，但是想要理解为什么这样配置，就必须了解下 Git 的内部原理。正如上面 git-http-backend 文档上的那段描述，当 Git 客户端执行
                 <code>git fetch/git pull/git clone</code>时，会调用 <code>upload-pack</code> 服务，当执行 <code>git push</code>
-                时，会调用 <code>receive-pack</code> 服务。我们可以查看 nginx 的访问日志，目录在<code>/var/log/nginx/access.log</code>：
-            </p>
+                时，会调用 <code>receive-pack</code> 服务。我们可以查看 nginx 的访问日志，目录在<code>/var/log/nginx/access.log</code>：</p>
             <p>执行 git clone：</p>
-            <pre><code>[27/Nov/2018:22:18:00] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
+            <pre><code class="language-plaintext">[27/Nov/2018:22:18:00] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
 [27/Nov/2018:22:18:00] &quot;POST /test.git/git-upload-pack HTTP/1.1&quot; 200 306 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
             <p>执行 git pull：</p>
-            <pre><code>[27/Nov/2018:22:20:25] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
+            <pre><code class="language-plaintext">[27/Nov/2018:22:20:25] &quot;GET /test.git/info/refs?service=git-upload-pack HTTP/1.1&quot; 200 363 &quot;-&quot; &quot;git/1.9.1&quot;
 [27/Nov/2018:22:20:25] &quot;POST /test.git/git-upload-pack HTTP/1.1&quot; 200 551 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
             <p>执行 git push：</p>
-            <pre><code>[27/Nov/2018:22:19:33] &quot;GET /test.git/info/refs?service=git-receive-pack HTTP/1.1&quot; 401 204 &quot;-&quot; &quot;git/1.9.1&quot;
+            <pre><code class="language-plaintext">[27/Nov/2018:22:19:33] &quot;GET /test.git/info/refs?service=git-receive-pack HTTP/1.1&quot; 401 204 &quot;-&quot; &quot;git/1.9.1&quot;
 admin [27/Nov/2018:22:19:33] &quot;GET /test.git/info/refs?service=git-receive-pack HTTP/1.1&quot; 200 193 &quot;-&quot; &quot;git/1.9.1&quot;
 admin [27/Nov/2018:22:19:33] &quot;POST /test.git/git-receive-pack HTTP/1.1&quot; 200 63 &quot;-&quot; &quot;git/1.9.1&quot;</code></pre>
             <p>可以看到执行 clone 和 pull 请求的接口是一样的，先请求 <code>/info/refs?service=git-upload-pack</code>，然后再请求
@@ -206,10 +206,9 @@ admin [27/Nov/2018:22:19:33] &quot;POST /test.git/git-receive-pack HTTP/1.1&quot
                 <code>/git-receive-pack</code>，所以在上面的的配置中我们看到了两条记录，如果要对 push 做访问控制，那么对这两个请求都要限制。关于 Git 传输的原理可以参考 《Pro
                 Git》的 <a
                     href="https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E4%BC%A0%E8%BE%93%E5%8D%8F%E8%AE%AE">Git
-                    内部原理 - 传输协议</a> 这一节。
-            </p>
+                    内部原理 - 传输协议</a> 这一节。</p>
             <p>于是，我们对 nginx 的配置文件进行修改：</p>
-            <pre><code>server
+            <pre><code class="language-nginx">server
 {
     listen 80;
     server_name git.player.com;
@@ -274,21 +273,21 @@ server
             </blockquote>
             <h2 id="认证文件">认证文件</h2>
             <p>nginx 的配置中我们用到了认证文件，它的生成是这样的：</p>
-            <pre><code># 创建认证文件并添加第一个用户
+            <pre><code class="language-bash"># 创建认证文件并添加第一个用户
 htpasswd -cd &lt;文件名&gt; &lt;用户名&gt; &lt;密码&gt;
 # 在已有的文件中继续添加用户
 htpasswd -d &lt;文件名&gt; &lt;用户名&gt; &lt;密码&gt;</code></pre>
             <p>到了这里，我们重启 nginx 然后进行测试，也许就可以正常使用了……吗？</p>
             <h2 id="问题">问题</h2>
             <p>我在测试的时候发现了一个问题：</p>
-            <pre><code>$ git clone https://git.player.com/test.git
+            <pre><code class="language-bash">$ git clone https://git.player.com/test.git
 Cloning into &#39;test&#39;...
 fatal: repository &#39;https://git.player.com/test.git/&#39; not found</code></pre>
             <p>看起来很匪夷所思：我们明明把仓库放进了指定目录啊，nginx 也已经配置好了，为什么就是找不到呢？我在网上找了很久也没找到答案。最后自己发现了问题所在：<strong>仓库文件夹权限不对</strong>。
             </p>
             <h3 id="linux-权限描述">Linux 权限描述</h3>
             <p>当我们使用<code>ls -l</code>命令查看文件夹时，会看到类似这样的输出：</p>
-            <pre><code>drwxr-xr-x 2 git git 4096 Nov 27 22:19 test.git</code></pre>
+            <pre><code class="language-bash">drwxr-xr-x 2 git git 4096 Nov 27 22:19 test.git</code></pre>
             <p>其中前 10 个字符就是用来描述该目录权限的。</p>
             <ul>
                 <li>第一位字符代表文件类型
@@ -334,7 +333,7 @@ fatal: repository &#39;https://git.player.com/test.git/&#39; not found</code></p
                 </li>
             </ul>
             <p><strong>这也就是上文我推荐为 git 仓库托管设立单独用户的原因。</strong>因而，最后我选择了第三种方案。具体操作如下：</p>
-            <pre><code>usermod -aG git root
+            <pre><code class="language-bash">usermod -aG git root
 usermod -aG git www-data</code></pre>
             <p>此时再进行测试，应该就可以正常使用了。</p>
             <h1 id="cgit-拥抱图形化">cgit 拥抱图形化</h1>
@@ -349,7 +348,7 @@ usermod -aG git www-data</code></pre>
             </p>
             <h2 id="依赖">依赖</h2>
             <p><code>nginx</code>/<code>git</code>/<code>vim</code>等工具不必赘述，还有一些依赖项需要安装：</p>
-            <pre><code># apache2-utils是用其htpasswd命令创建认证文件的
+            <pre><code class="language-bash"># apache2-utils是用其htpasswd命令创建认证文件的
 # fcgiwrap是用于将 FastCGI 转换为 HTTP 协议的工具
 # 这两个工具上文均已提到和使用，不再赘述
 sudo apt update
@@ -363,14 +362,14 @@ sudo apt install -y libssl-dev
 sudo apt install liblua5.1-0 liblua5.1-0-dbg liblua5.1-dev lua5.1</code></pre>
             <h2 id="cgit-安装">cgit 安装</h2>
             <p>cgit 最近的正式发行版已经好几年了，但是它的开发仍然很活跃，所以建议从它的 git 仓库中获取最新的代码，而非直接安装：</p>
-            <pre><code>git clone https://git.zx2c4.com/cgit
+            <pre><code class="language-bash">git clone https://git.zx2c4.com/cgit
 cd cgit
 git submodule init
 git submodule update</code></pre>
             <p>在仓库目录下创建<code>cgit.conf</code>文件，用来存放 cgit 构建时可以覆盖的配置：</p>
-            <pre><code>sed -n &#39;3,31p&#39; Makefile &gt; cgit.conf</code></pre>
+            <pre><code class="language-bash">sed -n &#39;3,31p&#39; Makefile &gt; cgit.conf</code></pre>
             <p>我们可以按需编辑之：</p>
-            <pre><code>CGIT_VERSION = v1.2.3
+            <pre><code class="language-plaintext">CGIT_VERSION = v1.2.3
 CGIT_SCRIPT_NAME = cgit.cgi
 CGIT_SCRIPT_PATH = /var/www/cgit  # 本文只改了这里
 CGIT_DATA_PATH = $(CGIT_SCRIPT_PATH)
@@ -400,7 +399,7 @@ ASCIIDOC_HTML = xhtml11
 ASCIIDOC_COMMON = $(ASCIIDOC) $(ASCIIDOC_EXTRA)
 TXT_TO_HTML = $(ASCIIDOC_COMMON) -b $(ASCIIDOC_HTML)</code></pre>
             <p>编译 &amp;&amp; 安装：</p>
-            <pre><code># 如果不需要lua支持
+            <pre><code class="language-bash"># 如果不需要lua支持
 make NO_LUA=1
 # 有lua支持的话
 make LUA_PKGCONFIG=lua5.1
@@ -411,7 +410,7 @@ sudo make install | tee install.log</code></pre>
             <h2 id="nginx-配置">nginx 配置</h2>
             <p>首先，参照<a href="认证文件">这里</a>生成一个自己的认证文件，再继续往下看。</p>
             <p>在<code>/etc/nginx/git-http-backend.conf</code>中写入以下内容，注意把域名、ssl 路径、htpasswd 认证文件换成自己的：</p>
-            <pre><code># /etc/nginx/git-http-backend.conf
+            <pre><code class="language-nginx"># /etc/nginx/git-http-backend.conf
 fastcgi_pass unix:/var/run/fcgiwrap.socket;
 include fastcgi_params;
 fastcgi_param SCRIPT_FILENAME /usr/lib/git-core/git-http-backend;
@@ -420,7 +419,7 @@ fastcgi_param GIT_PROJECT_ROOT /home/git;
 fastcgi_param PATH_INFO $1;
 fastcgi_param REMOTE_USER $remote_user;</code></pre>
             <p>而后，在<code>/etc/nginx/conf.d/cgit.conf</code>中写：</p>
-            <pre><code># /etc/nginx/conf.d/cgit.conf
+            <pre><code class="language-nginx"># /etc/nginx/conf.d/cgit.conf
 server {
     listen 80;
     server_name git.player.com;
@@ -491,11 +490,11 @@ server {
     }
 }</code></pre>
             <p>最后，重启 nginx 服务：</p>
-            <pre><code>sudo nginx -s reload</code></pre>
+            <pre><code class="language-bash">sudo nginx -s reload</code></pre>
             <p><em>看吧，一个个仓库，向我们列队走来！</em></p>
             <h2 id="cgit-高级配置">cgit 高级配置</h2>
             <p>可以安装一些包，用于 cgit 的代码高亮、Markdown 渲染、Gravatar 头像渲染等：</p>
-            <pre><code>sudo apt install -y python3-docutils python3-markdown highlight python3-pygments
+            <pre><code class="language-bash">sudo apt install -y python3-docutils python3-markdown highlight python3-pygments
 
 # 编译安装 LuaoSSL
 # https://25thandclement.com/~william/projects/luaossl.html
@@ -511,7 +510,7 @@ sudo chown -R www-data:www-data /usr/local/share/cgit/
 sudo chmod +x /usr/local/share/cgit/filters/email-gravatar.lua</code></pre>
             <p>然后编辑上边我们已经指定的配置文件<code>/etc/cgitrc</code>，更多配置项参见<a
                     href="https://git.zx2c4.com/cgit/tree/cgitrc.5.txt">cgitrc.5.txt</a>。</p>
-            <pre><code># /etc/cgitrc
+            <pre><code class="language-plaintext"># /etc/cgitrc
 # 包含 cgit 的所有运行时设置
 # 格式 NAME=VALUE
 # 以 &quot;#&quot; 开头的行是注释
@@ -595,7 +594,7 @@ scan-path=/home/git
             <p>在上面的配置文件里，我们使用了<a href="https://pygments.org/styles/">Pygments</a>的代码高亮。其默认使用的高亮是
                 pastie，我们可以根据自己的喜好修改高亮风格。</p>
             <p>首先，看看有哪些可用的高亮风格。</p>
-            <pre><code># 查看可用的高亮风格
+            <pre><code class="language-bash"># 查看可用的高亮风格
 pygmentize -L styles
 
 # 编辑我们使用的代码高亮脚本
@@ -617,9 +616,9 @@ sudo vim /usr/local/share/cgit/filters/syntax-highlighting.py</code></pre>
             <p>cgit 的<a href="https://git.zx2c4.com/cgit/">官网</a>上不仅能实现 Gravatar 头像，还能在鼠标移动到头像上的时候以大图显示。这不是原生功能，而是需要动
                 lua 脚本自己实现。原博客大佬在 cgit 的<a
                     href="https://lists.zx2c4.com/pipermail/cgit/2014-March/002036.html">邮件列表</a>找到了实现方式。</p>
-            <pre><code>sudo vim /usr/local/share/cgit/filters/email-libravatar-korg.lua</code></pre>
+            <pre><code class="language-bash">sudo vim /usr/local/share/cgit/filters/email-libravatar-korg.lua</code></pre>
             <p>在脚本中写入以下内容：</p>
-            <pre><code>-- This script may be used with the email-filter or repo.email-filter settings in cgitrc.
+            <pre><code class="language-lua">-- This script may be used with the email-filter or repo.email-filter settings in cgitrc.
 -- It adds gravatar icons to author names. It is designed to be used with the lua:
 -- prefix in filters. It is much faster than the corresponding python script.
 --
@@ -656,7 +655,7 @@ function filter_write(str)
         buffer = buffer .. str
 end</code></pre>
             <p>只有 lua 还不够，我们需要将以下内容添加到<code>/var/www/cgit/cgit.css</code>中：</p>
-            <pre><code>/* libgravatar */
+            <pre><code class="language-css">/* libgravatar */
 div#cgit span.libravatar img.onhover {
   display: none;
   border: 1px solid gray;
@@ -697,7 +696,7 @@ div#cgit span.libravatar:hover &gt; img.onhover {
             <p>对于 cgit 显示出来的界面，你可能并不太满意（比如我就嫌界面的字太小、颜色不舒适啥的）。修改办法也很简单，找到<code>/var/www/cgit/cgit.css</code>文件，然后修改之。</p>
             <p>而对于我们的 Markdown 或者别的什么语言写的 README，如果觉得渲染效果不好，都是可以自己去修改的。</p>
             <p>找到<code>/usr/local/share/cgit/filters/about-formatting.sh</code>文件，我们会看到以下内容：</p>
-            <pre><code>#!/bin/sh
+            <pre><code class="language-bash">#!/bin/sh
 
 # This may be used with the about-filter or repo.about-filter setting in cgitrc.
 # It passes formatting of about pages to differing programs, depending on the usage.
@@ -741,6 +740,7 @@ esac</code></pre>
             </ul>
             <p>这篇博客前前后后有二十多天了，有空再折腾吧。看电视去也~</p>
             <!-- 2024.1.3 -->
+            <p class="time">2024.1.3</p>
             <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>

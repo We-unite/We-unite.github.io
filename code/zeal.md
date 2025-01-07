@@ -295,14 +295,3 @@ http://tokyo.kapeli.com/feeds/ZeptoJS.tgz
 下载完成后，对压缩包进行解压，并将解压所得文件夹整体放入上文规定的 Zeal 文档存储路径之下。
 
 重启 Zeal，即可在左侧看到信息，可以在左上角搜索了。
-
-# test
-
-```mermaid
-graph LR
-A[1]-->B[2]
-```
-
-$$
-\int_0^\frac \pi 2 \sin x =1
-$$

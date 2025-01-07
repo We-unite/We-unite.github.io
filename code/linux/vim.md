@@ -169,7 +169,7 @@ sudo make install
 
 除此之外，出于同样的目的（保证当前用户与 root 用户观感一致），建议将插件也指定一个专门的绝对路径。我放在了`/home/player/useful/bundle`。
 
-```
+```bash
 # 创建软链接
 # 我习惯把有用的文件放在～/useful下
 mkdir useful
@@ -191,17 +191,14 @@ mkdir bundle
 ```plaintext
 /etc/vim
 ├── vimrc            # vim配置文件，负责引入不同的配置模块
-├── vimrc_origin     # 原有配置脚本备份
-├── vimrcs           # 我的配置文件夹，里边是不同的配置模块
-│   ├── autocmd.vim
-│   ├── codecmd.vim
-│   ├── keybind.vim
-│   ├── match.vim
-│   ├── myset.vim
-│   ├── plugs.vim
-│   └── statusline.vim
-├── vimrc.tiny       # 原有脚本，无用
-└── vimscript.vim    # 原有脚本，无用
+└── vimrcs           # 我的配置文件夹，里边是不同的配置模块
+    ├── autocmd.vim
+    ├── codecmd.vim
+    ├── keybind.vim
+    ├── match.vim
+    ├── myset.vim
+    ├── plugs.vim
+    └── statusline.vim
 ```
 
-我直接把我服务器上的配置文件[放在这里](https://file.qin-juan-ge-zhu.top/useful/vim/)，以供查看。
+我直接把我服务器上的配置文件[放在这里](https://git.qin-juan-ge-zhu.top/vimrc)，以供查看。

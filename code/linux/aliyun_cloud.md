@@ -498,7 +498,7 @@ Nginx 默认下载目录在`/etc/nginx`，该目录下有个`.conf`文件，但�
 
 在`/etc/nginx/conf.d`中，新建文件`vscode.conf`，内容如下：
 
-```conf
+```nginx
 server
 {
     # 这段是一个常用的http重定向到https的方法，用了都说好

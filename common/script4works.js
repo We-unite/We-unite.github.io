@@ -151,7 +151,7 @@ document.writeln("            </div>");
 document.writeln("            <a onclick=\"clickit(\'grandson22\')\">-一些小玩意儿</a>");
 document.writeln("            <div class=\"grandson\" id=\"grandson22\" style=\"display: none;\">");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/highlight.html\">代码高亮与复制</a>");
-document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/index.html\">C的小零件</a>");
+document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/MyCodes.html\">C的小零件</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/cpppp.html\">C++ Primer Plus基础</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/experiment.html\">大物实验MATLAB</a>");
 document.writeln("                <a href=\"https://www.qin-juan-ge-zhu.top/code/zeal.html\">Zeal文档下载</a>");

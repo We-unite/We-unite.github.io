@@ -90,7 +90,7 @@
 
 方法极为简单，如下：
 
-```vim
+```plaintext
 A::B
 B::A
 ```
@@ -128,7 +128,7 @@ B::A
 
 如下：
 
-```
+```bash
 # 进入对应文件夹
 cd /usr/shared/X11/xkb/symbols
 
@@ -150,7 +150,7 @@ exit
 
 在编辑 pc 文件时，可以看到，每一行的构成如下：
 
-```vim
+```plaintext
 key<Esc> { [ Escape ] }
 ```
 

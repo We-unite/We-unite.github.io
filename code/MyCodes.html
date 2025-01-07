@@ -7,25 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>我的实用代码</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">我的实用代码</p>
+            <header id="title-block-header">
+                <p class="title">我的实用代码</p>
+            </header>
             <p>这里是英（C）语（yǔ）科（yán）听力部分。该部分有第一、第二两节。</p>
             <p>请注意，回答听力部分时，请先将答案写在试卷上，听力部分结束前，你将有两分钟的时间将试卷上的答案转移到答题卡上。</p>
             <p>听力考试，现在开始！</p>
             <h1 id="光标隐藏函数">光标隐藏函数</h1>
-            <pre><code>void HideCursor(void)
+            <pre><code class="language-c">void HideCursor(void)
 {
    CONSOLE_CURSOR_INFO cursor_info = {1, 0};
    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &amp;cursor_info);
 }</code></pre>
             <h1 id="show_bytes">show_bytes</h1>
-            <pre><code>#include &lt;bits/stdc++.h&gt;
+            <pre><code class="language-cpp">#include &lt;bits/stdc++.h&gt;
 using namespace std;
 typedef unsigned char* bite_pointer;
 typedef int T;//数据类型为int,可更改
@@ -56,7 +57,7 @@ int main()
 }</code></pre>
             <h1 id="界面设计和上色">界面设计和上色</h1>
             <p>注意：<strong>本内容请勿改动任何参数！</strong></p>
-            <pre><code>#include &lt;windows.h&gt;
+            <pre><code class="language-c">#include &lt;windows.h&gt;
 #include &lt;conio.h&gt;
 #include &lt;time.h&gt;
 
@@ -82,7 +83,7 @@ int color(int c)//设置颜色
                 句子上色用<code>color(c)</code>，c 为指定颜色序号。
                 输出后的停顿用<code>void Sleep(int t)</code>函数，在<code>&lt;windows.h&gt;</code>中，t 代表暂停的毫秒数。 使用时每个句子前都要用 gotoxy
                 指定位置，用 color 上色。 合起来如下：</p>
-            <pre><code>    gotoxy(hout,wide/5,high/6);
+            <pre><code class="language-c">    gotoxy(hout,wide/5,high/6);
     color(6);
     printf(&quot;本计算器仅支持5个及以下的矩阵，分别名为A~E(大写）。&quot;);
     Sleep(200);
@@ -91,7 +92,7 @@ int color(int c)//设置颜色
     printf(&quot;每个矩阵阶数不超过5*5。&quot;);
     Sleep(200);</code></pre>
             <h1 id="关于音乐效果">关于音乐效果</h1>
-            <pre><code>#include&lt;windows.h&gt;
+            <pre><code class="language-c">#include&lt;windows.h&gt;
 #include&lt;mmsystem.h&gt;
 #pragma comment(lib.&quot;Winmm.lib&quot;) //头文件
 PlaySound(TEXT(&quot;音乐名.wav&quot;),NULL,SND_FILENAME | SND_ASYNC | SND_LOOP);//开始播放
@@ -99,7 +100,7 @@ PlaySound(NULL,NULL,SND_FILENAME);//结束播放</code></pre>
             <p>注意：音频必须使用<strong>wav</strong>格式，必须放在<strong>跟代码同一个文件夹</strong>，如果不然，音乐名处<strong>应当使用其绝对地址或相对地址</strong>。
             </p>
             <h1 id="震动心形设计">震动心形设计</h1>
-            <pre><code>#define I 20
+            <pre><code class="language-c">#define I 20
 #define R 340
 
 int wide=80,high=40;//宏常量定义，数据可变
@@ -120,7 +121,7 @@ void draw_color()//整体颜色震动效果函数
     system(cl);
 }</code></pre>
             <p>颜色震动使用方法实例：</p>
-            <pre><code>for(i=0;i&lt;6;i++,lower+=3)
+            <pre><code class="language-c">for(i=0;i&lt;6;i++,lower+=3)
 {
     puts(data[i+15]);
     for(j=0;j&lt;wait;j++)
@@ -194,7 +195,7 @@ void draw_heart(int wait)//心形设计函数，传入参数为0即可
     }
 }</code></pre>
             <h1 id="给代码加行号的代码">给代码加行号的代码</h1>
-            <pre><code>#include&lt;stdio.h&gt;
+            <pre><code class="language-c">#include&lt;stdio.h&gt;
 
 int main(void)
 {

@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>LCM 交叉编译</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">LCM 交叉编译</p>
+            <header id="title-block-header">
+                <p class="title">LCM 交叉编译</p>
+            </header>
             <!-- 编译集成lcm模块 -->
             <h1 id="lcm-简介">LCM 简介</h1>
             <p>LCM(Lightweight Communications and
@@ -28,13 +29,13 @@
                 <li><a href="https://zhuanlan.zhihu.com/p/621943685">一篇博客</a></li>
             </ul>
             <h1 id="依赖项安装">依赖项安装</h1>
-            <pre><code>sudo apt update
+            <pre><code class="language-bash">sudo apt update
 sudo apt upgrade
 sudo apt install build-essential cmake libglib2.0-dev
 sudo apt install openjdk-8-jdk # lcm仅支持jdk8</code></pre>
             <h1 id="x86-的-lcm">x86 的 lcm</h1>
             <p>如果我们仅仅需要 x86 架构的 lcm，执行下列命令即可：</p>
-            <pre><code>git clone https://github.com/lcm-proj/lcm
+            <pre><code class="language-bash">git clone https://github.com/lcm-proj/lcm
 cd lcm
 mkdir build &amp;&amp; cd build
 cmake ..
@@ -48,14 +49,14 @@ sudo make install</code></pre>
             <p>lcm-spy 是 LCM 配套的数据可视化工具。 可以通过 lcm-spy 监视 lcm 数据发送频率、数据量、数据结构，甚至实时画图。 如果安装了 JAVA，则 lcm-spy 会连同 LCM 一同被安装。
             </p>
             <p>启动 lcm-spy：</p>
-            <pre><code>export CLASSPATH=${your lcm-type class path}
+            <pre><code class="language-bash">export CLASSPATH=${your lcm-type class path}
 lcm-spy</code></pre>
             <h1 id="交叉编译">交叉编译</h1>
             <p>既然 lcm 用的是 cmake，何不交叉编译到 OHOS 里用呢？</p>
             <p>首先，我们可以设置一下 Native Development Kit（NDK）的路径：</p>
-            <pre><code># 设置成自己的NDK工具目录
+            <pre><code class="language-bash"># 设置成自己的NDK工具目录
 export OHOS_ROOT=~/app/native</code></pre>
-            <pre><code>$OHOS_ROOT/build-tools/cmake/bin/cmake \
+            <pre><code class="language-bash">$OHOS_ROOT/build-tools/cmake/bin/cmake \
       -DOHOS_STL=c++_shared \
       -DOHOS_ARCH=armv8-a \
       -DOHOS_PLATFORM=OHOS \
@@ -66,7 +67,7 @@ export OHOS_ROOT=~/app/native</code></pre>
             <p>解决方案自然是自己手动交叉编译<code>libglib2.0-dev</code>。</p>
             <h2 id="glib2.0-交叉编译">Glib2.0 交叉编译</h2>
             <p>从<a href="https://download.gnome.org/sources/glib/">官网</a>下载 glib-2.79.2 源码，解压后进入源码目录。</p>
-            <pre><code>mkdir glib &amp;&amp; cd glib
+            <pre><code class="language-bash">mkdir glib &amp;&amp; cd glib
 wget https://download.gnome.org/sources/glib/2.79/glib-2.79.2.tar.xz
 tar -xvf glib-2.79.2.tar.xz
 mkdir build</code></pre>
@@ -78,7 +79,7 @@ mkdir build</code></pre>
             <p>接着，参考博客<a
                     href="https://t.csdnimg.cn/YfSJC">这篇博客</a>，撰写如下<kbd>meson_ohos.txt</kbd>（友情提醒，使用该文件时把<kbd>native</kbd>也就是
                 NDK 的路径修改为自己的路径、源平台与目标平台按需修改）：</p>
-            <pre><code>[binaries]
+            <pre><code class="language-meson">[binaries]
 c = &#39;$OHOS_ROOT/llvm/bin/aarch64-unknown-linux-ohos-clang&#39;
 cpp = &#39;$OHOS_ROOT/llvm/bin/aarch64-unknown-linux-ohos-clang++&#39;
 ar = &#39;$OHOS_ROOT/llvm/bin/llvm-ar&#39;
@@ -102,15 +103,16 @@ cpu_family = &#39;aarch64&#39;
 cpu = &#39;armv8a&#39;
 endian = &#39;little&#39;</code></pre>
             <p>将该文件放置在<kbd>glib-2.79.2</kbd>源码目录下，而后在<kbd>build</kbd>目录下执行以下命令：</p>
-            <pre><code>meson --cross-file=../glib-2.79.2/meson_ohos.txt ..
+            <pre><code class="language-bash">meson --cross-file=../glib-2.79.2/meson_ohos.txt ..
 ninja</code></pre>
             <p>编译完成，正确地安装 glib2 到交叉编译工具链中（？？？），之后我们回到 lcm 的源码目录，重新执行 cmake 命令：</p>
-            <pre><code>$OHOS_ROOT/build-tools/cmake/bin/cmake \
+            <pre><code class="language-bash">$OHOS_ROOT/build-tools/cmake/bin/cmake \
       -DOHOS_STL=c++_shared \
       -DOHOS_ARCH=armv8-a \
       -DOHOS_PLATFORM=OHOS \
       -DCMAKE_TOOLCHAIN_FILE=$(find $OHOS_ROOT -name &quot;ohos.toolchain.cmake&quot;)</code></pre>
             <p>这次，编译成功了。万岁！</p>
+            <p class="time">2024.4</p>
             <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>

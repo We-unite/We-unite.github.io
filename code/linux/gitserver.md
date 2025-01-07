@@ -135,7 +135,7 @@ echo "Success!"
 
 最初的设置是这样的：
 
-```conf
+```nginx
 server
 {
     # 这里用于将 http 请求重定向到 https，是一种常用的方式
@@ -183,7 +183,7 @@ fatal: unable to access 'https://git.player.com/test.git/': The requested URL re
 
 我们可以在仓库中执行 `git config http.receivepack true` 来开启 push 权限，但是这样的话，所有人都可以 push 代码了，这显然不是我们想要的。我们可以通过 `git config http.receivepack false` 来关闭 push 权限，这样的话，所有人都不能 push 代码了，这也不是我们想要的。那么，我们应该怎么做呢？更好的做法是这样的：
 
-```conf
+```nginx
 $HTTP["querystring"] =~ "service=git-receive-pack" {
     include "git-auth.conf"
 }
@@ -196,21 +196,21 @@ $HTTP["url"] =~ "^/git/.*/git-receive-pack$" {
 
 执行 git clone：
 
-```log
+```plaintext
 [27/Nov/2018:22:18:00] "GET /test.git/info/refs?service=git-upload-pack HTTP/1.1" 200 363 "-" "git/1.9.1"
 [27/Nov/2018:22:18:00] "POST /test.git/git-upload-pack HTTP/1.1" 200 306 "-" "git/1.9.1"
 ```
 
 执行 git pull：
 
-```log
+```plaintext
 [27/Nov/2018:22:20:25] "GET /test.git/info/refs?service=git-upload-pack HTTP/1.1" 200 363 "-" "git/1.9.1"
 [27/Nov/2018:22:20:25] "POST /test.git/git-upload-pack HTTP/1.1" 200 551 "-" "git/1.9.1"
 ```
 
 执行 git push：
 
-```log
+```plaintext
 [27/Nov/2018:22:19:33] "GET /test.git/info/refs?service=git-receive-pack HTTP/1.1" 401 204 "-" "git/1.9.1"
 admin [27/Nov/2018:22:19:33] "GET /test.git/info/refs?service=git-receive-pack HTTP/1.1" 200 193 "-" "git/1.9.1"
 admin [27/Nov/2018:22:19:33] "POST /test.git/git-receive-pack HTTP/1.1" 200 63 "-" "git/1.9.1"
@@ -220,7 +220,7 @@ admin [27/Nov/2018:22:19:33] "POST /test.git/git-receive-pack HTTP/1.1" 200 63 "
 
 于是，我们对 nginx 的配置文件进行修改：
 
-```conf
+```nginx
 server
 {
     listen 80;
@@ -452,7 +452,7 @@ sudo make install | tee install.log
 
 在`/etc/nginx/git-http-backend.conf`中写入以下内容，注意把域名、ssl 路径、htpasswd 认证文件换成自己的：
 
-```conf
+```nginx
 # /etc/nginx/git-http-backend.conf
 fastcgi_pass unix:/var/run/fcgiwrap.socket;
 include fastcgi_params;
@@ -465,7 +465,7 @@ fastcgi_param REMOTE_USER $remote_user;
 
 而后，在`/etc/nginx/conf.d/cgit.conf`中写：
 
-```conf
+```nginx
 # /etc/nginx/conf.d/cgit.conf
 server {
     listen 80;

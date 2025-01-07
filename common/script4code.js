@@ -11,6 +11,7 @@ document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-jua
 document.writeln("    <!-- <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/click4code.js\"></script> -->");
 document.writeln("    <script src=\"https://www.qin-juan-ge-zhu.top/common/js/click4notes.js\"></script>");
 document.writeln("    <script type=\"text/javascript\" src=\"https://www.qin-juan-ge-zhu.top/common/js/pandoc-menu.js\"></script>");
+document.writeln("    <script type=\"text/javascript\" src=\"https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js\"></script>");
 document.writeln("</head>");
 document.writeln("");
 document.writeln("<body class=\'typora-export os-windows\'>");

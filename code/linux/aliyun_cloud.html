@@ -7,15 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>我的免费云服</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">我的免费云服</p>
-            <p class="metto">谁不想要个免费的云服呢？</p>
+            <header id="title-block-header">
+                <p class="title">我的免费云服</p>
+            </header>
             <h1 id="阿里云服务器">阿里云服务器</h1>
             <p>自从开始做自己的网页，越来越发现<strong>干啥都需要一个服务器</strong>。先是和大佬<a
                     href="https://user.qzone.qq.com/2506370693">黄四郎</a>一起在自己的电脑上搞服务，利用 VSCode 插件<a
@@ -40,7 +40,7 @@
             <h2 id="创建新用户">创建新用户</h2>
             <p>众所周知，<strong>为了安全起见，我们需要一个非 root 但具有 sudo
                     权限的用户来进行日常操作</strong>。这里我创建了一个名为<kbd>player</kbd>的用户并设置了密码，然后将其加入 sudo 组。</p>
-            <pre><code># 创建新用户，-m参数创建用户，-d参数手动指定用户的主目录
+            <pre><code class="language-bash"># 创建新用户，-m参数创建用户，-d参数手动指定用户的主目录
 sudo useradd -m player -d /home/player
 # 如需指定默认shell，可以加上-s参数。
 # 这里需要注意，一般意义上bash是sh的超集，因此sh能干的bash一般都能干，所以这里一般需要指定为bash。
@@ -59,7 +59,7 @@ sudo vim sudoers
 # 新开一行然后写一份一样的，把root改成player，保存退出</code></pre>
             <h2 id="安装软件">安装软件</h2>
             <p>经历了上边的配置，现在我们拥有了一台可以正常使用的服务器。服务器是为了什么？开发！开发！开发！所以，我们需要安装一些开发所需的软件。</p>
-            <pre><code># 如需添加软件源，可以先执行下边的命令
+            <pre><code class="language-bash"># 如需添加软件源，可以先执行下边的命令
 # 备份软件源
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.old
 # 修改软件源
@@ -86,7 +86,7 @@ sudo apt install make cmake
 # 剩下需要安装的软件，可以自行搜索</code></pre>
             <h2 id="简单美化一下命令行">简单美化一下命令行</h2>
             <p>配到这里，我们会发现一个很操蛋的事情，“为啥命令提示符之前不显示当前用户名和当前路径嘞？这岂不是每次看路径都需要<kbd>pwd</kbd>吗？烦不烦啊！”别急，问题很好修改。</p>
-            <pre><code>cd ~
+            <pre><code class="language-bash">cd ~
 vim .bashrc
 # 找到PS1=，将其修改为PS1=&quot;\u@\h:\w\$&quot;
 
@@ -94,7 +94,7 @@ vim .bashrc
 source .bashrc</code></pre>
             <p>改好之后也许还是没有变化，我就是这样的。后来在处理其它问题的时候，我发现了根本原因所在：我 TM 创建用户的时候忘了加<kbd>-s</kbd>参数，导致新用户的默认 shell
                 是<kbd>sh</kbd>而不是<kbd>bash</kbd>。所以，我们需要修改一下新用户的默认 shell。</p>
-            <pre><code># 查看当前用户的默认shell
+            <pre><code class="language-bash"># 查看当前用户的默认shell
 echo $SHELL
 
 # 修改默认shell
@@ -102,7 +102,7 @@ sudo chsh -s /bin/bash player</code></pre>
             <p>这时再重新加载，就会发现，一切都正常了，一切是那么美好。</p>
             <p>除此之外，我们也许想要调整命令行显示的用户名、路径之类内容的颜色，会想让命令行像 git bash 一样当我们进入 git 仓库的时候显示当前在什么分支。针对这两项需求，我修改了一下我的.bashrc
                 文件，现在其内容如下：</p>
-            <pre><code># ~/.bashrc: executed by bash(1) for non-login shells.
+            <pre><code class="language-bash"># ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
@@ -254,7 +254,7 @@ export https_proxy=http://127.0.0.1:7890</code></pre>
                 <li>将上述.pem 文件移动到家目录<code>C:\用户\当前用户名</code>的<kbd>.ssh</kbd>文件夹下</li>
                 <li>在<kbd>.ssh</kbd>文件夹下创建文件<kbd>config</kbd>，内容如下：</li>
             </ul>
-            <pre><code># 给服务器起的别名，这里是aliyun
+            <pre><code class="language-plaintext"># 给服务器起的别名，这里是aliyun
 Host aliyun
 # IP地址，这里以127.0.0.1代替，但真实操作需要换成服务器的公网ip，在控制台就能看到
 IP 127.0.0.1
@@ -265,7 +265,7 @@ User player
 # 密钥位置
 ……</code></pre>
             <p>在写好之后，我们就可以在本地命令行远程 ssh 连接云服务器操作了！</p>
-            <pre><code># 登陆，这里的aliyun是上边config里边起的别名
+            <pre><code class="language-bash"># 登陆，这里的aliyun是上边config里边起的别名
 ssh aliyun</code></pre>
             <h1 id="拥抱-vim">拥抱 vim</h1>
             <p>既然我们选择了在命令行里使用，编辑文件当然是比较常用 vim 了。当然 neovim 与其他命令行编辑器也很好，但我不熟悉，请参照网上其他教程进行配置。</p>
@@ -293,26 +293,26 @@ ssh aliyun</code></pre>
                     href="https://github.com/coder/code-server">链接</a>。官方也有安装教程，这里浅浅说几句吧。</p>
             <h2 id="安装">安装</h2>
             <p>官方提供了安装脚本，一条命令直接完成安装：</p>
-            <pre><code>curl -fsSL https://code-server.dev/install.sh | sh</code></pre>
+            <pre><code class="language-bash">curl -fsSL https://code-server.dev/install.sh | sh</code></pre>
             <p>但是我这里 curl 不知何故一直不能用，wget 也不好使，只能在 gayhub 仓库的<a
                     href="https://github.com/coder/code-server/releases">Releases</a>里找到最新版适合的安装包手动安装了。我是
                 Ubuntu22.04LTS，系统架构 amd64，所以下载了对应的.deb 安装包。</p>
-            <pre><code># 本地命令行中运行
+            <pre><code class="language-bash"># 本地命令行中运行
 scp code-server-4.13.0-linux-amd64.deb aliyun:code-server-4.13.0-linux-amd64.deb</code></pre>
-            <pre><code># 云服务器命令行中运行
+            <pre><code class="language-bash"># 云服务器命令行中运行
 
 # 安装
 sudo dpkg -i code-server-4.13.0-linux-amd64.deb</code></pre>
             <p>默认安装目录在<code>~/.local/share/code-server</code>下。暂且不管。</p>
             <h2 id="运行">运行</h2>
             <p>安装完成后，就可以直接运行了。</p>
-            <pre><code>code-server</code></pre>
+            <pre><code class="language-bash">code-server</code></pre>
             <p>就可以直接运行了，但是这样只能在本地浏览器运行，而我们需要的是远程运行。算了，直接上脚本！</p>
-            <pre><code>#!/bin/sh
+            <pre><code class="language-bash">#!/bin/sh
 code-server --host &quot;0.0.0.0&quot;&gt; /home/player/useful/codeserver-out.txt 2&gt;&amp;1 &amp;</code></pre>
             <p>其中第一条指令是设置允许外界访问，并指定了由后台运行、所有输出写进<code>/home/player/useful/codeserver.txt</code>文件中。后续均为输出信息。</p>
             <p>初次这样设置，直接打开会有密码，密码的存储文件在<code>~/.config/code-server/config.yaml</code>中，可以直接修改，也可以使用命令行修改。比如我当前的设置为：</p>
-            <pre><code>bind-addr: 127.0.0.1:8080
+            <pre><code class="language-yaml">bind-addr: 127.0.0.1:8080
 auth: password
 password: player
 cert: false</code></pre>
@@ -321,7 +321,7 @@ cert: false</code></pre>
             <h2 id="杀死">杀死</h2>
             <p>设置好之后会需要重新启动程序，我一般选择杀死然后重新运行启动脚本。</p>
             <p>杀死的方法：</p>
-            <pre><code>$ ps -ef | grep code-server
+            <pre><code class="language-plaintext">$ ps -ef | grep code-server
 player      2621       1  0 May29 ?        00:00:00 /usr/lib/code-server/lib/node /usr/lib/code-server --host 0.0.0.0
 player      2646    2621  0 May29 ?        00:03:31 /usr/lib/code-server/lib/node /usr/lib/code-server/out/node/entry
 player      3079    2646  0 May29 ?        00:00:57 /usr/lib/code-server/lib/node /usr/lib/code-server/lib/vscode/out/bootstrap-fork --type=ptyHost --logsPath /home/player/.local/share/code-server/logs/20230529T211752
@@ -389,7 +389,7 @@ $ kill -9 2621</code></pre>
                 默认端口 443，都和上边 code-server 指定的端口 8080 不一样。</p>
             <p>没错，我们需要一个代理，根据访问的网址来对应到指定端口。</p>
             <h3 id="安装运行与常用操作">安装、运行与常用操作</h3>
-            <pre><code>sudo apt install nginx
+            <pre><code class="language-bash">sudo apt install nginx
 # 安装完成后如果服务器重启，nginx会自动启动，手动启动命令如下
 sudo nginx
 
@@ -401,9 +401,9 @@ sudo nginx -s reload</code></pre>
             <h3 id="ssl-证书">SSL 证书</h3>
             <p>想要使用 https 方式，还需要一个 SSL 证书，每个域名一个证。腾讯云比较坑，必须花钱。这里我用的是 Certbot 免费发放的证书。</p>
             <p>首先，下载 Certbot:</p>
-            <pre><code>sudo apt install certbot</code></pre>
+            <pre><code class="language-bash">sudo apt install certbot</code></pre>
             <p>在申请证书之前，需要停止 nginx 的工作，如果正在运行，按照上边说的方法杀死，而后就可以申请证书辣！</p>
-            <pre><code># 申请证书
+            <pre><code class="language-bash"># 申请证书
 sudo certbot certonly --standalone --email example@qq.com -d code.player.com
 
 # 除了使用参数方式外，也可以使用交互的方式
@@ -416,7 +416,7 @@ sudo certbot certonly</code></pre>
                 默认下载目录在<code>/etc/nginx</code>，该目录下有个<code>.conf</code>文件，但不建议直接改，建议在<code>/etc/nginx/conf.d</code>文件夹下为每个需要转发的域名添加单独的设置文件，这样方便管理和修改。运行过程中
                 Nginx 会自动将该目录下所有配置文件全部加载的，不需要手动设置。</p>
             <p>在<code>/etc/nginx/conf.d</code>中，新建文件<code>vscode.conf</code>，内容如下：</p>
-            <pre><code>server
+            <pre><code class="language-nginx">server
 {
     # 这段是一个常用的http重定向到https的方法，用了都说好
     listen 80;
@@ -449,12 +449,12 @@ server
     # }
 }</code></pre>
             <p>编写完文件之后，需要重新加载配置文件（不必重启 Nginx）：</p>
-            <pre><code>sudo nginx -s reload</code></pre>
+            <pre><code class="language-bash">sudo nginx -s reload</code></pre>
             <p>再次提醒：一定记得把域名换成自己的域名、证书路径换成自己的证书路径、端口换成自己在提供服务的应用（如 code-server）中指定的端口！</p>
             <h1 id="服务器上的文件浏览">服务器上的文件浏览</h1>
             <p>我们已经学会了设置 nginx 的 webroot，但也有很多情况我们需要能在各种设备上直接地看到服务器上有哪些文件，既能方便文件传输，也能覆盖对大多数只需要看不需要改的场景。</p>
             <p>python3 为我们提供了一个简单的 http 文件浏览服务，默认安装目录为<code>/usr/lib/python3.x/http/server.py</code>，一般情况下我们可以直接运行它：</p>
-            <pre><code>python3 -m http.server</code></pre>
+            <pre><code class="language-bash">python3 -m http.server</code></pre>
             <p>但是 python 提供的这份文件存在一些问题：</p>
             <ul>
                 <li>响应头没有规定文件编码，让浏览器自己看着办，容易出现乱码</li>
@@ -487,7 +487,7 @@ server
                 clash。但是每次重启系统之后，这许多服务都需要自己手动拉起的话未免太过麻烦了，所以我们需要一个在系统加载完成后就能自动以 root 身份执行的脚本。经过查询，我找到了处理办法。</p>
             <p>在 Linux 系统下，开机启动一般使用的是<code>/etc/rc.local</code>文件（但也有很多发行版不再使用这种操作方式）。ubuntu20.04 系统已经默认安装了
                 rc-local.service 服务，但是不知什么原因系统把这个服务给“隐蔽”了，所以如果不做一番操作是无法使用的。</p>
-            <pre><code># 以下所有命令需要root身份执行
+            <pre><code class="language-bash"># 以下所有命令需要root身份执行
 
 cp /usr/lib/systemd/system/rc-local.service /etc/systemd/system/
 # 修改rc-local.service文件，在文件末尾添加以下内容（注意删去前边的注释符）：
@@ -516,7 +516,7 @@ systemctl status rc-local.service
 # 文件的最后，可以用exec &amp;&gt; /var/log/rc-local.log将脚本的输出重定向到日志文件中</code></pre>
             <p>除此之外，我们可能还需要为所有用户默认开启魔法。这个功能在开机脚本和<code>/etc/profile</code>中都无法实现，应当放在<code>/etc/environment</code>中。在其中添加以下内容：
             </p>
-            <pre><code>PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin&quot;
+            <pre><code class="language-plaintext">PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin&quot;
 http_proxy=http://127.0.0.1:7890
 https_proxy=http://127.0.0.1:7890
 no_proxy=127.0.0.1,localhost

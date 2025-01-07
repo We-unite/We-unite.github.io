@@ -6,15 +6,16 @@
     <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>godo知识总结</title>
-    <link rel="stylesheet" href="https://test.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://test.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
-    <script type="text/javascript" src="https://test.qin-juan-ge-zhu.top/common/script4code.js"></script>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">godo知识总结</p>
+            <header id="title-block-header">
+                <p class="title">godo知识总结</p>
+            </header>
             <h1 id="背景说明">背景说明</h1>
             <p>本文档对<a href="https://git.qin-juan-ge-zhu.top/godo">godo</a>编写过程中新了解到的技术、遇到的问题进行简要说明，以备所需。</p>
             <h1 id="系统调用">系统调用</h1>
@@ -31,7 +32,7 @@
                 <li>在 C 语言中直接调用同名函数，但大概率经过了 glibc 的封装</li>
                 <li>手动封装。如下：</li>
             </ul>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;sys/syscall.h&gt;
 #include &lt;sys/types.h&gt;
 #include &lt;sys/wait.h&gt;
@@ -50,7 +51,7 @@ int main(){
     return 0;
 }</code></pre>
             <p>这种封装方式与经常被用来当作 os 教材的 Linux-0.11/0.12 有所区别。Linux-0.11 环境上，unistd.h 大致如下：</p>
-            <pre><code>#ifndef _UNISTD_H
+            <pre><code class="language-c">#ifndef _UNISTD_H
 #define _UNISTD_H
 
 ...
@@ -102,7 +103,7 @@ return -1; \
 
 #endif</code></pre>
             <p>可以看到，Linux-0.11 上，封装的一般方法为：</p>
-            <pre><code>#define __LIBRARY__ // 一定要在unistd.h之前
+            <pre><code class="language-c">#define __LIBRARY__ // 一定要在unistd.h之前
 #include &lt;unistd.h&gt;
 #include &lt;stdio.h&gt;
 
@@ -124,13 +125,13 @@ int main() {
                     tasks 表里的一个 task，而每个 task 才具有独一无二的 id</strong>。</p>
             <h3 id="常见系统调用的分析">常见系统调用的分析</h3>
             <p>看看这个：</p>
-            <pre><code>extern int pthread_create (pthread_t *__restrict __newthread,
+            <pre><code class="language-c">extern int pthread_create (pthread_t *__restrict __newthread,
                const pthread_attr_t *__restrict __attr,
                void *(*__start_routine) (void *),
                void *__restrict __arg) __THROWNL __nonnull ((1, 3));</code></pre>
             <p><code>pthread_create</code>函数的第一个参数，就是一个 pthread_t 类型的指针，处理后将 task 的 id 写到指针指向的区域。</p>
             <p>让我们来看一段简单的代码：</p>
-            <pre><code>// test.c
+            <pre><code class="language-c">// test.c
 #include &lt;stdio.h&gt;
 #include &lt;pthread.h&gt;
 #include &lt;sys/syscall.h&gt;
@@ -160,7 +161,7 @@ int main() {
     return 0;
 }</code></pre>
             <p>当我们使用<code>strace ./test</code>来查看上述代码时，会发现情况如下：</p>
-            <pre><code>clone(child_stack=0x7f3dd28bbff0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7f3dd28bc9d0, tls=0x7f3dd28bc700, child_tidptr=0x7f3dd28bc9d0) = 21756
+            <pre><code class="language-c">clone(child_stack=0x7f3dd28bbff0, flags=CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND|CLONE_THREAD|CLONE_SYSVSEM|CLONE_SETTLS|CLONE_PARENT_SETTID|CLONE_CHILD_CLEARTID, parent_tidptr=0x7f3dd28bc9d0, tls=0x7f3dd28bc700, child_tidptr=0x7f3dd28bc9d0) = 21756
 write(1, &quot;main: thread 139903502108416\n&quot;, 29) = 29
 clone(child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x7f3dd308e9d0) = 21757
 --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=21757, si_uid=1000, si_status=0, si_utime=0, si_stime=0} ---
@@ -173,7 +174,7 @@ exit_group(0)                           = ?
             <p>从这样的输出里，我们可以清晰地看到，<strong>无论是<code>pthread_create</code>还是<code>fork</code>（指库函数），本质上都是封装了<code>clone</code>系统调用，即使
                     Linux 本身提供了专门的 fork 系统调用。</strong>也许这是 glibc 和 Linux 都想在添加功能的基础上保证代码兼容性？花开两朵各表一枝了属于是。</p>
             <p>这一结论也可以从 glibc 的代码中得到验证：</p>
-            <pre><code>// 文件 glibc-2.18/nptl/sysdeps/unix/sysv/linux/pt-fork.c
+            <pre><code class="language-c">// 文件 glibc-2.18/nptl/sysdeps/unix/sysv/linux/pt-fork.c
 pid_t
 __fork (void)
 {
@@ -354,7 +355,8 @@ PSEUDO_END (syscall)</code></pre>
                 <li>gcc 技术大全</li>
                 <li>黑客调试技术大全</li>
             </ul>
-            <script src="https://test.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+            <p class="time">2024.8</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>
 </body>

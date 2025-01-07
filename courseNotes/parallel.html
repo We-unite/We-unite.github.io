@@ -6,25 +6,27 @@
     <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>并行计算大法好</title>
+    <script src="none" type="text/javascript"></script>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
     <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
-	    tex2jax: {
-	        inlineMath: [['$','$'], ['\\(','\\)']],
-	        processEscapes: true
-	    }
-	});
-    </script>
+            tex2jax: {
+                inlineMath: [["$","$"], ["\\(","\\)"]],
+                processEscapes: true
+            }
+        });
+        </script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">并行计算大法好</p>
+            <header id="title-block-header">
+                <p class="title">并行计算大法好</p>
+            </header>
             <h1 id="基于共享内存的并行编程">基于共享内存的并行编程</h1>
             <h2 id="pthreads的多线程并行"><code>Pthreads</code>的多线程并行</h2>
             <h3 id="简介">简介</h3>
@@ -39,7 +41,7 @@
                 <li>条件变量</li>
             </ul>
             <h3 id="线程管理">线程管理</h3>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;pthread.h&gt;
 
@@ -102,17 +104,18 @@ int main()
             </ul>
             <h4 id="忙等待">忙等待</h4>
             <p>可以通过空循环的方法实现当一个线程在用的时候另一个线程禁止访问。</p>
-            <p>空口白话不好使，看代码吧，利用泰勒公式求$\pi$的值。</p>
+            <p>空口白话不好使，看代码吧，利用泰勒公式求<span class="math inline">\(\pi\)</span>的值。</p>
             <p>已知：</p>
             <ul>
-                <li>$arctan(1)=\frac \pi 4$</li>
-                <li>$arctan(x)=\Sigma_{i=0}^{+\infty}(-1)^i \frac 1 {2x+1}$，收敛域为$[-1, 1]$</li>
+                <li><span class="math inline">\(arctan(1)=\frac \pi 4\)</span></li>
+                <li><span class="math inline">\(arctan(x)=\Sigma_{i=0}^{+\infty}(-1)^i \frac 1 {2x+1}\)</span>，收敛域为<span
+                        class="math inline">\([-1,1]\)</span></li>
             </ul>
             <blockquote>
                 <p>哪个大佬知道收敛更快的算法啊，这个办法<strong>收敛实在是太慢辣</strong>！</p>
             </blockquote>
             <p>编程如下：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;pthread.h&gt;
 
@@ -171,7 +174,7 @@ int main()
             <p>上述<strong>通过循环的办法实现的忙等待，优点在于实现比较简单好理解，缺点在于空循环浪费 CPU
                     资源，且当线程数较多时，线程切换的开销也会增大</strong>。因此我们可以调用<code>Pthreads</code>提供的互斥锁来实现临界区的功能。互斥锁是一个变量，通过调用函数来实现锁定临界区实现忙等待。
             </p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;pthread.h&gt;
 
@@ -260,7 +263,7 @@ int main()
                 <li>信号量为 0 时，试图访问共享资源的线程将处于等待状态</li>
             </ul>
             <p>需要注意的是，上述的信号量只是一种管理方法，与<code>Pthreads</code>中的信号量似乎区别不小，这一点从<code>sem_t</code>的大小上就能看出来。凑合看吧，知道原理就行。</p>
-            <pre><code>#include &lt;semaphore.h&gt; // 信号量头文件
+            <pre><code class="language-c">#include &lt;semaphore.h&gt; // 信号量头文件
 
 // 定义信号量
 sem_t sem;
@@ -296,7 +299,7 @@ int sem_destroy(sem_t *sem);</code></pre>
                 <li>主线程将共享数组初始化为<code>NULL</code></li>
                 <li>信号量初始化为 0</li>
             </ul>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;pthread.h&gt;
 #include &lt;semaphore.h&gt;
 #define MSG_MAX_LEN 50
@@ -360,7 +363,7 @@ int main()
             <h3 id="路障">路障</h3>
             <p>路障也称同步点，指线程到达此处进入阻塞状态，等所有进程到达后才能继续进行，主要应用于程序计时/调试等。</p>
             <p>路障使用有以下几步：</p>
-            <pre><code>#include &lt;pthread.h&gt;
+            <pre><code class="language-c">#include &lt;pthread.h&gt;
 
 // 定义路障
 pthread_barrier_t barrier;
@@ -379,7 +382,7 @@ int pthread_barrier_wait(pthread_barrier_t *barrier);
 // 销毁路障
 int pthread_barrier_destroy(pthread_barrier_t *barrier);</code></pre>
             <p>示例程序如下：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;pthread.h&gt;
 #include &lt;time.h&gt;
@@ -427,7 +430,7 @@ int main()
 }</code></pre>
             <h3 id="条件变量">条件变量</h3>
             <p>条件变量使线程在特定条件或事件之前处于挂起状态。</p>
-            <pre><code>#include &lt;pthread.h&gt;
+            <pre><code class="language-c">#include &lt;pthread.h&gt;
 
 // 定义条件变量
 pthread_cond_t cond;
@@ -456,7 +459,7 @@ int pthread_cond_broadcast(pthread_cond_t *cond);
  */
 int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);</code></pre>
             <p>示例程序，这个程序真没看明白：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;pthread.h&gt;
 #include &lt;unistd.h&gt;
@@ -517,7 +520,7 @@ int main()
 }</code></pre>
             <h3 id="读写锁">读写锁</h3>
             <p>读写锁在互斥量的基础上，<strong>把对共享资源的访问分为读者和写者</strong>，读者只能读、写者只能写，读者之间不互斥，写者之间互斥，读者和写者之间互斥。</p>
-            <pre><code>#include &lt;pthread.h&gt; // 哈哈，没想到吧
+            <pre><code class="language-c">#include &lt;pthread.h&gt; // 哈哈，没想到吧
 
 // 定义读写锁
 pthread_rwlock_t rwlock;
@@ -541,7 +544,7 @@ int pthread_rwlock_unlock(pthread_rwlock_t *rwlock);
 // 销毁
 int pthread_rwlock_destroy(pthread_rwlock_t *rwlock);</code></pre>
             <p>示例程序：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 #include &lt;pthread.h&gt;
@@ -646,8 +649,9 @@ int main(int argc,char *argv[])
                 采用<code>Fork-Join</code>的并行编程方式，开始于一个单独的主线程，一直串行执行（串行域），直到遇见并行域；在并行域中，根据指定的线程数，多线程并行执行；并行域结束后，所有线程汇合，继续串行执行。如此在串行域和并行域中循环往复，直到程序结束。
             </p>
             <p>需要注意的是，在并行域中，可以划分出更小的并行域，也就是一个线程再次划分为多个线程执行。</p>
+            <img src="https://www.qin-juan-ge-zhu.top/images/courseNotes/parallel_1.png">
             <h3 id="使用指南">使用指南</h3>
-            <pre><code>// 头文件必不可少
+            <pre><code class="language-c">// 头文件必不可少
 #include &lt;omp.h&gt;
 
 // 指定线程数，这是一个函数，参数就是线程数
@@ -666,17 +670,14 @@ omp_set_num_threads(4);
     // some codes here.
 }</code></pre>
             <p>编译的时候，使用<code>-fopenmp</code>选项是万万不能忘记的：</p>
-            <div class="sourceCode" id="cb14">
-                <pre
-                    class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="fu">gcc</span> -g -o test test.c -fopenmp</span></code></pre>
-            </div>
+            <pre><code class="language-bash">gcc -g -o test test.c -fopenmp</code></pre>
             <p>在 OpenMP 程序编写中，需要注意以下几点：</p>
             <ul>
                 <li>通常采用增量并行，也局势每次只对部分代码并行化，这样可以<strong>逐步改造</strong>，方便调试</li>
                 <li>OpenMP 指令<strong>区分大小写</strong></li>
             </ul>
             <p>先来一段小实例：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;omp.h&gt;
 
 int main()
@@ -688,7 +689,7 @@ int main()
     return 0;
 }</code></pre>
             <p>可以看到一般的结果为：</p>
-            <pre class="plain"><code>Hello World! I&#39;m thread 1
+            <pre><code class="language-plain">Hello World! I&#39;m thread 1
 Hello World! I&#39;m thread 2
 Hello World! I&#39;m thread 3
 Hello World! I&#39;m thread 5
@@ -772,7 +773,7 @@ Hello World! I&#39;m the master thread</code></pre>
             <p>再次说明，不支持 OpenMP 的编译器也能编译 OpenMP 程序，不过是忽略了这部分语句，也就是直接串行执行。</p>
             <h4 id="并行域指令">并行域指令</h4>
             <p>并行域指令前边写了，就不废话了。需要注意的是结尾处有隐式同步（等待所有线程结束才进入下一个串行域）。另外，可用的字句包括以下几种：</p>
-            <pre><code>if(scalar-logical-expression)
+            <pre><code class="language-c">if(scalar-logical-expression)
 num_threads(scalar-integer-expression)
 default(shared|none)
 private(list)
@@ -790,7 +791,7 @@ reduction(operator:list)</code></pre>
                 <li><code>task</code>指令</li>
             </ul>
             <h5 id="for-指令">for 指令</h5>
-            <pre><code>/*
+            <pre><code class="language-c">/*
  * for指令，自动划分和分配循环任务
  * 需要注意，循环变量只能是整形或指针
  */
@@ -807,7 +808,7 @@ reduction(operator:list)</code></pre>
  * nowait
  */</code></pre>
             <p>示例程序：</p>
-            <pre><code>#include &lt;omp.h&gt;
+            <pre><code class="language-c">#include &lt;omp.h&gt;
 #include &lt;stdio.h&gt;
 #define N 10000
 
@@ -857,7 +858,7 @@ int main()
                 </li>
             </ul>
             <p>OpenMP 提供了以下几种调度方式（<code>schedule</code>子句）：</p>
-            <pre><code>schedule(static,chunk_size) // 静态分配，chunk_size为任务块大小
+            <pre><code class="language-c">schedule(static,chunk_size) // 静态分配，chunk_size为任务块大小
 schedule(dynamic,chunk_size) // 动态分配，chunk_size为任务块大小，按照先来先服务原则分配
 schedule(guided,chunk_size) // 动态分配。任务块大小可变，先大后小，chunk_size为最小任务块大小
 schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`OMP_SCHEDULE`指定</code></pre>
@@ -891,7 +892,7 @@ schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`O
                 <li>每个子任务<strong>只会</strong>被一个线程执行</li>
                 <li>结尾处隐式同步，除非有子句<code>nowait</code></li>
             </ul>
-            <pre><code>/*
+            <pre><code class="language-c">/*
  * 可用子句：
  * private(list)
  * firstprivate(list)
@@ -926,7 +927,7 @@ schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`O
                 <li><code>copyprivate(list)</code></li>
                 <li><code>nowait</code></li>
             </ul>
-            <pre><code>#pragma omp parallel
+            <pre><code class="language-c">#pragma omp parallel
 {
     // 代码
     #pragma omp single [clause [clause]...]
@@ -939,7 +940,7 @@ schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`O
             <p>master
                 块仅由线程组之中的<strong>主线程执行</strong>，其他线程<strong>跳过并继续执行后续代码</strong>，即结尾处<strong>没有隐式同步</strong>。该结构通常用于
                 I/O。注意其与 single 结构的区别。</p>
-            <pre><code>#pragmaomp parallel private(tid)
+            <pre><code class="language-c">#pragmaomp parallel private(tid)
 {
     tid=omp_get_thread_num();
     printf(&quot;Thread %d is here!\n&quot;,tid);
@@ -952,7 +953,7 @@ schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`O
 }</code></pre>
             <h5 id="task-结构">task 结构</h5>
             <p>task 指令主要用于不规则循环迭代（如<code>do-while</code>循环）和递归的函数调用。</p>
-            <pre><code>#pragma omp parallel
+            <pre><code class="language-c">#pragma omp parallel
 {
     #pragma omp single
     {
@@ -969,9 +970,9 @@ schedule(runtime) // 具体调度方式在运行时才确定，由环境变量`O
 }</code></pre>
             <h4 id="变量作用域与属性">变量作用域与属性</h4>
             <p>变量作用域可以通过如下方式修改：</p>
-            <pre><code>default(shared|none)</code></pre>
+            <pre><code class="language-c">default(shared|none)</code></pre>
             <p>作用域属性语句：</p>
-            <pre><code>shared(varname,...)
+            <pre><code class="language-c">shared(varname,...)
 private(varname,...)</code></pre>
             <p>变量究竟应该是共享的还是私有的？</p>
             <ul>
@@ -1011,8 +1012,7 @@ private(varname,...)</code></pre>
                     <tr class="odd">
                         <td style="text-align: left;">lastprivate(list)</td>
                         <td style="text-align: left;">private 的扩展，推出并行域时，将制定的私有拷贝的“最后”值赋值给主线程变量。“最后”指循环的最后一次迭代、sections
-                            的最后一个
-                            section 等。可能会增加额外开销，一般不建议使用，可用共享变量等方式实现</td>
+                            的最后一个 section 等。可能会增加额外开销，一般不建议使用，可用共享变量等方式实现</td>
                         <td></td>
                     </tr>
                     <tr class="even">
@@ -1089,18 +1089,13 @@ private(varname,...)</code></pre>
                     </tr>
                 </tbody>
             </table>
-            <p>我们仍然以计算$\pi$为例子：</p>
-            <!-- <p><br /><span class="math display">$$
+            <p>我们仍然以计算<span class="math inline">\(pi\)</span>为例子：</p>
+            <p><span class="math display">\[
                     \begin{align*}
                     \pi = 4\Sigma_{i=0}^{+\infty}\frac {(-1)^i}{2i+1}
                     \end{align*}
-                    $$</span><br /></p> -->
-            <p><br />$$
-                    \begin{align*}
-                    \pi = 4\Sigma_{i=0}^{+\infty}\frac {(-1)^i}{2i+1}
-                    \end{align*}
-                    $$<br /></p>
-            <pre><code>#include &lt;stdio.h&gt;
+                    \]</span></p>
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;omp.h&gt;
 #define NUM_OF_CYCLES 1000000000
 
@@ -1157,9 +1152,10 @@ int main()
                 MPI 的支持。</p>
             <p><strong>MPI 是一个库，不是一门语言</strong>，其最终目的是服务于进程间通信。</p>
             <h3 id="一般结构">一般结构</h3>
-            <p>MPI 程序的一般结构为: 包含MPI头文件-->初始化MPI环境-->信息交换处理及计算等-->退出MPI环境。</p>
+            <p>MPI 程序的一般结构为:</p>
+            <img src="https://www.qin-juan-ge-zhu.top/images/courseNotes/parallel_2.png">
             <p>写程序罢。</p>
-            <pre><code>// hello.c
+            <pre><code class="language-c">// hello.c
 #include &lt;stdio.h&gt;
 #include &lt;mpi.h&gt; // MPI的头文件
 
@@ -1172,16 +1168,14 @@ int main(int argc,char *argv[])
     return 0;
 }</code></pre>
             <p>编译运行：</p>
-            <div class="sourceCode" id="cb30">
-                <pre
-                    class="sourceCode bash"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a><span class="co"># 编译MPI程序，需要专用的编译器mpicc</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a><span class="ex">mpicc</span> -O2 hello hello.c</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a><span class="co"># 运行的命令也比较特别</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a><span class="ex">mpirun</span> -np 4 ./hello</span></code></pre>
-            </div>
+            <pre><code class="language-bash"># 编译MPI程序，需要专用的编译器mpicc
+mpicc -O2 hello hello.c
+
+# 运行的命令也比较特别
+mpirun -np 4 ./hello</code></pre>
             <h3 id="mpi-通信器">MPI 通信器</h3>
-            <p>现在我们已经学会了$1+1=2$，让我们来<del>手搓一下$e^\pi$的值</del>看看第二个程序罢。</p>
+            <p>现在我们已经学会了<span class="math inline">\(1+1=2\)</span>，让我们来<del>手搓一下<span
+                        class="math inline">\(e^{\pi}\)</span>的值</del>看看第二个程序罢。</p>
             <p>通信器/通信子是什么？</p>
             <ul>
                 <li>一个通信器定义一个通信域，也就是一组允许相互通信的进程</li>
@@ -1195,9 +1189,9 @@ int main(int argc,char *argv[])
                 <li>MPI 进程是 MPI 程序中一个独立参与通信的个体</li>
                 <li>MPI 进程组事由一些进程构成的有序集合</li>
                 <li>进程号是相对于进程组或通信器而言的，同一进程在不同的进程组可以有不同的进程号</li>
-                <li>进程号在进程组或通信器被创建时赋予，取值范围为$[0, np-1]$</li>
+                <li>进程号在进程组或通信器被创建时赋予，取值范围为<span class="math inline">\([0,np-1]\)</span></li>
             </ul>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
 #include &lt;mpi.h&gt;
 int main(int argc,char *argv[])
@@ -1251,7 +1245,7 @@ int main(int argc,char *argv[])
                 <p>Talking is cheap, show me the code.</p>
                 <p>Read the fxxking source code!</p>
             </blockquote>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
 #include &lt;mpi.h&gt;
 
@@ -1374,7 +1368,7 @@ int main()
                 </tbody>
             </table>
             <p>现在我们已经学会了六个最基本的 MPI 函数：</p>
-            <pre><code>int MPI_Init(int *argc,char ***argv);
+            <pre><code class="language-c">int MPI_Init(int *argc,char ***argv);
 int MPI_Comm_size(MPI_Comm comm,int *size);
 int MPI_Comm_rank(MPI_Comm comm,int *rank);
 int MPI_Send(const void *buf,int count,MPI_Datatype datatype,int dest,int tag,MPI_Comm comm);
@@ -1397,9 +1391,10 @@ int MPI_Finalize();</code></pre>
             <p>非阻塞通信返回就不意味着通信完成。MPI 提供了对非阻塞通信是否完成的检测，主要是<code>MPI_Wait</code>与<code>MPI_Test</code>函数。</p>
             <p>换言之，阻塞通信就是需要等待通讯结束再继续进行，而非阻塞则是<strong>计算与通信时间重叠</strong>，从而提高了系统性能。</p>
             <!-- 这幅图记得改，改成非阻塞通信的发送方与接收方的时序图 -->
+            <img src="https://www.qin-juan-ge-zhu.top/images/courseNotes/parallel_2.png">
             <h4 id="非阻塞通信">非阻塞通信</h4>
             <p>no bb：</p>
-            <pre><code>/*
+            <pre><code class="language-c">/*
  * 非阻塞发送
  * buf: 发送缓冲区的地址
  * count: 发送数据的个数
@@ -1420,7 +1415,7 @@ int MPI_Irecv(void *buf, int count, MPI_Datatype datatype, int source, int tag, 
                 <li>发送完成：发送缓冲区的数据已送出，缓冲区可以重新使用（并不代表数据已被接收方接受）。数据有可能被缓冲。</li>
                 <li>接收完成：数据已经写入接收缓冲区，可以正常访问与使用</li>
             </ul>
-            <pre><code>// 阻塞型函数，必须等待指定通信请求完成后才能返回和继续执行下一步
+            <pre><code class="language-c">// 阻塞型函数，必须等待指定通信请求完成后才能返回和继续执行下一步
 int MPI_Wait(MPI_Request *request, MPI_Status *status);
 // 检测指定的通信请求，不论是否完成都立刻返回，若完成则返回flag=true，反之返回false
 int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);</code></pre>
@@ -1510,19 +1505,14 @@ int MPI_Test(MPI_Request *request, int *flag, MPI_Status *status);</code></pre>
             <h3 id="聚合通信">聚合通信</h3>
             <p>内容和图片都太多，这里写不下。</p>
             <h3 id="示例程序">示例程序</h3>
-            <p>我们还是算算可爱的$\pi$罢，这次利用另一个柿子：</p>
-            <!-- <p><br /><span class="math display">$$
+            <p>我们还是算算可爱的<span class="math inline">\(\pi\)</span>罢，这次利用另一个柿子：</p>
+            <p><span class="math display">\[
                     \begin{align*}
                     \pi = \int_0^1 \frac 4 {1+x^2} \mathrm{d}x
                     \end{align*}
-                    $$</span><br /></p> -->
-            <p><br />$$
-                    \begin{align*}
-                    \pi = \int_0^1 \frac 4 {1+x^2} \mathrm{d}x
-                    \end{align*}
-                    $$<br /></p>
+                    \]</span></p>
             <h4 id="串行程序">串行程序</h4>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 
 int num_steps=1000;
 double width;
@@ -1543,7 +1533,7 @@ int main()
     return 0;
 }</code></pre>
             <h4 id="并行程序">并行程序</h4>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;math.h&gt;
 #include &lt;mpi.h&gt;
 
@@ -1657,7 +1647,7 @@ int main(int argc,char *argv[])
                 <li>将结果从 device 内存复制到 host，释放 device 和 host 上分配的内存</li>
             </ul>
             <p>在编写代码时，需要使用 NVIDIA 的编译器 nvcc。它也可以用于编译没有 device 代码的程序（也就是 1 一般的 C 程序）。</p>
-            <pre><code>// hello.cu
+            <pre><code class="language-c">// hello.cu
 #include &lt;stdio.h&gt;
 
 __global__ void helloFromGPU(void)
@@ -1675,12 +1665,10 @@ int main()
     return 0;
 }</code></pre>
             <p>编译运行：</p>
-            <div class="sourceCode" id="cb40">
-                <pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true"></a><span class="co"># nvcc编译为hello</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true"></a><span class="ex">nvcc</span> -o hello hello.cu</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true"></a><span class="co"># 运行</span></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true"></a><span class="ex">./hello</span></span></code></pre>
-            </div>
+            <pre><code class="language-bash"># nvcc编译为hello
+nvcc -o hello hello.cu
+# 运行
+./hello</code></pre>
             <p>在这段示例程序里，我们需要明白：</p>
             <ul>
                 <li>nvcc 将源码分为 host 和 device 两部分，其中 device 部分由 nvcc 编译，host 由标准的主机编译器（如 gcc）编译</li>
@@ -1741,7 +1729,7 @@ int main()
                 <li>device 指针指向 GPU 内存</li>
             </ul>
             <p>因而，在处理 device 内存时候，需要调用 CUDA 的内存管理函数：</p>
-            <pre><code>/*
+            <pre><code class="language-c">/*
  * 第一个参数是指向指针的指针，也就是指针地址
  * 因为函数返回值是void，需要把申请下来的内存指针写到这个指针地址里
  * 所以只有申请的时候使用二级指针，使用的时候使用一级指针
@@ -1760,9 +1748,9 @@ cudaError_t cudaFree(void *devPtr);
 cudaError_t cudaMemcpy(void *dst, const void *src, size_t count, cudaMemcpyKind kind);</code></pre>
             <p>需要注意的是，<code>cudaMemcpy</code>函数是同步的，也就是说，只有当数据复制完成后，才会返回。若需要异步，也就是调用函数之后立刻返回而不是等待数据传输完成，则可以使用<code>cudaMemcpyAsync</code>函数：
             </p>
-            <pre><code>cudaError_t cudaMemcpyAsync(void *dst, const void *src, size_t count, cudaMemcpyKind kind, cudaStream_t stream = 0);</code></pre>
+            <pre><code class="language-c">cudaError_t cudaMemcpyAsync(void *dst, const void *src, size_t count, cudaMemcpyKind kind, cudaStream_t stream = 0);</code></pre>
             <p>简单的示例程序：</p>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #include &lt;cuda_runtime.h&gt;
 
 __global__ void add(int *a,int *b,int *c)
@@ -1812,7 +1800,7 @@ int main()
             <p>在任何时间，warp 中所有线程必须执行相同的指令，但如果遇到条件控制就会出现问题，这时候可以选择为块中的线程创建一个不同的控制路径，将执行相同分支行为的线程放在同一个 warp
                 中，从而减少分支分歧/提高性能。</p>
             <h3 id="向量加法">向量加法</h3>
-            <pre><code>#define N 512
+            <pre><code class="language-c">#define N 512
 
 __global__ void add(int *a,int *b,int *c)
 {
@@ -1857,8 +1845,9 @@ int main()
 
     return 0;
 }</code></pre>
-            <p>CUDA 后续的理论讲解较多，恕不能一一列举于此。直接看 PPT 罢。</p>
-            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment4works.js"></script>
+            <p>CUDA后续的理论讲解较多，恕不能一一列举于此。直接看PPT罢。</p>
+            <p class="time">2023.7.8</p>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>
 </body>

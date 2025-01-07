@@ -3,17 +3,19 @@
 
 <head>
     <meta charset="utf-8" />
+    <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>键盘映射</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
-    <p class="title">键盘映射</p>
     <div class="pandoc">
         <div class="main">
+            <header id="title-block-header">
+                <p class="title">键盘映射</p>
+            </header>
             <!--  键盘映射更改 -->
             <p>在开发过程中，硬件键盘许多键位十分不便，因而我们需要对系统的键盘映射加以更改。</p>
             <h1 id="windows-键盘映射">Windows 键盘映射</h1>
@@ -23,8 +25,7 @@
             <p>打开该项，按照以下内容的规则对二进制项内容进行设置。</p>
             <h2 id="scancode-map-规则">ScanCode Map 规则</h2>
             <p>首先需要注意，以下所有数据都是小端党(<del>格列佛被欺负即视感</del>)，即数据高位写在高地址。如十六进制数据 0x007f365a，应当写为 5a 36 7f 00。如出现位数不足，数据高位以 0
-                补足即可。
-            </p>
+                补足即可。</p>
             <ul>
                 <li>输入 8 个 00 作为开头标识符。</li>
                 <li>4 个字节，表示映射键的总数，即所要做的键盘映射涉及几个按键（左右 Ctrl/Alt 均属于不同按键）。</li>
@@ -34,416 +35,406 @@
             <h2 id="按键码值表">按键码值表</h2>
             <p>以下内容为上述 ScanCode Map 所需的按键码值表。</p>
             <h3 id="主键盘">主键盘</h3>
-            <div class="table-div">
-                <table>
-                    <thead>
-                        <tr class="header">
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="odd">
-                            <td>~/`</td>
-                            <td>29</td>
-                            <td>Tab</td>
-                            <td>0f</td>
-                            <td>CapsLock</td>
-                            <td>3a</td>
-                            <td>L-Shift</td>
-                            <td>2a</td>
-                        </tr>
-                        <tr class="even">
-                            <td>!/1</td>
-                            <td>2</td>
-                            <td>q</td>
-                            <td>10</td>
-                            <td>a</td>
-                            <td>1e</td>
-                            <td>z</td>
-                            <td>2c</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>@/2</td>
-                            <td>3</td>
-                            <td>w</td>
-                            <td>11</td>
-                            <td>s</td>
-                            <td>1f</td>
-                            <td>x</td>
-                            <td>2d</td>
-                        </tr>
-                        <tr class="even">
-                            <td>#/3</td>
-                            <td>4</td>
-                            <td>e</td>
-                            <td>12</td>
-                            <td>d</td>
-                            <td>20</td>
-                            <td>c</td>
-                            <td>2e</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>$/4</td>
-                            <td>5</td>
-                            <td>r</td>
-                            <td>13</td>
-                            <td>f</td>
-                            <td>21</td>
-                            <td>v</td>
-                            <td>2f</td>
-                        </tr>
-                        <tr class="even">
-                            <td>%/5</td>
-                            <td>6</td>
-                            <td>t</td>
-                            <td>14</td>
-                            <td>g</td>
-                            <td>22</td>
-                            <td>b</td>
-                            <td>30</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>^/6</td>
-                            <td>7</td>
-                            <td>y</td>
-                            <td>15</td>
-                            <td>h</td>
-                            <td>23</td>
-                            <td>n</td>
-                            <td>31</td>
-                        </tr>
-                        <tr class="even">
-                            <td>&amp;/7</td>
-                            <td>8</td>
-                            <td>u</td>
-                            <td>16</td>
-                            <td>j</td>
-                            <td>24</td>
-                            <td>m</td>
-                            <td>32</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>*/8</td>
-                            <td>9</td>
-                            <td>i</td>
-                            <td>17</td>
-                            <td>k</td>
-                            <td>25</td>
-                            <td>&lt;/,</td>
-                            <td>33</td>
-                        </tr>
-                        <tr class="even">
-                            <td>(/9</td>
-                            <td>0a</td>
-                            <td>o</td>
-                            <td>18</td>
-                            <td>l</td>
-                            <td>26</td>
-                            <td>&gt;/.</td>
-                            <td>34</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>)/0</td>
-                            <td>0b</td>
-                            <td>p</td>
-                            <td>19</td>
-                            <td>:/;</td>
-                            <td>27</td>
-                            <td>?</td>
-                            <td>35</td>
-                        </tr>
-                        <tr class="even">
-                            <td>_/-</td>
-                            <td>0c</td>
-                            <td>{/[</td>
-                            <td>1a</td>
-                            <td>"/’</td>
-                            <td>28</td>
-                            <td>R-Shift</td>
-                            <td>36</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>+/=</td>
-                            <td>0d</td>
-                            <td>}/]</td>
-                            <td>1b</td>
-                            <td>Enter</td>
-                            <td>1c</td>
-                            <td>L-Ctrl</td>
-                            <td>1d</td>
-                        </tr>
-                        <tr class="even">
-                            <td>|/\</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>L-Alt</td>
-                            <td>38</td>
-                        </tr>
-                        <tr class="odd">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>Sace</td>
-                            <td>39</td>
-                        </tr>
-                        <tr class="even">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>R-Alt</td>
-                            <td>e0 38</td>
-                        </tr>
-                        <tr class="odd">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>R-Ctrl</td>
-                            <td>e0 1d</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td>~/`</td>
+                        <td>29</td>
+                        <td>Tab</td>
+                        <td>0f</td>
+                        <td>CapsLock</td>
+                        <td>3a</td>
+                        <td>L-Shift</td>
+                        <td>2a</td>
+                    </tr>
+                    <tr class="even">
+                        <td>!/1</td>
+                        <td>2</td>
+                        <td>q</td>
+                        <td>10</td>
+                        <td>a</td>
+                        <td>1e</td>
+                        <td>z</td>
+                        <td>2c</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>@/2</td>
+                        <td>3</td>
+                        <td>w</td>
+                        <td>11</td>
+                        <td>s</td>
+                        <td>1f</td>
+                        <td>x</td>
+                        <td>2d</td>
+                    </tr>
+                    <tr class="even">
+                        <td>#/3</td>
+                        <td>4</td>
+                        <td>e</td>
+                        <td>12</td>
+                        <td>d</td>
+                        <td>20</td>
+                        <td>c</td>
+                        <td>2e</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>$/4</td>
+                        <td>5</td>
+                        <td>r</td>
+                        <td>13</td>
+                        <td>f</td>
+                        <td>21</td>
+                        <td>v</td>
+                        <td>2f</td>
+                    </tr>
+                    <tr class="even">
+                        <td>%/5</td>
+                        <td>6</td>
+                        <td>t</td>
+                        <td>14</td>
+                        <td>g</td>
+                        <td>22</td>
+                        <td>b</td>
+                        <td>30</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>^/6</td>
+                        <td>7</td>
+                        <td>y</td>
+                        <td>15</td>
+                        <td>h</td>
+                        <td>23</td>
+                        <td>n</td>
+                        <td>31</td>
+                    </tr>
+                    <tr class="even">
+                        <td>&amp;/7</td>
+                        <td>8</td>
+                        <td>u</td>
+                        <td>16</td>
+                        <td>j</td>
+                        <td>24</td>
+                        <td>m</td>
+                        <td>32</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>*/8</td>
+                        <td>9</td>
+                        <td>i</td>
+                        <td>17</td>
+                        <td>k</td>
+                        <td>25</td>
+                        <td>&lt;/,</td>
+                        <td>33</td>
+                    </tr>
+                    <tr class="even">
+                        <td>(/9</td>
+                        <td>0a</td>
+                        <td>o</td>
+                        <td>18</td>
+                        <td>l</td>
+                        <td>26</td>
+                        <td>&gt;/.</td>
+                        <td>34</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>)/0</td>
+                        <td>0b</td>
+                        <td>p</td>
+                        <td>19</td>
+                        <td>:/;</td>
+                        <td>27</td>
+                        <td>?</td>
+                        <td>35</td>
+                    </tr>
+                    <tr class="even">
+                        <td>_/-</td>
+                        <td>0c</td>
+                        <td>{/[</td>
+                        <td>1a</td>
+                        <td>"/’</td>
+                        <td>28</td>
+                        <td>R-Shift</td>
+                        <td>36</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>+/=</td>
+                        <td>0d</td>
+                        <td>}/]</td>
+                        <td>1b</td>
+                        <td>Enter</td>
+                        <td>1c</td>
+                        <td>L-Ctrl</td>
+                        <td>1d</td>
+                    </tr>
+                    <tr class="even">
+                        <td>|/\</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>L-Alt</td>
+                        <td>38</td>
+                    </tr>
+                    <tr class="odd">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>Sace</td>
+                        <td>39</td>
+                    </tr>
+                    <tr class="even">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>R-Alt</td>
+                        <td>e0 38</td>
+                    </tr>
+                    <tr class="odd">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>R-Ctrl</td>
+                        <td>e0 1d</td>
+                    </tr>
+                </tbody>
+            </table>
             <h3 id="小键盘">小键盘</h3>
-            <div class="table-div">
-                <table>
-                    <thead>
-                        <tr class="header">
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="odd">
-                            <td>NumLock</td>
-                            <td>45</td>
-                            <td>8</td>
-                            <td>48</td>
-                            <td>1</td>
-                            <td>4f</td>
-                            <td>+</td>
-                            <td>4e</td>
-                        </tr>
-                        <tr class="even">
-                            <td>/</td>
-                            <td>e0 35</td>
-                            <td>9</td>
-                            <td>49</td>
-                            <td>2</td>
-                            <td>50</td>
-                            <td>Enter</td>
-                            <td>e0 1c</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>*</td>
-                            <td>37</td>
-                            <td>4</td>
-                            <td>4b</td>
-                            <td>3</td>
-                            <td>51</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="even">
-                            <td>-</td>
-                            <td>4a</td>
-                            <td>5</td>
-                            <td>4c</td>
-                            <td>0</td>
-                            <td>52</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="odd">
-                            <td>7</td>
-                            <td>47</td>
-                            <td>6</td>
-                            <td>4d</td>
-                            <td>.</td>
-                            <td>53</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td>NumLock</td>
+                        <td>45</td>
+                        <td>8</td>
+                        <td>48</td>
+                        <td>1</td>
+                        <td>4f</td>
+                        <td>+</td>
+                        <td>4e</td>
+                    </tr>
+                    <tr class="even">
+                        <td>/</td>
+                        <td>e0 35</td>
+                        <td>9</td>
+                        <td>49</td>
+                        <td>2</td>
+                        <td>50</td>
+                        <td>Enter</td>
+                        <td>e0 1c</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>*</td>
+                        <td>37</td>
+                        <td>4</td>
+                        <td>4b</td>
+                        <td>3</td>
+                        <td>51</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="even">
+                        <td>-</td>
+                        <td>4a</td>
+                        <td>5</td>
+                        <td>4c</td>
+                        <td>0</td>
+                        <td>52</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr class="odd">
+                        <td>7</td>
+                        <td>47</td>
+                        <td>6</td>
+                        <td>4d</td>
+                        <td>.</td>
+                        <td>53</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
             <h3 id="附加键盘">附加键盘</h3>
-            <div class="table-div">
-                <table>
-                    <thead>
-                        <tr class="header">
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="odd">
-                            <td>Scroll Lock</td>
-                            <td>46</td>
-                            <td>Page Up</td>
-                            <td>e0 49</td>
-                            <td>Page Down</td>
-                            <td>e0 51</td>
-                            <td>Up</td>
-                            <td>e0 48</td>
-                        </tr>
-                        <tr class="even">
-                            <td>Insert</td>
-                            <td>e0 52</td>
-                            <td>Delete</td>
-                            <td>e0 53</td>
-                            <td>Left</td>
-                            <td>e0 46</td>
-                            <td>Down</td>
-                            <td>e0 50</td>
-                        </tr>
-                        <tr class="odd">
-                            <td>Home</td>
-                            <td>e0 47</td>
-                            <td>End</td>
-                            <td>e0 4f</td>
-                            <td>Right</td>
-                            <td>e0 4d</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td>Scroll Lock</td>
+                        <td>46</td>
+                        <td>Page Up</td>
+                        <td>e0 49</td>
+                        <td>Page Down</td>
+                        <td>e0 51</td>
+                        <td>Up</td>
+                        <td>e0 48</td>
+                    </tr>
+                    <tr class="even">
+                        <td>Insert</td>
+                        <td>e0 52</td>
+                        <td>Delete</td>
+                        <td>e0 53</td>
+                        <td>Left</td>
+                        <td>e0 46</td>
+                        <td>Down</td>
+                        <td>e0 50</td>
+                    </tr>
+                    <tr class="odd">
+                        <td>Home</td>
+                        <td>e0 47</td>
+                        <td>End</td>
+                        <td>e0 4f</td>
+                        <td>Right</td>
+                        <td>e0 4d</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
             <h3 id="功能键">功能键</h3>
-            <div class="table-div">
-                <table>
-                    <thead>
-                        <tr class="header">
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="odd">
-                            <td>Esc</td>
-                            <td>1</td>
-                            <td>F1</td>
-                            <td>3b</td>
-                            <td>F5</td>
-                            <td>3f</td>
-                            <td>F9</td>
-                            <td>43</td>
-                        </tr>
-                        <tr class="even">
-                            <td></td>
-                            <td></td>
-                            <td>F2</td>
-                            <td>3c</td>
-                            <td>F6</td>
-                            <td>40</td>
-                            <td>F10</td>
-                            <td>44</td>
-                        </tr>
-                        <tr class="odd">
-                            <td></td>
-                            <td></td>
-                            <td>F3</td>
-                            <td>3d</td>
-                            <td>F7</td>
-                            <td>41</td>
-                            <td>F11</td>
-                            <td>57</td>
-                        </tr>
-                        <tr class="even">
-                            <td></td>
-                            <td></td>
-                            <td>F4</td>
-                            <td>3e</td>
-                            <td>F8</td>
-                            <td>42</td>
-                            <td>F12</td>
-                            <td>58</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td>Esc</td>
+                        <td>1</td>
+                        <td>F1</td>
+                        <td>3b</td>
+                        <td>F5</td>
+                        <td>3f</td>
+                        <td>F9</td>
+                        <td>43</td>
+                    </tr>
+                    <tr class="even">
+                        <td></td>
+                        <td></td>
+                        <td>F2</td>
+                        <td>3c</td>
+                        <td>F6</td>
+                        <td>40</td>
+                        <td>F10</td>
+                        <td>44</td>
+                    </tr>
+                    <tr class="odd">
+                        <td></td>
+                        <td></td>
+                        <td>F3</td>
+                        <td>3d</td>
+                        <td>F7</td>
+                        <td>41</td>
+                        <td>F11</td>
+                        <td>57</td>
+                    </tr>
+                    <tr class="even">
+                        <td></td>
+                        <td></td>
+                        <td>F4</td>
+                        <td>3e</td>
+                        <td>F8</td>
+                        <td>42</td>
+                        <td>F12</td>
+                        <td>58</td>
+                    </tr>
+                </tbody>
+            </table>
             <h3 id="媒体键">媒体键</h3>
-            <div class="table-div">
-                <table>
-                    <thead>
-                        <tr class="header">
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                            <th>key</th>
-                            <th>mark</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="odd">
-                            <td>Mute</td>
-                            <td>e0 20</td>
-                            <td>Paly/Pasue</td>
-                            <td>e0 22</td>
-                            <td>Volume Down</td>
-                            <td>e0 2e</td>
-                            <td>Stop</td>
-                            <td>e0 24</td>
-                        </tr>
-                        <tr class="even">
-                            <td>Next Track</td>
-                            <td>e0 19</td>
-                            <td>Prev Track</td>
-                            <td>e0 10</td>
-                            <td>Volume Up</td>
-                            <td>e0 30</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table>
+                <thead>
+                    <tr class="header">
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                        <th>key</th>
+                        <th>mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="odd">
+                        <td>Mute</td>
+                        <td>e0 20</td>
+                        <td>Paly/Pasue</td>
+                        <td>e0 22</td>
+                        <td>Volume Down</td>
+                        <td>e0 2e</td>
+                        <td>Stop</td>
+                        <td>e0 24</td>
+                    </tr>
+                    <tr class="even">
+                        <td>Next Track</td>
+                        <td>e0 19</td>
+                        <td>Prev Track</td>
+                        <td>e0 10</td>
+                        <td>Volume Up</td>
+                        <td>e0 30</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
             <h2 id="windows-其他热键映射">Windows 其他热键映射</h2>
             <p>除了简单的键位位置调换，我们可能还需要一些快捷键的映射。这里采用 Autohotkeys，注意下载合适版本（p.s.即使不合适，编写好了之后运行，也会提醒你版本不对，然后提示下载对应版本的）</p>
             <p>下载安装之后，打开应用，创建一个新脚本，路径自己设置，按以下方式进行编写。</p>
             <h3 id="简单更换按键">简单更换按键</h3>
             <p>方法极为简单，如下：</p>
-            <pre class="vim"><code>A::B
+            <pre><code class="language-plaintext">A::B
 B::A</code></pre>
             <p>其中 A 与 B 是需要更换位置的按键。</p>
             <h3 id="脚本运行">脚本运行</h3>
@@ -452,8 +443,7 @@ B::A</code></pre>
             </p>
             <h3 id="一个复杂设计">一个复杂设计</h3>
             <p>在<a href="https://csdiy.wiki">CS 自学指南</a>中提到，这个<a
-                    href="https://gist.github.com/sedm0784/4443120">Autohotkey
-                    gist</a>将 CapsLock 设置为以下功能：</p>
+                    href="https://gist.github.com/sedm0784/4443120">Autohotkey gist</a>将 CapsLock 设置为以下功能：</p>
             <ul>
                 <li>在单独按下时，相当于 Escape</li>
                 <li>在与其他按键一起按下时，相当于 Ctrl</li>
@@ -470,7 +460,7 @@ B::A</code></pre>
                 vim 中可行。</p>
             <h2 id="更换按键位置">更换按键位置</h2>
             <p>如下：</p>
-            <pre><code># 进入对应文件夹
+            <pre><code class="language-bash"># 进入对应文件夹
 cd /usr/shared/X11/xkb/symbols
 
 # 查看一下
@@ -486,10 +476,9 @@ cp pc pc_bkup
 vim pc
 
 # 退出root用户
-exit
-</code></pre>
+exit</code></pre>
             <p>在编辑 pc 文件时，可以看到，每一行的构成如下：</p>
-            <pre class="vim"><code>key&lt;Esc&gt; { [ Escape ] }</code></pre>
+            <pre><code class="language-plaintext">key&lt;Esc&gt; { [ Escape ] }</code></pre>
             <p>可以理解为键盘上的 Esc 键位是 Esc 键的功能。需要修改时，将中括号中内容修改。如：</p>
             <p>调换两个案件（如 Esc 与 CapsLock ），即将二者（本处分别在第 4、第 22 行）中括号中内容互换即可。</p>
             <p class="time">2023.7.5</p>

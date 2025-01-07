@@ -5,16 +5,17 @@
     <meta charset="utf-8" />
     <meta name="generator" content="pandoc" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-    <title>OHOS全量编译记录</title>
-    <link rel="stylesheet" href="https://test.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://test.qin-juan-ge-zhu.top/common/js/myhighlight.js"></script>
-    <script type="text/javascript" src="https://test.qin-juan-ge-zhu.top/common/script4code.js"></script>
+    <title>OHOS 全量编译记录</title>
+    <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
+    <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">OHOS 全量编译记录</p>
+            <header id="title-block-header">
+                <p class="title">OHOS 全量编译记录</p>
+            </header>
             <!-- 鸿蒙开发环境搭建 -->
             <blockquote>
                 <p>本次编译环境搭建参考了以下博客：</p>
@@ -36,8 +37,7 @@
             <h2 id="硬件环境">硬件环境</h2>
             <p>编译过程使用的是
                 <code>Ubuntu</code>，经测试，<code>Ubuntu 22.04 LTS</code>/<code>Ubuntu 20.04 LTS</code>/<code>Ubuntu 18.04 LTS</code>
-                均可用。
-            </p>
+                均可用。</p>
             <p>网上的大多数博客里没有对编译的硬件限制作出说明，现根据我们的情况，给出一个大概的范围：</p>
             <ul>
                 <li><strong>内存必须在 10G 以上</strong>，我使用的是 13G，编译成功（8G 时编译失败了，下文会说明）</li>
@@ -53,7 +53,7 @@
             <p>这里我用的是 VMWare+Ubuntu22.04 虚拟机。</p>
             <h2 id="软件包依赖">软件包依赖</h2>
             <p>安装依赖在博客中都有讲，但<strong>少了一部分依赖项</strong>，我因而将所有必要的依赖项整理到一个脚本里了：</p>
-            <pre><code>#!/bin/bash
+            <pre><code class="language-bash">#!/bin/bash
 set -e # 一旦出错立刻停止执行，不会执行后续指令
 
 # 更新软件源
@@ -87,7 +87,7 @@ fi</code></pre>
             <h1 id="配置-git">配置 git</h1>
             <h2 id="git-基础设置">git 基础设置</h2>
             <p>在上边我们已经下载了本次所需要的<code>git</code>与<code>git-lfs</code>，接下来我们需要对<code>git</code>进行基础设置。</p>
-            <pre><code># 设置用户名与密码，新用户必做
+            <pre><code class="language-bash"># 设置用户名与密码，新用户必做
 # 这里的用户名与密码只是一个写在git提交记录中的标识，可以与gitee/github账号无关
 git config --global user.name &quot;yourname&quot;
 git config --global user.email &quot;your-email-address&quot;
@@ -99,7 +99,7 @@ git config --global core.editor vim</code></pre>
             <p>由于 OpenHarmony 的源码托管在 gitee 上，所以我们需要在 gitee 上注册一个帐户。注册的方法在此不复赘述。</p>
             <p>本次编译过程中，我们并不需要提交代码，因而可以仅通过 http 方式从 gitee 下载源码——如果是这样的话，<strong>就不需要进行 git 与 gitee
                     关联</strong>；如果想要提交代码，那么需要将本地的 git 与 gitee 账号关联起来，具体操作如下：</p>
-            <pre><code># 在本地执行
+            <pre><code class="language-bash"># 在本地执行
 ssh-keygen -t rsa -C &quot;your-email-address&quot;</code></pre>
             <p>命令执行后，每次需要输入都直接回车，<strong>连续有三个回车</strong>，执行就会结束，ssh
                 密钥对的公钥和私钥分别保存在<code>~/.ssh/id_rsa.pub</code>和<code>~/.ssh/id_rsa</code>中。</p>
@@ -107,7 +107,7 @@ ssh-keygen -t rsa -C &quot;your-email-address&quot;</code></pre>
             <p>此时，我们就可以通过 ssh 的方式与 gitee 进行交互、也可以免密提交代码了。</p>
             <h1 id="系统源码编译">系统源码编译</h1>
             <h2 id="配置-repo-工具">配置 repo 工具</h2>
-            <pre><code>curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; ~/repo
+            <pre><code class="language-bash">curl -s https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 &gt; ~/repo
 chmod a+x ~/repo
 sudo mv ~/repo /usr/local/bin/repo
 sudo chown root:root /usr/local/bin/repo
@@ -121,7 +121,7 @@ pip3 install -i https://repo.huaweicloud.com/repository/pypi/simple requests</co
                 的区别，如<code>OpenHarmony-v4.0-Release</code>和<code>OpenHarmony-4.0-Release</code>。二者的区别主要在于，不带 v
                 的是官方维护的稳定版，也会更新代码，厂商的补丁一般只针对带 v 的使用。</p>
             <p>通过 repo + https/ssh 下载：</p>
-            <pre><code># 如果需要的是特定分支，-b后边改成对应分支名
+            <pre><code class="language-bash"># 如果需要的是特定分支，-b后边改成对应分支名
 # repo init -u https://gitee.com/openharmony/manifest.git -b master --no-repo-verify
 # 如果是tag，-b后的参数比较复杂，要在网页上提前确定好需要的tag名字，
 # 如下载的是tag为OpenHarmony-v3.2-Release的版本，命令如下：
@@ -133,11 +133,11 @@ repo sync -c
 repo forall -c &#39;git lfs pull&#39;</code></pre>
             <h2 id="补丁与编译">补丁与编译</h2>
             <p>首先，打上厂商的补丁。下载对应版本补丁后，将补丁文件放到源码根目录下，执行：</p>
-            <pre><code>unzip purple_pi_oh_patch.zip
+            <pre><code class="language-bash">unzip purple_pi_oh_patch.zip
 cd purple_pi_oh_patch
 ./ido_patch.sh</code></pre>
             <p>看到<code>patch complete</code>字样，说明补丁成功。接下来进行 prebuilts 和编译：</p>
-            <pre><code># 先在源码根目录下执行脚本，安装编译器及二进制工具
+            <pre><code class="language-bash"># 先在源码根目录下执行脚本，安装编译器及二进制工具
 bash build/prebuilts_download.sh
 
 # 编译
@@ -181,22 +181,22 @@ sudo ./build.sh --product-name purple_pi_oh --ccache --no-prebuilt-sdk --target-
                 <li>右键该分区，查看挂载到什么位置了。一般是挂载到<code>/</code>与<code>/var/snap/firefox/common/host-hunspell</code></li>
                 <li>执行以下命令：</li>
             </ul>
-            <pre><code># 对于这个设备挂载到的每一个分区，都执行以下命令，以此类推
+            <pre><code class="language-bash"># 对于这个设备挂载到的每一个分区，都执行以下命令，以此类推
 sudo mount -o remount -rw /
 sudo mount -o remount -rw /var/snap/firefox/common/host-hunspell</code></pre>
             <p>而后在 gparted 中点击<code>gparted-&gt;刷新设备</code>，即可进行分区扩展。</p>
             <h2 id="ninja-编译报错-code-4000">Ninja 编译报错 <code>Code 4000</code></h2>
             <p>编译 rk3568 过程中可能会出现以下报错：</p>
-            <pre><code>[OHOS ERROR] Code: 4000
+            <pre><code class="language-plaintext">[OHOS ERROR] Code: 4000
 [OHOS ERROR] Reason: ninja phase failed</code></pre>
             <p>详细的报错信息已经丢失，将就着看吧。反正别的办法都不好使的时候试试这个。</p>
             <p>此时执行以下内容即可：</p>
-            <pre><code>rm -rf out
+            <pre><code class="language-bash">rm -rf out
 sed -i &#39;s/CONFIG_DEBUG_INFO_BTF=y/# CONFIG_DEBUG_INFO_BTF=y/g&#39; kernel/linux/config/linux-5.10/rk3568/arch/arm64_defconfig</code></pre>
             <p>而后重新编译。</p>
             <h2 id="另一个code-4000">另一个<code>Code 4000</code></h2>
             <p>编译时报错如下：</p>
-            <pre><code>ninja: build stopped: subcommand failed.
+            <pre><code class="language-plaintext">ninja: build stopped: subcommand failed.
 [91m[OHOS ERROR][0m Traceback (most recent call last):
 [91m[OHOS ERROR][0m   File &quot;/home/player/Desktop/ohos/src/build/hb/services/ninja.py&quot;, line 49, in _execute_ninja_cmd
 [91m[OHOS ERROR][0m     SystemUtil.exec_command(
@@ -250,13 +250,13 @@ sed -i &#39;s/CONFIG_DEBUG_INFO_BTF=y/# CONFIG_DEBUG_INFO_BTF=y/g&#39; kernel/li
             <p>这是一个很奇怪的报错，我们尚未找到真正的原因所在，只知道如何暂时地绕过去。</p>
             <h3 id="问题描述与复现">问题描述与复现</h3>
             <p>问题复现方法为在编译过程中，执行以下命令：</p>
-            <pre><code>./build.sh --product-name rk3568 --ccache</code></pre>
+            <pre><code class="language-bash">./build.sh --product-name rk3568 --ccache</code></pre>
             <p>该命令是指导书中写的编译命令，但执行时候会出错；<strong>与上文所述的经确认无误的编译命令不同在于没加<code>sudo</code></strong>。</p>
-            <p>如果按照指导书的命令来，不出意外编译将会报错： <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_1.png" /> <img
-                    src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_2.png" /></p>
+            <p>如果按照指导书的命令来，不出意外编译将会报错： <img src="https://www.qin-juan-ge-zhu.top/images/code/ohos_compile_gn_fail_1.png" /> <img
+                    src="https://www.qin-juan-ge-zhu.top/images/code/ohos_compile_gn_fail_2.png" /></p>
             <p><strong>以下是该问题的具体描述：</strong></p>
             <p><code>build.log</code>如下：</p>
-            <pre><code>Set cache size limit to 100.0 GB
+            <pre><code class="language-plaintext">Set cache size limit to 100.0 GB
 [OHOS INFO] loader args:[&#39;platforms_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/platforms.build&quot;&#39;, &#39;subsystem_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/subsystem_config.json&quot;&#39;, &#39;example_subsystem_file=&quot;&quot;&#39;, &#39;exclusion_modules_config_file=&quot;/home/axiomer/桌面/out/preloader/ohos-sdk/exclusion_modules.json&quot;&#39;, &#39;source_root_dir=&quot;/home/axiomer/桌面/&quot;&#39;, &#39;gn_root_out_dir=&quot;out/sdk&quot;&#39;, &#39;build_platform_name=phone&#39;, &#39;build_xts=False&#39;, &#39;load_test_config=False&#39;, &#39;target_os=ohos&#39;, &#39;target_cpu=arm64&#39;, &#39;os_level=standard&#39;, &quot;ignore_api_check=[&#39;xts&#39;, &#39;common&#39;, &#39;testfwk&#39;]&quot;, &#39;scalable_build=False&#39;, &#39;skip_partlist_check=False&#39;]
 [OHOS INFO] Excuting gn command: /home/axiomer/桌面/prebuilts/build-tools/linux-x86/bin/gn gen --args=&quot;product_name=\&quot;ohos-sdk\&quot; product_path=\&quot;/home/axiomer/桌面/productdefine/common/products\&quot; product_config_path=\&quot;/home/axiomer/桌面/productdefine/common/products\&quot; device_name=\&quot;sdk\&quot; device_path=\&quot;/home/axiomer/桌面/device/board/ohos/sdk\&quot; device_company=\&quot;ohos\&quot; device_config_path=\&quot;/home/axiomer/桌面/device/board/ohos/sdk\&quot; target_cpu=\&quot;arm64\&quot; is_standard_system=true ohos_build_compiler_specified=\&quot;\&quot; ohos_build_time=1707374188101 ohos_build_datetime=\&quot;2024-02-08 22:36:28\&quot; build_ohos_sdk=true build_ohos_ndk=true ohos_build_enable_ccache=true ohos_build_type=\&quot;debug\&quot; device_type=\&quot;default\&quot; build_variant=\&quot;root\&quot; use_thin_lto=false ndk_platform=\&quot;linux\&quot; sdk_for_hap_build=true skip_generate_module_list_file=true enable_lto_O0=true archive_ndk=false enable_ndk_doxygen=false use_cfi=false sdk_check_flag=false sdk_platform=\&quot;linux\&quot; root_perf_main=\&quot;main\&quot; runtime_mode=\&quot;release\&quot;&quot; --args=product_name=&quot;ohos-sdk&quot; product_path=&quot;/home/axiomer/桌面/productdefine/common/products&quot; product_config_path=&quot;/home/axiomer/桌面/productdefine/common/products&quot; device_name=&quot;sdk&quot; device_path=&quot;/home/axiomer/桌面/device/board/ohos/sdk&quot; device_company=&quot;ohos&quot; device_config_path=&quot;/home/axiomer/桌面/device/board/ohos/sdk&quot; target_cpu=&quot;arm64&quot; is_standard_system=true ohos_build_compiler_specified=&quot;&quot; ohos_build_time=1707374188101 ohos_build_datetime=&quot;2024-02-08 22:36:28&quot; build_ohos_sdk=true build_ohos_ndk=true ohos_build_enable_ccache=true ohos_build_type=&quot;debug&quot; device_type=&quot;default&quot; build_variant=&quot;root&quot; use_thin_lto=false ndk_platform=&quot;linux&quot; sdk_for_hap_build=true skip_generate_module_list_file=true enable_lto_O0=true archive_ndk=false enable_ndk_doxygen=false use_cfi=false sdk_check_flag=false sdk_platform=&quot;linux&quot; root_perf_main=&quot;main&quot; runtime_mode=&quot;release&quot; /home/axiomer/桌面/out/sdk
 ERROR at //build/config/BUILDCONFIG.gn:92:15: Could not read file.
@@ -296,7 +296,7 @@ current_toolchain=
             <p>在此，我进行了许多尝试，但都无一例外失败了；以下是我的尝试点，或许会有帮助：</p>
             <ul>
                 <li>根据<a href="">一个相似提问</a>，对相关依赖进行安装，失败了： <img
-                        src="https://www.qin-juan-ge-zhu.top/images/code/ohos_gn_fail_dependencies.png" /></li>
+                        src="https://www.qin-juan-ge-zhu.top/images/code/ohos_compile_gn_fail_dependencies.png" /></li>
                 <li>根据报错信息，在编译命令中添加<code>--no-prebuilt-sdk</code>选项对 ohos-sdk 的构建进行跳过，依然失败</li>
             </ul>
             <p>尝试未果 T^T</p>
@@ -304,7 +304,7 @@ current_toolchain=
             <p>报错信息如下所示：</p>
             <p>在上述报错信息中提到<code>Permission denied</code>，即权限不够；于是尝试添加<code>sudo</code>，居然跑通了！！！！</p>
             <p>在指导书的编译指令<code>./build.sh --product-name rk3568 --ccache</code>前添加权限设置<code>sudo</code>，即指令更改为：</p>
-            <pre><code>sudo ./build.sh --product-name rk3568 --ccache</code></pre>
+            <pre><code class="language-bash">sudo ./build.sh --product-name rk3568 --ccache</code></pre>
             <p>不知道为什么，编译过程中始终没有向我提出权限要求，但是不加<code>sudo</code>开权限就是跑不通，很奇怪 @ _ <span class="citation"
                     data-cites="也许是">@也许是</span> OHOS 内敛不好意思申请权限呢……</p>
             <h2 id="另一个奇怪的报错failed-load-btf-from-vmlinux-unknown-error--22">
@@ -312,7 +312,7 @@ current_toolchain=
             <p>关于这个报错，当时的错误日志、运行日志、聊天截图均已丢失，但时日不久，记忆还算清楚，加上这个报错困扰了我好些天，因而必须记录。</p>
             <h3 id="问题简要描述">问题简要描述</h3>
             <p>正常按照<code>sudo ./build.sh --product-name rk3568 --ccache</code>编译时，报错，主要报错信息如下：</p>
-            <pre><code>die__process_unit: DW_TAG_label (0xa) @ &lt;0x3adc&gt; not handled!
+            <pre><code class="language-plaintext">die__process_unit: DW_TAG_label (0xa) @ &lt;0x3adc&gt; not handled!
 die__process_unit: DW_TAG_label (0xa) @ &lt;0x3bdc&gt; not handled!
 die__process_unit: DW_TAG_label (0xa) @ &lt;0x3bef&gt; not handled!
 die__process_unit: DW_TAG_label (0xa) @ &lt;0x3ce5&gt; not handled!
@@ -333,7 +333,7 @@ make[1]: *** [arch/arm64/Makefile:208: rk3568-toybrick-x0-linux.img]错误2
 make[1]: 离开目录&quot;/home/player/harmony/out/kernel/OBJ/linux-5.10&quot;
 make: *** [Makefile:192:__sub-make]错误 2</code></pre>
             <p>可以看到，报错的关键点在于<code>FAILED: load BTF from vmlinux: Unknown error -22</code>这里。查看 Makefile 对应报错位置：</p>
-            <pre><code>vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
+            <pre><code class="language-makefile">vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
     +$(call if_changed,link-vmlinux)
 
 targets := vmlinux</code></pre>
@@ -362,7 +362,7 @@ targets := vmlinux</code></pre>
                 时候推荐的最大虚拟机内存)是能编译完成的，编译时长 6h。最终解决。</p>
             <h1 id="ohos-的-ndk">ohos 的 NDK</h1>
             <p>NDK 编译方式比较简单，在源码根目录下执行如下命令：</p>
-            <pre><code># 安装依赖
+            <pre><code class="language-bash"># 安装依赖
 ./build/build_scripts/env_setup.sh
 
 # 执行完上述命令后记得执行source ~/.bashrc或者重启终端
@@ -377,7 +377,7 @@ sudo apt-get install libxcursor-dev libxrandr-dev libxinerama-dev
             <p>注意，NDK 包提供的交叉编译工具是 cmake 和 ninja，编译器是 clang 和 clang++，并没有我们熟悉的 gcc/g++和 make。除此之外，NDK
                 还未我们提供编译所需的全套服务，如编译工具链配置文件<code>ohos.toolchain.cmake</code>、头文件、库文件等。快说，谢谢 ohos~</p>
             <p>为了更方便地使用 NDK，鄙人不才，写了两个脚本，分别用于 cmake 编译和单文件编译：</p>
-            <pre><code>#!/bin/bash
+            <pre><code class="language-bash">#!/bin/bash
 
 #######################################################################
 # File Name    : compile.sh
@@ -418,7 +418,7 @@ cmake -B build -D OHOS_STL=c++_$link -D OHOS_ARCH=$arch \
     -D OHOS_PLATFORM=OHOS \ 
     -D CMAKE_TOOLCHAIN_FILE=$(find $native_path -name ohos.toolchain.cmake)
 cmake --build build</code></pre>
-            <pre><code>#!/bin/bash
+            <pre><code class="language-bash">#!/bin/bash
 
 #######################################################################
 # File Name    : compile-tiny.sh
@@ -492,7 +492,7 @@ $compiler -o $targetFile $file -Wall \
             </ul>
             <p>不说了，抓紧攒点钱开学升级电脑配置要紧……磁盘快炸了……</p>
             <p class="time">2024.2.12，甲辰年正月初三<br>2024.4.24改<br>2024.11.19改</p>
-            <script src="https://test.qin-juan-ge-zhu.top/common/js/comment.js"></script>
+            <script src="https://www.qin-juan-ge-zhu.top/common/js/comment.js"></script>
         </div>
     </div>
 </body>

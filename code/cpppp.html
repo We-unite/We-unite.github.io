@@ -7,23 +7,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <title>cpppp快速基础</title>
     <link rel="stylesheet" href="https://www.qin-juan-ge-zhu.top/common/CSS/pandoc.css">
-    <script type="text/javascript" src="https://hl.qin-juan-ge-zhu.top/myset/myhighlight.js"></script>
     <script type="text/javascript" src="https://www.qin-juan-ge-zhu.top/common/script4code.js"></script>
 </head>
 
 <body>
     <div class="pandoc">
         <div class="main">
-            <p class="title">C++ Primer Plus快速基础</p>
+            <header id="title-block-header">
+                <p class="title">C++ Primer Plus<br>快速基础</p>
+            </header>
             <h1 id="第二章">第二章</h1>
             <ul>
-                <li>在 C++中，<span
-                        class="math inline"><em>m</em><em>a</em><em>i</em><em>n</em></span>函数括号中使用<code>void</code>关键字表明拒绝任何参数，而空括号表示对是否接受参数保持沉默。
-                </li>
+                <li>在 C++中，<code>main</code>函数括号中使用<code>void</code>关键字表明拒绝任何参数，而空括号表示对是否接受参数保持沉默。</li>
                 <li>连续赋值将从右向左进行。</li>
                 <li>输出拼接长字符串可以如下书写：</li>
             </ul>
-            <pre><code>    //当代码很长而追求风格的时候，这样操作。
+            <pre><code class="language-cpp">    //当代码很长而追求风格的时候，这样操作。
 cout &lt;&lt; &quot;1234567&quot;
      &lt;&lt; &quot;7654321&quot;
      &lt;&lt; endl;</code></pre>
@@ -34,7 +33,7 @@ cout &lt;&lt; &quot;1234567&quot;
             <ul>
                 <li>数据输入/常数可以以十进制、十六进制、二进制书写。</li>
             </ul>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 
 int main()
@@ -46,7 +45,7 @@ int main()
             <ul>
                 <li><code>cout</code>提供控制符以八进制、十进制与十六进制显示整数。</li>
             </ul>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 int main()
 {
@@ -94,7 +93,7 @@ int main()
                 </li>
                 <li><kbd>get</kbd>与<kbd>getline</kbd>，二者使用方式基本相同，只是前者继承 cin 的特性，不会读取换行符后再从字符串中删除，而是把换行符留在输入队列中。</li>
             </ul>
-            <pre><code>/*在没有任何参数的情况下
+            <pre><code class="language-cpp">/*在没有任何参数的情况下
  *cin.get()会读取下一个字符，即使是换行符
  *因此可用以清空*/
 cin.get(name , ArSize);// read first line
@@ -122,7 +121,7 @@ cin.get(dessert. Arsize ) ;// read second line
                     </ul>
                 </li>
             </ul>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 
 struct student
@@ -160,7 +159,7 @@ int main()
             </blockquote>
             <h2 id="共用体">共用体</h2>
             <p>举例：一个小商品目录，一些商品 id 为字符串，另一些为数字：</p>
-            <pre><code>union id
+            <pre><code class="language-cpp">union id
 {
     long id_num;
     char id_str[32];
@@ -172,7 +171,7 @@ struct good
     id id_val;
 };</code></pre>
             <p>同时，有匿名共用体：</p>
-            <pre><code>
+            <pre><code class="language-cpp">
 struct good
 {
     char brand[20];
@@ -237,7 +236,7 @@ struct good
                     </ul>
                 </li>
             </ul>
-            <pre><code>#include &lt;array&gt;
+            <pre><code class="language-cpp">#include &lt;array&gt;
 using namespace std;
 
 int main()
@@ -261,7 +260,7 @@ int main()
                 <li>写在前边，则变量先加/减，再使用</li>
                 <li>避免使用不完整的表达式</li>
             </ul>
-            <pre><code>    //完整的表达式
+            <pre><code class="language-cpp">    //完整的表达式
     i=0
     while(i++&lt;10)
     {
@@ -289,7 +288,7 @@ int main()
             <h3 id="指针与递增递减">指针与递增递减</h3>
             <p>递增递减作用不赘。</p>
             <p>前缀递增递减与解引用运算优先级相同，因而从内向外解释：</p>
-            <pre><code>    int a[2]={1,2},*pt=a;
+            <pre><code class="language-cpp">    int a[2]={1,2},*pt=a;
     cout&lt;&lt;*++pt&lt;&lt;*(++pt)&lt;&lt;endl;
     //输出结果，二者相等，即*++pt先执行递增，而后经过顺序点，再解引用，实际为a[1]=2</code></pre>
             <p>后缀递增递减优先级高于解引用，因而*pt++结果与上亦同。</p>
@@ -298,7 +297,7 @@ int main()
             <blockquote>
                 <p>普通赋值运算式的值为右值。</p>
             </blockquote>
-            <pre><code>#include&lt;iostream&gt;
+            <pre><code class="language-cpp">#include&lt;iostream&gt;
 using namespace std;
 int main()
 {
@@ -311,7 +310,7 @@ int main()
 }</code></pre>
             <h2 id="循环">循环</h2>
             <p><kbd>for</kbd>循环与<kbd>while</kbd>循环的本质是相同的：</p>
-            <pre><code>for(init-expression; test-expression; update-expression)
+            <pre><code class="language-cpp">for(init-expression; test-expression; update-expression)
 {
     statements
 }
@@ -404,7 +403,7 @@ while (test-expression)
             <h2 id="字符函数库">字符函数库</h2>
             <p>cctype(C 语言中的 ctype.h)可以用来确定字符是否为大/小写字母、数字、标点等。其优点在于更简单、更通用（字母、数字之类在不同的编码方式之下不一定都像 ASCII
                 中一样的连续分布）。包含的函数如下：</p>
-            <pre><code>namespace std {
+            <pre><code class="language-cpp">namespace std {
     int isalnum(int c);
     int isalpha(int c);
     int isblank(int c);
@@ -425,7 +424,7 @@ while (test-expression)
             <ul>
                 <li>函数原型：说明函数名、形参类型/名称、返回值类型
                     <ul>
-                        <li>其实就是<span class="math inline"><em>m</em><em>a</em><em>i</em><em>n</em>()</span>之前的函数声明</li>
+                        <li>其实就是<code>main()</code>之前的函数声明</li>
                         <li>函数原型中的函数特征标（参数列表）可以省略标识符（形参名称）而只是指出其类型</li>
                     </ul>
                 </li>
@@ -437,7 +436,7 @@ while (test-expression)
                 <li>函数定义：函数的本体实现</li>
             </ul>
             <h2 id="函数与数组">函数与数组</h2>
-            <pre><code>//函数定义
+            <pre><code class="language-cpp">//函数定义
 int sum_arr(int arr[], int n);//对数组中元素求和
 
 //函数调用
@@ -447,7 +446,7 @@ int sum=sum_arr(a,10);</code></pre>
             <p><strong>原因：</strong>C++与 C
                 一样，将数组名视为指针，指向第一个元素地址，对应元素大小为单个元素大小，详前。(相比之下，<kbd>&amp;a</kbd>虽然也是指向首地址，但大小是整块数组的大小。)因而第一个形参实际是<kbd>int*
                     arr</kbd>，即定义应当为：</p>
-            <pre><code>int sum_arr(int* arr, int n);</code></pre>
+            <pre><code class="language-cpp">int sum_arr(int* arr, int n);</code></pre>
             <p>这证明两种形参声明同时正确。<strong>在 C++中，<kbd>int* arr</kbd>与<kbd>int
                         arr[]</kbd>当且仅当出现在函数头或函数原型的时候，含义才相同</strong>。它们都意味着 arr 是一个<kbd>int*</kbd>。</p>
             <h2 id="使用数组区间的函数">使用数组区间的函数</h2>
@@ -457,7 +456,7 @@ int sum=sum_arr(a,10);</code></pre>
             <h2 id="指针与-const">指针与 const</h2>
             <h3 id="将-const-用于指针">将 const 用于指针</h3>
             <ul>
-                <li>指针指向<span class="math inline"><em>c</em><em>o</em><em>n</em><em>s</em><em>t</em></span>常量，防止修改</li>
+                <li>指针指向<code>const</code>常量，防止修改</li>
                 <li>传参将指针本身声明为常量，防止修改指针指向的位置，但可以修改内容</li>
             </ul>
             <p>优点：</p>
@@ -465,7 +464,7 @@ int sum=sum_arr(a,10);</code></pre>
                 <li>避免无意见修改数据导致错误</li>
                 <li><kbd>const</kbd>可使函数能处理 const 与非 const 实参，否则只能接收后者。</li>
             </ul>
-            <pre><code>//只能防止修改pt指向的值，但pt本身可以改成新地址
+            <pre><code class="language-cpp">//只能防止修改pt指向的值，但pt本身可以改成新地址
 int age=39;
 const int* pt=&amp;age;
 int sage=80;
@@ -478,7 +477,7 @@ int* const finger=&amp;sloth;//指向int的const指针
 //前者如上例，不能修改内容，但能重新指向
 //后者则不能重新指向，但可以修改内容</code></pre>
             <h2 id="二维数组作参数">二维数组作参数</h2>
-            <pre><code>int sum(int (*arr)[4], int size);
+            <pre><code class="language-cpp">int sum(int (*arr)[4], int size);
 //等价于以下
 int aum(int arr[][4], int size);
 
@@ -513,7 +512,7 @@ int sum(int *arr[4], int size);</code></pre>
                 <li>使用函数指针来调用函数</li>
             </ul>
             <p>例程如下：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 using namespace std;
 
@@ -549,7 +548,7 @@ int main()
             <p>我又要骂人了，这什么东西，类型声明这么复杂？不用了不用了，享受不来。</p>
             <p>没事，C++11 还有个特性叫<kbd>auto</kbd>，不是么？</p>
             <p>上边的例程可以被改写成如下形式：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 using namespace std;
 
@@ -568,7 +567,7 @@ int main()
 }</code></pre>
             <p><del>这自动推断类型，多是一件美逝了！</del>让我们一起说，<strong>谢谢<kbd>auto</kbd>！</strong></p>
             <p>另外，如果有若干函数返回类型和特征标都相同，都需要调用的话，何不考虑一下函数指针数组呢？更进一步地，为什么不选择创建一个指向整个函数指针数组的指针呢？</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 
 // 没错，函数原型可以不写形参名称的
@@ -630,7 +629,7 @@ const double *f3(int i)
             </ul>
             <p>程序员做出内联请求时，编译器不一定同意（p.s.到底是我写代码还是编译器写代码？气抖冷！），它可能认为函数过大或者注意到有递归（众所周知，内敛这个形式不能递归的），或者有些编译器没有启用或实现内联这一功能。
             </p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 
 // 这是一个内联函数
@@ -662,7 +661,7 @@ int main()
             <p>输出表明，内联函数与普通函数一样，按值传递参数，参数为表达式则传递表达式的值。</p>
             <p>C 语言中也可以像这样，不写函数原型，直接以函数定义充当函数原型。</p>
             <h2 id="内联的原始实现c-中的define">内联的原始实现：C 中的<kbd>#define</kbd></h2>
-            <pre><code>#include &lt;stdio.h&gt;
+            <pre><code class="language-c">#include &lt;stdio.h&gt;
 #define square(x) x*x
 
 int main()
@@ -674,14 +673,14 @@ int main()
     printf(&quot;a = %lf\nb = %lf\nd = %lf\n&quot;, a, b, d);
     return 0;
 }</code></pre>
-            <p>这并不是通过传递参数实现，而是通过文本替换实现的——<span class="math inline"><em>x</em></span>是“参数”的符号标记。</p>
-            <p>上例只有<span class="math inline"><em>a</em></span>输出正确，可以用括号进行改进：</p>
-            <pre><code>#define square(x) ((x) * (x))</code></pre>
+            <p>这并不是通过传递参数实现，而是通过文本替换实现的——<code>x</code>是“参数”的符号标记。</p>
+            <p>上例只有<code>a</code>输出正确，可以用括号进行改进：</p>
+            <pre><code class="language-c">#define square(x) ((x) * (x))</code></pre>
             <p>即使如此，后两者依然输出错误，即无法实现按值传递。所以，使用内联函数应当尽可能考虑使用 C++的内联，而不是 C 的宏。</p>
             <h2 id="引用变量">引用变量</h2>
             <h3 id="引用变量是什么能吃吗">引用变量是什么？能吃吗？</h3>
             <p>引用变量是已定义变量的一个别名。话不多说，上例程。</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 int main()
 {
@@ -710,7 +709,7 @@ Addr n is 0x7ffce76ff48c</code></pre>
                 一份送到调用函数里使，即使做出了更改也不会直接影响原函数里的值，除非用返回值将其返回。有时候一个函数本来有自己需要返回的东西，又想把这个量修改了，就不好办了（用<kbd>pair</kbd>或者结构体，多少有点麻烦，还要为此创建一个类型）。这时候就可以考虑引用变量。
             </p>
             <h3 id="c-风格字符串作-string-对象引用参数">C-风格字符串作 string 对象引用参数</h3>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 using namespace std;
 
 const string &amp;fuck(string &amp;s1, const string &amp;s2)
@@ -763,7 +762,7 @@ int main()
             </ul>
             <h3 id="默认参数">默认参数</h3>
             <p>默认参数指函数调用中省略实参时自动使用的实参值。</p>
-            <pre><code>// 一个使用默认参数的例子
+            <pre><code class="language-cpp">// 一个使用默认参数的例子
 #include &lt;iostream&gt;
 using namespace std;
 int add(int a, int b = 1, int c = 2)
@@ -780,7 +779,7 @@ int main()
             <p><strong>对于带参数列表（有形参）的函数，必须从右向左添加默认值，即所有有默认值的形参必须在所有无默认值形参的右边。使用时，传递的实参被从左到右依次赋给形参，而不得跳过任何形参。</strong></p>
             <h3 id="函数重载">函数重载</h3>
             <p>函数重载指可以有多个同名函数，它们<strong>以参数列表（形参，不包括返回值类型）为区别</strong>。C++使用上下文来确定要使用的重载函数版本。</p>
-            <pre><code>//一个函数重载示例程序
+            <pre><code class="language-cpp">//一个函数重载示例程序
 #include &lt;iostream&gt;
 using namespace std;
 
@@ -810,7 +809,7 @@ int main()
             <blockquote>
                 <p>少扯淡，一个代码就明白了</p>
             </blockquote>
-            <pre><code>//一个使用函数模板的历次
+            <pre><code class="language-cpp">//一个使用函数模板的历次
 #include &lt;iostream&gt;
 using namespace std;
 
@@ -840,7 +839,7 @@ int main()
             <p>常见用法为<strong>将模板放在头文件中，在需要使用的地方包含头文件</strong>。</p>
             <h3 id="模板重载">模板重载</h3>
             <p>模板满足了对不同类型使用同一种算法函数的需求，但并非所有类型都是用完全相同的算法。为满足此种需求，可以像重载常规函数一样重载模板定义，仍然需要满足参数列表不同便是了。</p>
-            <pre><code>template&lt;class T&gt;//一个模板
+            <pre><code class="language-cpp">template&lt;class T&gt;//一个模板
 void swap(T &amp;a,T &amp;b);
 
 template&lt;class T&gt;//另一个模板
@@ -909,7 +908,7 @@ void swap(T* a,T* b,int n);</code></pre>
                     </tbody>
                 </table>
             </blockquote>
-            <pre><code>//调用函数
+            <pre><code class="language-cpp">//调用函数
 may(&#39;B&#39;);
 
 //所有同名
@@ -941,7 +940,7 @@ void may(T *);               // 7</code></pre>
             <h2 id="头文件">头文件</h2>
             <p>C++文件操作头文件 fstream，也就是“文件流”。</p>
             <h2 id="对象声明">对象声明</h2>
-            <pre><code>ofstream ofs;//执行写操作
+            <pre><code class="language-cpp">ofstream ofs;//执行写操作
 ifstream ifs;//执行读操作
 fstream file;//读写都可以</code></pre>
             <h2 id="文件打开关闭">文件打开、关闭</h2>
@@ -997,7 +996,7 @@ fstream file;//读写都可以</code></pre>
             <h2 id="文本文件">文本文件</h2>
             <h3 id="读取">读取</h3>
             <p>五种方法。例程如下：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;fstream&gt;
 using namespace std;
@@ -1043,7 +1042,7 @@ int main()
 }</code></pre>
             <h3 id="文件写入">文件写入</h3>
             <p>格式如下： <code>对象名 &lt;&lt; 写入的内容;</code> 如需换行，在写入内容后加 endl 即可。例程如下：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;fstream&gt;
 using namespace std;
@@ -1071,7 +1070,7 @@ int main()
             <h3 id="读取-1">读取</h3>
             <p>利用流对象调用成员函数<code>read</code>。 函数原型：<code>istream&amp; read(char* buffer, int len)</code> 参数解释：字符指针 buffer
                 指向内存中一段存储空间。len 是读写的字节数。 例程如下：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;fstream&gt;
 using namespace std;
@@ -1092,7 +1091,7 @@ int main()
             <h3 id="写入">写入</h3>
             <p>使用流对象成员函数<code>write</code>。 函数原型：<code>ostream&amp; write(const char* buffer, int len)</code> 参数解释：字符指针
                 buffer 指向内存中一段存储空间。len 是读写的字节数。 例程如下：</p>
-            <pre><code>#include &lt;iostream&gt;
+            <pre><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;string&gt;
 #include &lt;fstream&gt;
 using namespace std;
