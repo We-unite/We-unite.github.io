@@ -1,13 +1,34 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const menudiv = document.createElement('div');
+    menudiv.className = 'side-menu';
+    
+    const menutitle = document.createElement('div');
+    menutitle.textContent = document.title;
+    menudiv.appendChild(menutitle);
+
+    // a button to open/close nav list
+    const toggleNavButton = document.createElement('button');
+    toggleNavButton.id = 'toggle-nav';
+    toggleNavButton.textContent = '关闭';
+    menudiv.appendChild(toggleNavButton);
+
+    // Add click event listener to the button
+    toggleNavButton.addEventListener('click', () => {
+        nav.style.display = nav.style.display === 'none' ? 'block' : 'none';
+        toggleNavButton.textContent = toggleNavButton.textContent === '关闭' ? '打开' : '关闭';
+    });
+
+    // nav list itself
     const nav = document.createElement('nav');
-    document.querySelector('.pandoc').insertBefore(nav, document.querySelector('.pandoc').firstChild);
+    menudiv.appendChild(nav);
+    document.querySelector('.pandoc').insertBefore(menudiv, document.querySelector('.pandoc').firstChild);
     const topLevelList = document.createElement('ul');
     nav.appendChild(topLevelList);
 
     let currentLevel = topLevelList;
     let lastLevel = 1;
 
+    const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
     headings.forEach(heading => {
         const listItem = document.createElement('li');
         const anchor = document.createElement('a');
@@ -31,9 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
         lastLevel = level;
     });
 
-    // document.body.insertBefore(nav, document.body.firstChild);
-
-    // Add functionality for expanding/collapsing
+    // Add functionality for expanding/collapsing menu list
     const navLinks = document.querySelectorAll('nav ul li');
     navLinks.forEach(link => {
         const sublist = link.querySelector('ul');

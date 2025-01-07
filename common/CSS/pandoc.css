@@ -549,17 +549,6 @@ a:hover {
     content: '-';
 }
 
-nav {
-    position: sticky;
-    top: 100px;
-    margin-top: 150px;
-    display: inline-block;
-    /* order: 1; */
-    float: left;
-    box-sizing: border-box;
-    max-width: 15%;
-}
-
 body {
     display: flex;
     flex-direction: column;
@@ -573,4 +562,37 @@ body {
     margin: 0 auto;
     box-sizing: border-box;
     max-width: 40em;
+}
+
+/* my set */
+
+/* 侧边栏 */
+.side-menu {
+    position: sticky;
+    float: left;
+    /* 上边没有东西时，距离顶部100px
+     * 有东西时，维持100px距离
+     */
+    top: 100px;
+    margin-top: 100px;
+    /* border-box使元素的内边距和边框不会撑大元素的尺寸 */
+    box-sizing: border-box;
+
+    /* 自身尺寸 */
+    width: 300px;
+    max-height: 600px;
+    overflow-y: auto;
+
+    /* 颜色与内部设置 */
+    background-color: #f0f0f0;
+    border: 1px solid #daa520;
+    padding-top: 30px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+}
+
+#toggle-nav {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
